@@ -3,100 +3,101 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jewellery Admin Panel</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f2eb;
-      color: #33251c;
-    }
-    header {
-      background: #5b3825;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    main {
-      max-width: 700px;
-      margin: 25px auto;
-      padding: 20px;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px #0001;
-    }
-    input, button {
-      box-sizing: border-box;
-      width: 100%;
-      padding: 12px;
-      margin: 7px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    button {
-      background: #8b5e3c;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    #products { padding-left: 20px; }
-    .note { color: #805b42; font-size: 14px; }
+    body{font-family:Arial;background:#f7f2eb;color:#33251c;margin:0}
+    header{background:#5b3825;color:white;text-align:center;padding:20px}
+    main{max-width:700px;margin:25px auto;padding:16px}
+    section{background:white;padding:20px;margin-bottom:20px;border-radius:12px}
+    input,button{box-sizing:border-box;width:100%;padding:12px;margin:7px 0;font-size:16px}
+    button{background:#8b5e3c;color:white;border:0;border-radius:6px}
+    li{margin:12px 0;overflow-wrap:anywhere}
+    img{max-width:100px;display:block;margin-top:6px}
+    #status{overflow-wrap:anywhere}
   </style>
 </head>
 <body>
-  <header>
-    <h1>Jewellery Store</h1>
-    <p>Admin Panel</p>
-  </header>
-
+  <header><h1>Jewellery Store</h1><p>Admin Panel Demo</p></header>
   <main>
-    <section class="card">
+    <section>
       <h2>Add Product</h2>
-      <form id="productForm">
+      <form id="form">
         <input id="name" placeholder="Product name" required>
-        <input id="price" type="number" min="0" placeholder="Price in ₹" required>
-        <input id="image" type="url" placeholder="Product image URL" required>
+        <input id="price" type="number" min="0" step="0.01" placeholder="Price in ₹" required>
+        <input id="image" type="url" placeholder="Image URL (https://...)" required>
         <button type="submit">Add Product</button>
       </form>
-      <p class="note">यह शुरुआती demo है। Products अभी इसी browser में सेव होंगे।</p>
+      <p id="status" role="status"></p>
     </section>
-
-    <section class="card">
-      <h2>Product List</h2>
+    <section>
+      <h2>Products</h2>
       <ul id="products"></ul>
     </section>
   </main>
-
   <script>
-    const form = document.getElementById("productForm");
+    const form = document.getElementById("form");
     const list = document.getElementById("products");
-    let products = [];
+    const statusText = document.getElementById("status");
 
-    function showProducts() {
-      list.replaceChildren();
-      products.forEach(product => {
-        const item = document.createElement("li");
-        item.textContent = `${product.name} — ₹${product.price}`;
-        list.appendChild(item);
-      });
+    async function loadProducts() {
+      try {
+        const response = await fetch("/api/products");
+        if (!response.ok) throw new Error("Could not load products");
+        const products = await response.json();
+        list.replaceChildren();
+
+        products.forEach(product => {
+          const item = document.createElement("li");
+          item.append(document.createTextNode(
+            product.name + " — ₹" + product.price
+          ));
+
+          if (product.image) {
+            const img = document.createElement("img");
+            img.src = product.image;
+            img.alt = product.name;
+            img.onerror = () => img.remove();
+            item.appendChild(img);
+          }
+          list.appendChild(item);
+        });
+
+        if (products.length === 0) {
+          list.textContent = "No products yet.";
+        }
+      } catch (error) {
+        statusText.textContent = "Products load nahi hue. Server check karein.";
+      }
     }
 
-    form.addEventListener("submit", function(event) {
+    form.addEventListener("submit", async event => {
       event.preventDefault();
-      products.push({
-        name: document.getElementById("name").value.trim(),
-        price: document.getElementById("price").value,
-        image: document.getElementById("image").value.trim()
-      });
-      showProducts();
-      form.reset();
+      statusText.textContent = "Saving product...";
+
+      try {
+        const response = await fetch("/api/products", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            name: document.getElementById("name").value.trim(),
+            price: document.getElementById("price").value,
+            image: document.getElementById("image").value.trim()
+          })
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Save failed");
+
+        form.reset();
+        statusText.textContent = "Product added successfully!";
+        await loadProducts();
+      } catch (error) {
+        statusText.textContent = "Product add nahi hua. Server check karein.";
+      }
     });
+
+    loadProducts();
   </script>
 </body>
 </html>
