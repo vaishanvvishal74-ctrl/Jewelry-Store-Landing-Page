@@ -1,574 +1,618 @@
 
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#8e44ad">
-<title>Jewellery Store Admin</title>
-<style>
-:root{
-  --primary:#8e44ad;
-  --secondary:#d63384;
-  --bg:#f7f3fa;
-  --card:#fff;
-  --text:#292235;
-  --muted:#756b7c;
-  --border:#eadff0;
-  --green:#168653;
-  --red:#c0392b;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:system-ui,-apple-system,sans-serif
-}
-button,input,select{font:inherit}
-button{border:0;border-radius:9px;padding:11px 14px;
-background:var(--primary);color:white;font-weight:700;cursor:pointer}
-button:disabled{opacity:.6;cursor:wait}
-input,select{
-  width:100%;padding:11px;border:1px solid var(--border);
-  border-radius:9px;background:white;color:var(--text)
-}
-label{display:block;font-weight:700;font-size:13px;margin:12px 0 6px}
-.hidden{display:none!important}
-.muted{font-size:13px;color:var(--muted)}
-header{
-  background:linear-gradient(120deg,#8e44ad,#d63384);
-  color:white;padding:16px;position:sticky;top:0;z-index:5
-}
-.header-inner{
-  max-width:1200px;margin:auto;display:flex;
-  align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap
-}
-header .muted{color:#f5eafa}
-main{max-width:1200px;margin:auto;padding:18px 12px 40px}
-.panel,.stat,.login-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:15px;padding:16px;margin-bottom:16px
-}
-.login-wrap{min-height:100vh;display:grid;place-items:center;padding:16px}
-.login-card{width:100%;max-width:420px;padding:25px}
-.login-card h1{color:var(--primary)}
-.full{width:100%;margin-top:16px}
-.secondary{background:#f0e5f7;color:#6e3289}
-.danger{background:#ffeded;color:var(--red)}
-.success{background:#e4f7ec;color:var(--green)}
-.actions{display:flex;gap:7px;flex-wrap:wrap}
-.actions button{font-size:12px;padding:9px}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.stat strong{display:block;font-size:25px;margin-top:8px;color:var(--primary)}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.tab{background:white;color:var(--text);border:1px solid var(--border)}
-.tab.active{background:var(--primary);color:white}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
-.toolbar>*{flex:1;min-width:140px}
-.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
-table{width:100%;border-collapse:collapse;min-width:650px}
-th,td{text-align:left;padding:11px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top}
-th{background:#f8effb}
-.badge{display:inline-block;padding:5px 8px;border-radius:20px;background:#f0e5f7;font-size:11px;font-weight:700}
-.notice{padding:12px;border-radius:9px;margin:10px 0;overflow-wrap:anywhere;background:#f0e5f7}
-.notice.error{background:#ffeded;color:#a32626}
-.notice.success{background:#e4f7ec;color:#17663b}
-.detail{border:1px solid var(--border);border-radius:10px;padding:13px;margin:12px 0;overflow-wrap:anywhere}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
-.span2{grid-column:1/-1}
-.product-img{width:44px;height:44px;object-fit:cover;border-radius:7px;vertical-align:middle;margin-right:8px}
-footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
-@media(max-width:650px){
- .stats{grid-template-columns:1fr}
- .grid{grid-template-columns:1fr}
- .span2{grid-column:auto}
- .panel{padding:12px}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jewellery Store - Admin Panel</title>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f5f9;
+      color: #222;
+    }
+    header {
+      background: #211a2b;
+      color: white;
+      padding: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    header h1 { margin: 0; font-size: 21px; }
+    main { max-width: 1100px; margin: 20px auto; padding: 12px; }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 10px #0000000d;
+    }
+    h2 { margin-top: 0; font-size: 20px; }
+    input, textarea, select, button {
+      width: 100%;
+      padding: 11px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 7px;
+      font: inherit;
+    }
+    button {
+      border: 0;
+      cursor: pointer;
+      background: #6c3f8c;
+      color: white;
+      font-weight: bold;
+    }
+    button:disabled { opacity: .6; cursor: wait; }
+    .secondary { background: #555; }
+    .danger { background: #bd3030; }
+    .success { background: #227747; }
+    .hidden { display: none !important; }
+    .message { padding: 10px; border-radius: 7px; margin: 10px 0; }
+    .error { background: #ffe8e8; color: #9d1515; }
+    .ok { background: #e4f7e9; color: #145d2c; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+    }
+    .item {
+      border: 1px solid #e2e2e2;
+      border-radius: 9px;
+      padding: 13px;
+      overflow-wrap: anywhere;
+    }
+    .item img {
+      width: 100%;
+      height: 150px;
+      object-fit: contain;
+      background: #f7f7f7;
+      border-radius: 6px;
+    }
+    .item button { width: auto; margin-right: 5px; padding: 9px 12px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .actions button { flex: 1; min-width: 110px; }
+    .muted { color: #666; font-size: 14px; }
+    .order-details { white-space: pre-wrap; overflow-wrap: anywhere; }
+    #status { overflow-wrap: anywhere; }
+    @media (max-width: 500px) {
+      header h1 { font-size: 18px; }
+      .card { padding: 14px; }
+    }
+  </style>
 </head>
+
 <body>
+  <header>
+    <h1>Jewellery Store Admin</h1>
+    <button id="logoutBtn" class="danger hidden"
+      style="width:auto;margin:0">Logout</button>
+  </header>
 
-<section id="loginView" class="login-wrap">
-  <form id="loginForm" class="login-card">
-    <h1>💎 Store Admin</h1>
-    <p class="muted">अपने Jewellery Store को सुरक्षित तरीके से मैनेज करें।</p>
-    <label for="password">Admin Password</label>
-    <input id="password" type="password" required autocomplete="current-password">
-    <button id="loginBtn" class="full" type="submit">Login</button>
-    <div id="loginMessage" aria-live="polite"></div>
-  </form>
-</section>
+  <main>
+    <div id="status" aria-live="polite"></div>
 
-<div id="adminView" class="hidden">
-<header>
-  <div class="header-inner">
-    <div><strong>💎 JEWELLERY ADMIN</strong><div class="muted">Products · Orders · Payments</div></div>
-    <div class="actions">
-      <button id="refreshBtn" class="secondary">Refresh</button>
-      <button id="logoutBtn" class="danger">Logout</button>
-    </div>
-  </div>
-</header>
+    <!-- LOGIN -->
+    <section id="loginSection" class="card">
+      <h2>Admin Login</h2>
+      <p class="muted">Enter your administrator password.</p>
 
-<main>
-  <div id="globalMessage" aria-live="polite"></div>
+      <form id="loginForm">
+        <label for="password">Admin Password</label>
+        <input id="password" type="password"
+          placeholder="Enter admin password"
+          autocomplete="current-password" required>
+        <button id="loginBtn" type="submit">Login</button>
+      </form>
+    </section>
 
-  <div class="stats">
-    <div class="stat">Total Products<strong id="productCount">0</strong></div>
-    <div class="stat">Total Orders<strong id="orderCount">0</strong></div>
-    <div class="stat">Pending Orders<strong id="pendingCount">0</strong></div>
-  </div>
-
-  <nav class="tabs">
-    <button class="tab active" data-tab="orders">📦 Orders</button>
-    <button class="tab" data-tab="products">💍 Products</button>
-  </nav>
-
-  <section id="ordersSection">
-    <div class="panel">
-      <h2>Customer Orders</h2>
-      <div class="toolbar">
-        <input id="orderSearch" placeholder="Order ID, customer या phone खोजें">
-        <select id="orderFilter">
-          <option value="">सभी Status</option>
-          <option value="pending">Pending</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="processing">Processing</option>
-          <option value="shipped">Shipped</option>
-          <option value="delivered">Delivered</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="rejected">Rejected</option>
-        </select>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
-          <tbody id="ordersBody"><tr><td colspan="6">Login के बाद Orders दिखेंगे।</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div id="orderPanel" class="panel hidden">
-      <div class="header-inner">
-        <h2 id="orderTitle">Order Details</h2>
-        <button class="secondary" id="closeOrder">Close</button>
-      </div>
-      <div id="orderDetails"></div>
-    </div>
-  </section>
-
-  <section id="productsSection" class="hidden">
-    <div class="panel">
-      <div class="header-inner">
-        <h2>Manage Products</h2>
-        <button id="addProductBtn">+ Add Product</button>
+    <!-- ADMIN DASHBOARD -->
+    <section id="dashboard" class="hidden">
+      <div class="card">
+        <h2>Dashboard</h2>
+        <div class="actions">
+          <button id="loadProductsBtn">Refresh Products</button>
+          <button id="loadOrdersBtn" class="secondary">Refresh Orders</button>
+        </div>
       </div>
 
-      <div id="productFormWrap" class="detail hidden">
-        <h3 id="productFormTitle">Add Product</h3>
+      <!-- PRODUCTS -->
+      <div class="card">
+        <h2 id="productFormTitle">Add Product</h2>
+
         <form id="productForm">
-          <label for="productName">Product Name</label>
-          <input id="productName" maxlength="200" required>
+          <input id="productId" type="hidden">
 
-          <div class="grid">
-            <div>
-              <label for="productPrice">Price (₹)</label>
-              <input id="productPrice" type="number" min="0" max="100000000" step="0.01" required>
-            </div>
-            <div>
-              <label for="productImage">HTTPS Image URL</label>
-              <input id="productImage" type="url" placeholder="https://..." required>
-            </div>
+          <label for="productName">Product Name</label>
+          <input id="productName" maxlength="200"
+            placeholder="Gold Necklace" required>
+
+          <label for="productPrice">Price (₹)</label>
+          <input id="productPrice" type="number"
+            min="0" step="0.01" placeholder="2500" required>
+
+          <label for="productImage">Image URL</label>
+          <input id="productImage" type="url"
+            placeholder="https://example.com/image.jpg">
+
+          <div class="actions">
+            <button id="saveProductBtn" type="submit">Save Product</button>
+            <button id="cancelEditBtn" class="secondary hidden"
+              type="button">Cancel Edit</button>
           </div>
-          <div class="actions" style="margin-top:14px">
-            <button id="saveProductBtn">Save Product</button>
-            <button type="button" id="cancelProductBtn" class="secondary">Cancel</button>
-          </div>
-          <div id="productMessage"></div>
         </form>
       </div>
 
-      <input id="productSearch" placeholder="Product खोजें" style="margin:12px 0">
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Product</th><th>Price</th><th>ID</th><th>Actions</th></tr></thead>
-          <tbody id="productsBody"><tr><td colspan="4">Products लोड हो रहे हैं...</td></tr></tbody>
-        </table>
+      <div class="card">
+        <h2>Products</h2>
+        <div id="productsList" class="grid">
+          <p>Products have not been loaded yet.</p>
+        </div>
       </div>
-    </div>
-  </section>
-</main>
-<footer>Jewellery Store Admin Panel</footer>
-</div>
+
+      <!-- ORDERS -->
+      <div class="card">
+        <h2>Customer Orders</h2>
+        <div id="ordersList">
+          <p>Orders have not been loaded yet.</p>
+        </div>
+      </div>
+    </section>
+  </main>
 
 <script>
-"use strict";
+(() => {
+  "use strict";
 
-const API="/api";
-const TOKEN_KEY="jewelleryAdminToken";
-const STATUSES=["pending","confirmed","processing","shipped","delivered","cancelled","rejected"];
+  const API = "/api";
+  let adminToken = "";
+  let products = [];
 
-let products=[];
-let orders=[];
-let editingProductId=null;
-let selectedOrderId=null;
+  const $ = (id) => document.getElementById(id);
 
-const $=id=>document.getElementById(id);
-const token=()=>localStorage.getItem(TOKEN_KEY)||"";
-
-function esc(value){
-  return String(value??"").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[c]);
-}
-function money(value){
-  const n=Number(value);
-  return new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR"})
-    .format(Number.isFinite(n)?n:0);
-}
-function date(value){
-  const d=new Date(value);
-  return value&&!Number.isNaN(d.getTime())?d.toLocaleString("en-IN"):"—";
-}
-function message(id,text,type=""){
-  $(id).className=text?"notice "+type:"";
-  $(id).textContent=text;
-}
-function globalMessage(text,type=""){
-  message("globalMessage",text,type);
-}
-
-async function api(path,options={}){
-  const headers={...(options.headers||{})};
-  if(options.body!==undefined)headers["Content-Type"]="application/json";
-  if(token())headers.Authorization="Bearer "+token();
-
-  let response;
-  try{
-    response=await fetch(API+path,{...options,headers});
-  }catch{
-    throw Error("Server से कनेक्शन नहीं हो पाया। Render Logs चेक करें।");
+  function showMessage(message, isError = false) {
+    const el = $("status");
+    el.textContent = message;
+    el.className = "message " + (isError ? "error" : "ok");
+    el.classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  const raw=await response.text();
-  let data={};
-  try{data=raw?JSON.parse(raw):{}}
-  catch{data={error:raw||"Invalid server response"}}
-
-  if(response.status===401){
-    localStorage.removeItem(TOKEN_KEY);
-    showLogin();
-    throw Error(data.error||"Session समाप्त हुआ। फिर Login करें।");
+  function clearMessage() {
+    $("status").textContent = "";
+    $("status").className = "hidden";
   }
-  if(!response.ok)throw Error(data.error||data.message||"Request failed");
-  return data;
-}
 
-function showLogin(){
-  $("adminView").classList.add("hidden");
-  $("loginView").classList.remove("hidden");
-}
-function showAdmin(){
-  $("loginView").classList.add("hidden");
-  $("adminView").classList.remove("hidden");
-}
+  function setLoggedIn(value) {
+    $("loginSection").classList.toggle("hidden", value);
+    $("dashboard").classList.toggle("hidden", !value);
+    $("logoutBtn").classList.toggle("hidden", !value);
+  }
 
-$("loginForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  $("loginBtn").disabled=true;
-  message("loginMessage","Login हो रहा है...");
-  try{
-    const response=await fetch(API+"/admin/login",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({password:$("password").value})
+  async function apiRequest(path, options = {}) {
+    const headers = { ...(options.headers || {}) };
+
+    if (options.body && !headers["Content-Type"]) {
+      headers["Content-Type"] = "application/json";
+    }
+
+    if (adminToken) {
+      headers["Authorization"] = "Bearer " + adminToken;
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    try {
+      const response = await fetch(API + path, {
+        ...options,
+        headers,
+        signal: controller.signal
+      });
+
+      const raw = await response.text();
+      let data = {};
+
+      if (raw) {
+        try {
+          data = JSON.parse(raw);
+        } catch {
+          data = { message: raw };
+        }
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || data.message || ("Request failed: " + response.status)
+        );
+      }
+
+      return data;
+    } catch (error) {
+      if (error.name === "AbortError") {
+        throw new Error(
+          "Request timed out. Check your Render server and database."
+        );
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  function getArray(data, key) {
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data[key])) return data[key];
+    return [];
+  }
+
+  function formatPrice(value) {
+    const amount = Number(value || 0);
+    return "₹" + amount.toLocaleString("en-IN", {
+      maximumFractionDigits: 2
     });
-    const data=await response.json();
-    if(!response.ok)throw Error(data.error||"Login असफल हुआ");
-    if(!data.token)throw Error("Server से Login token नहीं मिला");
-
-    localStorage.setItem(TOKEN_KEY,data.token);
-    $("password").value="";
-    showAdmin();
-    await loadAll();
-    globalMessage("Login सफल हुआ","success");
-  }catch(error){
-    message("loginMessage",error.message,"error");
-  }finally{
-    $("loginBtn").disabled=false;
-  }
-});
-
-$("logoutBtn").addEventListener("click",async()=>{
-  try{await api("/admin/logout",{method:"POST"})}catch{}
-  localStorage.removeItem(TOKEN_KEY);
-  showLogin();
-  message("loginMessage","आप Logout हो गए हैं","success");
-});
-
-async function checkSession(){
-  if(!token()){showLogin();return}
-  try{
-    await api("/admin/check");
-    showAdmin();
-    await loadAll();
-  }catch(error){
-    showLogin();
-    message("loginMessage",error.message,"error");
-  }
-}
-
-async function loadAll(){
-  globalMessage("Data लोड हो रहा है...");
-  const results=await Promise.allSettled([loadProducts(),loadOrders()]);
-  const errors=results.filter(x=>x.status==="rejected");
-  if(errors.length){
-    globalMessage(errors.map(x=>x.reason.message).join(" | "),"error");
-  }else{
-    globalMessage("Data अपडेट हो गया","success");
-  }
-  updateStats();
-}
-$("refreshBtn").addEventListener("click",loadAll);
-
-async function loadProducts(){
-  const data=await api("/products");
-  if(!Array.isArray(data))throw Error("Products response सही नहीं है");
-  products=data;
-  renderProducts();
-  updateStats();
-}
-async function loadOrders(){
-  const data=await api("/orders");
-  if(!Array.isArray(data))throw Error("Orders response सही नहीं है");
-  orders=data;
-  renderOrders();
-  updateStats();
-
-  if(selectedOrderId!==null){
-    const order=orders.find(o=>String(o.id)===String(selectedOrderId));
-    if(order)renderOrderDetails(order);
-    else closeOrderPanel();
-  }
-}
-function updateStats(){
-  $("productCount").textContent=products.length;
-  $("orderCount").textContent=orders.length;
-  $("pendingCount").textContent=orders.filter(o=>o.status==="pending").length;
-}
-
-document.querySelectorAll("[data-tab]").forEach(button=>{
-  button.addEventListener("click",()=>{
-    document.querySelectorAll("[data-tab]").forEach(b=>
-      b.classList.toggle("active",b===button)
-    );
-    $("ordersSection").classList.toggle("hidden",button.dataset.tab!=="orders");
-    $("productsSection").classList.toggle("hidden",button.dataset.tab!=="products");
-  });
-});
-
-function renderOrders(){
-  const query=$("orderSearch").value.trim().toLowerCase();
-  const status=$("orderFilter").value;
-  const list=orders.filter(o=>{
-    const matches=[o.id,o.customer_name,o.customer_email,o.phone]
-      .some(v=>String(v??"").toLowerCase().includes(query));
-    return matches&&(!status||o.status===status);
-  });
-
-  if(!list.length){
-    $("ordersBody").innerHTML='<tr><td colspan="6">कोई Order नहीं मिला</td></tr>';
-    return;
   }
 
-  $("ordersBody").innerHTML=list.map(o=>`
-    <tr>
-      <td>#${esc(o.id)}</td>
-      <td>${esc(o.customer_name)}<br><small>${esc(o.phone)}</small></td>
-      <td>${money(o.total)}</td>
-      <td><span class="badge">${esc(o.status)}</span></td>
-      <td>${esc(date(o.created_at))}</td>
-      <td><button data-view-order="${esc(o.id)}">Details</button></td>
-    </tr>
-  `).join("");
-}
-$("orderSearch").addEventListener("input",renderOrders);
-$("orderFilter").addEventListener("change",renderOrders);
+  function makeText(tag, text, className) {
+    const el = document.createElement(tag);
+    el.textContent = text == null ? "" : String(text);
+    if (className) el.className = className;
+    return el;
+  }
 
-$("ordersBody").addEventListener("click",e=>{
-  const button=e.target.closest("[data-view-order]");
-  if(!button)return;
-  const order=orders.find(o=>String(o.id)===button.dataset.viewOrder);
-  if(order)renderOrderDetails(order);
-});
+  // LOGIN
+  $("loginForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    clearMessage();
 
-function renderOrderDetails(o){
-  selectedOrderId=o.id;
-  $("orderPanel").classList.remove("hidden");
-  $("orderTitle").textContent="Order #"+o.id;
+    const password = $("password").value;
+    const button = $("loginBtn");
+    button.disabled = true;
+    button.textContent = "Logging in...";
 
-  const items=Array.isArray(o.items)?o.items:[];
-  $("orderDetails").innerHTML=`
-    <div class="detail">
-      <strong>Customer Details</strong>
-      <p>Name: ${esc(o.customer_name)}</p>
-      <p>Email: ${esc(o.customer_email)}</p>
-      <p>Phone: ${esc(o.phone)}</p>
-      <p>Address: ${esc(o.address)}</p>
-      <p>Date: ${esc(date(o.created_at))}</p>
-    </div>
-
-    <div class="detail">
-      <strong>Order Items</strong>
-      ${items.map(i=>`<p>${esc(i.name)} × ${esc(i.quantity)} — ${money(i.line_total??Number(i.price)*Number(i.quantity))}</p>`).join("")}
-      <hr><strong>Total: ${money(o.total)}</strong>
-    </div>
-
-    <div class="detail">
-      <strong>Order Status</strong>
-      <p>Current: <span class="badge">${esc(o.status)}</span></p>
-      <label for="newStatus">Change Status</label>
-      <select id="newStatus">
-        ${STATUSES.map(s=>`<option value="${s}" ${s===o.status?"selected":""}>${s}</option>`).join("")}
-      </select>
-      <div class="actions" style="margin-top:10px">
-        <button data-save-status="${esc(o.id)}">Save Status</button>
-        <button class="success" data-quick-status="${esc(o.id)}" data-status="confirmed">Accept Order</button>
-        <button class="danger" data-quick-status="${esc(o.id)}" data-status="rejected">Reject Order</button>
-      </div>
-    </div>
-
-    <div class="detail">
-      <strong>Payment Details</strong>
-      <p>Method: ${esc(o.payment_method)}</p>
-      <p>Status: <span class="badge">${esc(o.payment_status)}</span></p>
-      <p>Reference: ${esc(o.payment_reference||"Not provided")}</p>
-      <p class="muted">Payment approve करने से पहले वास्तविक भुगतान की पुष्टि करें।</p>
-      <div class="actions">
-        <button class="success" data-payment="${esc(o.id)}" data-payment-status="approved">Approve Payment</button>
-        <button class="danger" data-payment="${esc(o.id)}" data-payment-status="rejected">Reject Payment</button>
-        <button class="secondary" data-payment="${esc(o.id)}" data-payment-status="pending">Set Pending</button>
-      </div>
-    </div>
-
-    <div class="detail">
-      <strong>Customer Feedback</strong>
-      <p>${esc(o.feedback||"अभी कोई Feedback नहीं")}</p>
-    </div>
-  `;
-  $("orderPanel").scrollIntoView({behavior:"smooth",block:"start"});
-}
-
-$("orderDetails").addEventListener("click",async e=>{
-  const quick=e.target.closest("[data-quick-status]");
-  const save=e.target.closest("[data-save-status]");
-  const pay=e.target.closest("[data-payment]");
-
-  try{
-    if(quick){
-      await api("/orders/"+encodeURIComponent(quick.dataset.quickStatus)+"/status",{
-        method:"PATCH",
-        body:JSON.stringify({status:quick.dataset.status})
+    try {
+      const data = await apiRequest("/admin/login", {
+        method: "POST",
+        body: JSON.stringify({ password })
       });
-      globalMessage("Order Status अपडेट हो गया","success");
-      await loadOrders();
-    }else if(save){
-      const status=$("newStatus").value;
-      await api("/orders/"+encodeURIComponent(save.dataset.saveStatus)+"/status",{
-        method:"PATCH",
-        body:JSON.stringify({status})
-      });
-      globalMessage("Order Status अपडेट हो गया","success");
-      await loadOrders();
-    }else if(pay){
-      const id=pay.dataset.payment;
-      const payment_status=pay.dataset.paymentStatus;
-      const reference=orders.find(o=>String(o.id)===id)?.payment_reference||"";
 
-      if(payment_status==="approved"&&
-        !confirm("क्या आपने वास्तविक भुगतान verify कर लिया है?"))return;
+      if (!data.token) {
+        throw new Error(
+          "Server did not return a login token. Check server.js."
+        );
+      }
 
-      await api("/orders/"+encodeURIComponent(id)+"/payment",{
-        method:"PATCH",
-        body:JSON.stringify({payment_status,payment_reference:reference})
-      });
-      globalMessage("Payment Status अपडेट हो गया","success");
-      await loadOrders();
+      adminToken = data.token;
+      $("password").value = "";
+      setLoggedIn(true);
+      showMessage("Login successful.");
+
+      await Promise.allSettled([
+        loadProducts(),
+        loadOrders()
+      ]);
+    } catch (error) {
+      showMessage("Login failed: " + error.message, true);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Login";
     }
-  }catch(error){
-    globalMessage(error.message,"error");
-  }
-});
+  });
 
-function closeOrderPanel(){
-  selectedOrderId=null;
-  $("orderPanel").classList.add("hidden");
-  $("orderDetails").innerHTML="";
-}
-$("closeOrder").addEventListener("click",closeOrderPanel);
-
-function renderProducts(){
-  const query=$("productSearch").value.trim().toLowerCase();
-  const list=products.filter(p=>(p.name||"").toLowerCase().includes(query));
-
-  if(!list.length){
-    $("productsBody").innerHTML='<tr><td colspan="4">कोई Product नहीं मिला</td></tr>';
-    return;
+  // OPTIONAL SESSION CHECK
+  async function checkExistingLogin() {
+    try {
+      const data = await apiRequest("/admin/check");
+      if (data.authenticated === true || data.ok === true) {
+        setLoggedIn(true);
+        await Promise.allSettled([loadProducts(), loadOrders()]);
+      }
+    } catch {
+      // Login manually if this server does not support session checking.
+    }
   }
 
-  $("productsBody").innerHTML=list.map(p=>`
-    <tr>
-      <td>${p.image?`<img class="product-img" src="${esc(p.image)}" alt="" loading="lazy">`:""}${esc(p.name)}</td>
-      <td>${money(p.price)}</td>
-      <td>${esc(p.id)}</td>
-      <td><div class="actions">
-        <button data-edit-product="${esc(p.id)}">Edit</button>
-        <button class="danger" data-delete-product="${esc(p.id)}">Delete</button>
-      </div></td>
-    </tr>
-  `).join("");
-}
-$("productSearch").addEventListener("input",renderProducts);
+  // PRODUCTS: LOAD
+  async function loadProducts() {
+    $("productsList").replaceChildren(makeText("p", "Loading products..."));
 
-function openProductForm(p=null){
-  editingProductId=p?p.id:null;
-  $("productFormTitle").textContent=p?"Edit Product":"Add Product";
-  $("productName").value=p?.name||"";
-  $("productPrice").value=p?.price??"";
-  $("productImage").value=p?.image||"";
-  $("productFormWrap").classList.remove("hidden");
-  message("productMessage","");
-  $("productFormWrap").scrollIntoView({behavior:"smooth",block:"start"});
-}
-function closeProductForm(){
-  editingProductId=null;
-  $("productForm").reset();
-  $("productFormWrap").classList.add("hidden");
-  message("productMessage","");
-}
-$("addProductBtn").addEventListener("click",()=>openProductForm());
-$("cancelProductBtn").addEventListener("click",closeProductForm);
-
-$("productsBody").addEventListener("click",async e=>{
-  const edit=e.target.closest("[data-edit-product]");
-  const del=e.target.closest("[data-delete-product]");
-
-  if(edit){
-    const p=products.find(x=>String(x.id)===edit.dataset.editProduct);
-    if(p)openProductForm(p);
+    try {
+      const data = await apiRequest("/products");
+      products = getArray(data, "products");
+      renderProducts();
+    } catch (error) {
+      $("productsList").replaceChildren(
+        makeText("p", "Could not load products: " + error.message)
+      );
+    }
   }
 
-  if(del){
-    const p=products.find(x=>String(x.id)===del.dataset.deleteProduct);
-    if(!p||!confirm("क्या '"+p.name+"' Product delete करना है?"))return;
-    try{
-      await api("/products/"+encodeURIComponent(p.id),{method:"DELETE"});
+  function renderProducts() {
+    const container = $("productsList");
+    container.replaceChildren();
+
+    if (!products.length) {
+      container.appendChild(makeText("p", "No products found."));
+      return;
+    }
+
+    products.forEach((product) => {
+      const card = document.createElement("article");
+      card.className = "item";
+
+      if (product.image) {
+        const img = document.createElement("img");
+        img.src = product.image;
+        img.alt = product.name || "Product";
+        img.loading = "lazy";
+        img.onerror = () => img.remove();
+        card.appendChild(img);
+      }
+
+      card.appendChild(makeText("h3", product.name || "Unnamed product"));
+      card.appendChild(makeText("p", formatPrice(product.price)));
+
+      const editButton = makeText("button", "Edit");
+      editButton.type = "button";
+      editButton.addEventListener("click", () => editProduct(product));
+      card.appendChild(editButton);
+
+      const deleteButton = makeText("button", "Delete", "danger");
+      deleteButton.type = "button";
+      deleteButton.addEventListener("click", () => deleteProduct(product));
+      card.appendChild(deleteButton);
+
+      container.appendChild(card);
+    });
+  }
+
+  // PRODUCTS: EDIT
+  function editProduct(product) {
+    $("productId").value = product.id ?? "";
+    $("productName").value = product.name || "";
+    $("productPrice").value = product.price ?? "";
+    $("productImage").value = product.image || "";
+    $("productFormTitle").textContent = "Edit Product";
+    $("saveProductBtn").textContent = "Update Product";
+    $("cancelEditBtn").classList.remove("hidden");
+    $("productForm").scrollIntoView({ behavior: "smooth" });
+  }
+
+  function resetProductForm() {
+    $("productForm").reset();
+    $("productId").value = "";
+    $("productFormTitle").textContent = "Add Product";
+    $("saveProductBtn").textContent = "Save Product";
+    $("cancelEditBtn").classList.add("hidden");
+  }
+
+  $("cancelEditBtn").addEventListener("click", resetProductForm);
+
+  // PRODUCTS: CREATE / UPDATE
+  $("productForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    clearMessage();
+
+    const id = $("productId").value;
+    const name = $("productName").value.trim();
+    const price = Number($("productPrice").value);
+    const image = $("productImage").value.trim();
+
+    if (!name) {
+      showMessage("Please enter the product name.", true);
+      return;
+    }
+
+    if (!Number.isFinite(price) || price < 0) {
+      showMessage("Please enter a valid product price.", true);
+      return;
+    }
+
+    const button = $("saveProductBtn");
+    button.disabled = true;
+
+    try {
+      const payload = { name, price, image: image || null };
+      const path = id ? "/products/" + encodeURIComponent(id) : "/products";
+      const method = id ? "PUT" : "POST";
+
+      await apiRequest(path, {
+        method,
+        body: JSON.stringify(payload)
+      });
+
+      showMessage(id ? "Product updated." : "Product added.");
+      resetProductForm();
       await loadProducts();
-      globalMessage("Product delete हो गया","success");
-    }catch(error){
-      globalMessage(error.message,"error");
+    } catch (error) {
+      showMessage("Could not save product: " + error.message, true);
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  // PRODUCTS: DELETE
+  async function deleteProduct(product) {
+    if (!confirm('Delete "' + (product.name || "this product") + '"?')) {
+      return;
+    }
+
+    try {
+      await apiRequest(
+        "/products/" + encodeURIComponent(product.id),
+        { method: "DELETE" }
+      );
+
+      showMessage("Product deleted.");
+      await loadProducts();
+    } catch (error) {
+      showMessage("Could not delete product: " + error.message, true);
     }
   }
-});
 
-$("productForm").addEventListener("submit",async e=>{
-  e.preventDefau
+  // ORDERS: LOAD
+  async function loadOrders() {
+    $("ordersList").replaceChildren(makeText("p", "Loading orders..."));
+
+    try {
+      const data = await apiRequest("/orders");
+      const orders = getArray(data, "orders");
+      renderOrders(orders);
+    } catch (error) {
+      $("ordersList").replaceChildren(
+        makeText("p", "Could not load orders: " + error.message)
+      );
+    }
+  }
+
+  function renderOrders(orders) {
+    const container = $("ordersList");
+    container.replaceChildren();
+
+    if (!orders.length) {
+      container.appendChild(makeText("p", "No orders found."));
+      return;
+    }
+
+    orders.forEach((order) => {
+      const card = document.createElement("article");
+      card.className = "item";
+      card.style.marginBottom = "12px";
+
+      card.appendChild(makeText("h3", "Order #" + order.id));
+
+      card.appendChild(makeText("p",
+        "Customer: " + (order.customer_name || "N/A")));
+      card.appendChild(makeText("p",
+        "Email: " + (order.customer_email || "N/A")));
+      card.appendChild(makeText("p",
+        "Phone: " + (order.phone || "N/A")));
+      card.appendChild(makeText("p",
+        "Address: " + (order.address || "N/A")));
+      card.appendChild(makeText("p",
+        "Total: " + formatPrice(order.total)));
+      card.appendChild(makeText("p",
+        "Payment method: " + (order.payment_method || "N/A")));
+      card.appendChild(makeText("p",
+        "Payment reference: " + (order.payment_reference || "N/A")));
+      card.appendChild(makeText("p",
+        "Feedback: " + (order.feedback || "N/A")));
+      card.appendChild(makeText("p",
+        "Created: " + (order.created_at || "N/A")));
+
+      let items = order.items;
+      if (typeof items === "string") {
+        try { items = JSON.parse(items); } catch { /* keep as text */ }
+      }
+
+      const details = document.createElement("div");
+      details.className = "order-details";
+      details.textContent = "Items: " +
+        (typeof items === "object" ? JSON.stringify(items, null, 2) :
+          (items || "N/A"));
+      card.appendChild(details);
+
+      // Order status
+      card.appendChild(makeText("label", "Order Status"));
+      const orderStatus = document.createElement("select");
+
+      ["pending", "approved", "processing", "shipped",
+       "delivered", "rejected", "cancelled"].forEach((value) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        orderStatus.appendChild(option);
+      });
+
+      orderStatus.value = order.status || "pending";
+      card.appendChild(orderStatus);
+
+      const orderButton = makeText("button", "Update Order Status");
+      orderButton.type = "button";
+      orderButton.addEventListener("click", async () => {
+        await updateOrder(order.id, { status: orderStatus.value }, "status");
+      });
+      card.appendChild(orderButton);
+
+      // Payment status
+      card.appendChild(makeText("label", "Payment Status"));
+      const paymentStatus = document.createElement("select");
+
+      ["pending", "approved", "paid", "rejected", "failed", "refunded"]
+        .forEach((value) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          paymentStatus.appendChild(option);
+        });
+
+      paymentStatus.value = order.payment_status || "pending";
+      card.appendChild(paymentStatus);
+
+      const paymentButton = makeText("button", "Update Payment Status");
+      paymentButton.type = "button";
+      paymentButton.className = "success";
+      paymentButton.addEventListener("click", async () => {
+        await updateOrder(
+          order.id,
+          { payment_status: paymentStatus.value },
+          "payment"
+        );
+      });
+      card.appendChild(paymentButton);
+
+      container.appendChild(card);
+    });
+  }
+
+  async function updateOrder(id, payload, type) {
+    try {
+      const endpoint = type === "payment"
+        ? "/orders/" + encodeURIComponent(id) + "/payment"
+        : "/orders/" + encodeURIComponent(id) + "/status";
+
+      await apiRequest(endpoint, {
+        method: "PATCH",
+        body: JSON.stringify(payload)
+      });
+
+      showMessage(type === "payment"
+        ? "Payment status updated."
+        : "Order status updated.");
+
+      await loadOrders();
+    } catch (error) {
+      showMessage("Could not update order: " + error.message, true);
+    }
+  }
+
+  $("loadProductsBtn").addEventListener("click", loadProducts);
+  $("loadOrdersBtn").addEventListener("click", loadOrders);
+
+  // LOGOUT
+  $("logoutBtn").addEventListener("click", async () => {
+    try {
+      await apiRequest("/admin/logout", { method: "POST" });
+    } catch {
+      // Clear local login state even if the server has no logout endpoint.
+    }
+
+    adminToken = "";
+    setLoggedIn(false);
+    resetProductForm();
+    $("productsList").replaceChildren();
+    $("ordersList").replaceChildren();
+    showMessage("Logged out.");
+  });
+
+  checkExistingLogin();
+})();
+</script>
+</body>
+</html>
