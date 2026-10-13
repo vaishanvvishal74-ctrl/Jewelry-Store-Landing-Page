@@ -1,4 +1,3 @@
-
 const express = require("express");
 const crypto = require("crypto");
 const path = require("path");
@@ -26,10 +25,11 @@ const pool = new Pool({
     : { rejectUnauthorized: false }
 });
 
+app.disable("x-powered-by");
 app.use(express.json({ limit: "20kb" }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "20kb" }));
 
-// Sessions are stored in memory and reset on server restart.
+// In-memory sessions; sessions reset after server restart.
 const adminSessions = new Map();
 const customerSessions = new Map();
 
@@ -57,7 +57,8 @@ const ORDER_STATUSES = [
   "processing",
   "shipped",
   "delivered",
-  "cancelled"
+  "cancelled",
+  "rejected"
 ];
 
 function makeToken() {
@@ -70,8 +71,7 @@ function getBearerToken(req) {
 }
 
 function requireAdmin(req, res, next) {
-  const token =
-    req.get("x-admin-token") || getBearerToken(req);
+  const token = req.get("x-admin-token") || getBearerToken(req);
 
   if (!token || !adminSessions.has(token)) {
     return res.status(401).json({
@@ -84,9 +84,7 @@ function requireAdmin(req, res, next) {
 }
 
 function requireCustomer(req, res, next) {
-  const token =
-    req.get("x-customer-token") || getBearerToken(req);
-
+  const token = req.get("x-customer-token") || getBearerToken(req);
   const customerId = token ? customerSessions.get(token) : null;
 
   if (!customerId) {
@@ -121,6 +119,11 @@ function validProductInput(body) {
     typeof image === "string" &&
     /^https:\/\/\S+$/i.test(image.trim())
   );
+}
+
+function validId(value) {
+  const id = Number(value);
+  return Number.isInteger(id) && id > 0 ? id : null;
 }
 
 // Website pages
@@ -158,7 +161,7 @@ app.get("/admin.html", (req, res) => {
 const publicDir = path.join(__dirname, "public");
 
 if (fs.existsSync(publicDir)) {
-  app.use(express.static(publicDir));
+  app.use(express.static(publicDir, { dotfiles: "deny" }));
 } else {
   app.use(express.static(__dirname, {
     index: false,
@@ -166,6 +169,7 @@ if (fs.existsSync(publicDir)) {
   }));
 }
 
+// Do not expose server source or package metadata.
 app.get("/server.js", (req, res) => res.sendStatus(404));
 app.get("/package.json", (req, res) => res.sendStatus(404));
 
@@ -186,7 +190,7 @@ app.get("/api/health", async (req, res) => {
   }
 });
 
-// Database tables
+// Database setup
 async function initializeDatabase() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS products (
@@ -233,6 +237,24 @@ async function initializeDatabase() {
     )
   `);
 
+  // Add missing columns if an older database already exists.
+  await pool.query(`
+    ALTER TABLE orders
+      ADD COLUMN IF NOT EXISTS customer_id INTEGER REFERENCES customers(id),
+      ADD COLUMN IF NOT EXISTS customer_name TEXT NOT NULL DEFAULT '',
+      ADD COLUMN IF NOT EXISTS customer_email TEXT NOT NULL DEFAULT '',
+      ADD COLUMN IF NOT EXISTS phone TEXT NOT NULL DEFAULT '',
+      ADD COLUMN IF NOT EXISTS address TEXT NOT NULL DEFAULT '',
+      ADD COLUMN IF NOT EXISTS items JSONB NOT NULL DEFAULT '[]'::jsonb,
+      ADD COLUMN IF NOT EXISTS total NUMERIC(12,2) NOT NULL DEFAULT 0,
+      ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'pending',
+      ADD COLUMN IF NOT EXISTS payment_method TEXT NOT NULL DEFAULT 'cod',
+      ADD COLUMN IF NOT EXISTS payment_status TEXT NOT NULL DEFAULT 'pending',
+      ADD COLUMN IF NOT EXISTS payment_reference TEXT NOT NULL DEFAULT '',
+      ADD COLUMN IF NOT EXISTS feedback TEXT NOT NULL DEFAULT '',
+      ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  `);
+
   await pool.query(`
     INSERT INTO store_settings (id, data)
     VALUES (1, $1::jsonb)
@@ -253,6 +275,8 @@ function hashPassword(password, salt) {
 }
 
 async function verifyPassword(password, stored) {
+  if (typeof stored !== "string") return false;
+
   const parts = stored.split(":");
   if (parts.length !== 2) return false;
 
@@ -282,15 +306,13 @@ async function adminLogin(req, res) {
 
   if (
     typeof password !== "string" ||
-    password.length !== ADMIN_PASSWORD.length ||
+    Buffer.byteLength(password) !== Buffer.byteLength(ADMIN_PASSWORD) ||
     !crypto.timingSafeEqual(
       Buffer.from(password),
       Buffer.from(ADMIN_PASSWORD)
     )
   ) {
-    return res.status(401).json({
-      error: "Wrong password"
-    });
+    return res.status(401).json({ error: "Wrong password" });
   }
 
   const token = makeToken();
@@ -367,7 +389,7 @@ app.put("/api/settings", requireAdmin, async (req, res) => {
   }
 });
 
-// Products
+// Products: public list
 app.get("/api/products", async (req, res) => {
   try {
     const result = await pool.query(
@@ -380,6 +402,7 @@ app.get("/api/products", async (req, res) => {
   }
 });
 
+// Add product
 app.post("/api/products", requireAdmin, async (req, res) => {
   if (!validProductInput(req.body)) {
     return res.status(400).json({
@@ -403,10 +426,11 @@ app.post("/api/products", requireAdmin, async (req, res) => {
   }
 });
 
+// Edit product
 app.put("/api/products/:id", requireAdmin, async (req, res) => {
-  const id = Number(req.params.id);
+  const id = validId(req.params.id);
 
-  if (!Number.isInteger(id) || id < 1 || !validProductInput(req.body)) {
+  if (!id || !validProductInput(req.body)) {
     return res.status(400).json({ error: "Invalid product details" });
   }
 
@@ -431,10 +455,11 @@ app.put("/api/products/:id", requireAdmin, async (req, res) => {
   }
 });
 
+// Delete product
 app.delete("/api/products/:id", requireAdmin, async (req, res) => {
-  const id = Number(req.params.id);
+  const id = validId(req.params.id);
 
-  if (!Number.isInteger(id) || id < 1) {
+  if (!id) {
     return res.status(400).json({ error: "Invalid product ID" });
   }
 
@@ -493,7 +518,9 @@ app.post("/api/register", async (req, res) => {
     });
   } catch (error) {
     if (error.code === "23505") {
-      return res.status(409).json({ error: "Email already registered" });
+      return res.status(409).json({
+        error: "Email already registered"
+      });
     }
 
     console.error("Registration failed:", error.message);
@@ -511,14 +538,17 @@ app.post("/api/customer/login", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT id, name, email, password_hash FROM customers WHERE email = LOWER($1)",
+      `SELECT id, name, email, password_hash
+       FROM customers WHERE email = LOWER($1)`,
       [email.trim()]
     );
 
     const customer = result.rows[0];
 
     if (!customer || !(await verifyPassword(password, customer.password_hash))) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      return res.status(401).json({
+        error: "Invalid email or password"
+      });
     }
 
     const token = makeToken();
@@ -538,16 +568,16 @@ app.post("/api/customer/login", async (req, res) => {
   }
 });
 
+// Customer logout
 app.post("/api/customer/logout", requireCustomer, (req, res) => {
   customerSessions.delete(req.customerToken);
   res.json({ message: "Logged out" });
 });
 
-// Create order. Prices are calculated from database products.
+// Create order; prices are calculated from the database.
 app.post("/api/orders", async (req, res) => {
   const body = req.body || {};
-  const token =
-    req.get("x-customer-token") || getBearerToken(req);
+  const token = req.get("x-customer-token") || getBearerToken(req);
   const customerId = token ? customerSessions.get(token) : null;
 
   const name = body.customer_name || body.name;
@@ -559,9 +589,10 @@ app.post("/api/orders", async (req, res) => {
 
   if (
     typeof name !== "string" || !name.trim() ||
+    name.trim().length > 100 ||
     !validEmail(email) ||
-    typeof phone !== "string" || !phone.trim() ||
-    typeof address !== "string" || !address.trim() ||
+    typeof phone !== "string" || !phone.trim() || phone.length > 40 ||
+    typeof address !== "string" || !address.trim() || address.length > 2000 ||
     !Array.isArray(items) || items.length < 1 || items.length > 50 ||
     !["cod", "upi", "manual"].includes(paymentMethod)
   ) {
@@ -601,6 +632,7 @@ app.post("/api/orders", async (req, res) => {
       const product = productResult.rows[0];
       const unitPrice = Number(product.price);
       const lineTotal = unitPrice * quantity;
+
       total += lineTotal;
 
       normalizedItems.push({
@@ -646,7 +678,7 @@ app.post("/api/orders", async (req, res) => {
   }
 });
 
-// Admin: list orders
+// Admin: list all orders
 app.get("/api/orders", requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(
@@ -659,15 +691,12 @@ app.get("/api/orders", requireAdmin, async (req, res) => {
   }
 });
 
-// Admin: update order status
+// Admin: accept, reject, or update order status
 app.patch("/api/orders/:id/status", requireAdmin, async (req, res) => {
-  const id = Number(req.params.id);
+  const id = validId(req.params.id);
   const status = req.body?.status;
 
-  if (
-    !Number.isInteger(id) || id < 1 ||
-    !ORDER_STATUSES.includes(status)
-  ) {
+  if (!id || !ORDER_STATUSES.includes(status)) {
     return res.status(400).json({ error: "Invalid order ID or status" });
   }
 
@@ -683,21 +712,24 @@ app.patch("/api/orders/:id/status", requireAdmin, async (req, res) => {
       return res.status(404).json({ error: "Order not found" });
     }
 
-    res.json({ message: "Order status updated", order: result.rows[0] });
+    res.json({
+      message: "Order status updated",
+      order: result.rows[0]
+    });
   } catch (error) {
     console.error("Update order failed:", error.message);
     res.status(500).json({ error: "Could not update order" });
   }
 });
 
-// Admin: manually approve/reject payment after checking payment evidence.
+// Admin: manually approve/reject payment after verifying it.
 app.patch("/api/orders/:id/payment", requireAdmin, async (req, res) => {
-  const id = Number(req.params.id);
+  const id = validId(req.params.id);
   const status = req.body?.payment_status;
   const reference = req.body?.payment_reference;
 
   if (
-    !Number.isInteger(id) || id < 1 ||
+    !id ||
     !["pending", "approved", "rejected"].includes(status) ||
     (reference !== undefined &&
       (typeof reference !== "string" || reference.length > 200))
@@ -706,54 +738,4 @@ app.patch("/api/orders/:id/payment", requireAdmin, async (req, res) => {
   }
 
   try {
-    const result = await pool.query(`
-      UPDATE orders
-      SET payment_status = $1,
-          payment_reference = $2
-      WHERE id = $3
-      RETURNING *
-    `, [status, reference || "", id]);
-
-    if (!result.rowCount) {
-      return res.status(404).json({ error: "Order not found" });
-    }
-
-    res.json({
-      message: "Payment status updated",
-      order: result.rows[0]
-    });
-  } catch (error) {
-    console.error("Payment update failed:", error.message);
-    res.status(500).json({ error: "Could not update payment" });
-  }
-});
-
-// Customer: view own orders by account session
-app.get("/api/customer/orders", requireCustomer, async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM orders WHERE customer_id = $1 ORDER BY created_at DESC",
-      [req.customerId]
-    );
-    res.json(result.rows);
-  } catch (error) {
-    console.error("Customer orders failed:", error.message);
-    res.status(500).json({ error: "Could not load your orders" });
-  }
-});
-
-// Customer feedback attached to their own order
-app.post("/api/orders/:id/feedback", requireCustomer, async (req, res) => {
-  const id = Number(req.params.id);
-  const feedback = req.body?.feedback;
-
-  if (
-    !Number.isInteger(id) || id < 1 ||
-    typeof feedback !== "string" ||
-    !feedback.trim() || feedback.length > 2000
-  ) {
-    return res.status(400).json({ error: "Enter valid feedback" });
-  }
-
-  try {
-    const result = a
+    con
