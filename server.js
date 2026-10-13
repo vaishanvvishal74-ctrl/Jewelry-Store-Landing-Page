@@ -18,8 +18,21 @@ if (fs.existsSync(PUBLIC_DIR)) {
 }
 
 
+
 app.get("/", (req, res) => {
   const publicIndex = path.join(PUBLIC_DIR, "index.html");
+
+  if (fs.existsSync(publicIndex)) {
+    return res.sendFile(publicIndex);
+  }
+
+  if (fs.existsSync(ROOT_INDEX)) {
+    return res.sendFile(ROOT_INDEX);
+  }
+
+  return res.status(404).send("index.html not found");
+});
+
 
   if (fs.existsSync(publicIndex)) {
     return res.sendFile(publicIndex);
