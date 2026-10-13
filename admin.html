@@ -6,85 +6,112 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jewellery Store | Admin Panel</title>
 <style>
-:root{--purple:#8138b7;--dark:#251333;--bg:#f5f5fc;--muted:#77758b;--border:#e9e7f2;--white:#fff}
+:root{--purple:#8238bd;--dark:#241331;--bg:#f5f6fc;--white:#fff;--text:#20213a;--muted:#77788f;--border:#e8e7f1}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#191733;font:14px Arial,sans-serif}
+body{margin:0;font:14px Arial,sans-serif;background:var(--bg);color:var(--text)}
 button,input,select{font:inherit}
-button{cursor:pointer;border:0;border-radius:8px;padding:11px 14px;color:white;background:linear-gradient(100deg,#9141c1,#7029a4);font-weight:600}
-button:disabled{opacity:.55}
-input,select{padding:11px;border:1px solid #e3dfed;border-radius:8px;background:#fff;width:100%;margin:6px 0 12px}
-label{font-weight:bold;font-size:13px}
-header{height:70px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:12px 22px;gap:12px}
-header h1{font-size:20px;margin:0}
-.topsearch{max-width:580px;flex:1}
-.topsearch input{margin:0;background:#f5f3fc}
-.layout{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:calc(100vh - 70px)}
-aside{background:linear-gradient(180deg,#29143b,#21112f);color:#fff;padding:16px 10px}
-.brand{padding:6px 10px 20px;border-bottom:1px solid #ffffff20;margin-bottom:12px}
-.brand strong{font-size:21px}.brand small{display:block;color:#d8b7f1;margin-top:6px}
-.nav{display:block;width:100%;text-align:left;margin:5px 0;background:transparent;color:#f8f2ff}
-.nav.active,.nav:hover{background:linear-gradient(100deg,#9b42c9,#7025a5)}
-.premium{margin-top:35px;padding:18px 12px;border:1px solid #ffffff30;border-radius:12px;color:#e5c7ff;line-height:1.6}
-main{padding:24px;min-width:0;max-width:1800px;width:100%;margin:auto}
+button{cursor:pointer;border:0;border-radius:9px;padding:11px 14px;background:var(--purple);color:white;font-weight:600}
+button:disabled{opacity:.6}
+input,select{padding:11px;border:1px solid var(--border);border-radius:9px;background:white;max-width:100%}
+header{height:72px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:12px 22px;gap:16px;border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px;color:white}
+.brand strong{font-size:19px}.brand small{display:block;color:#d8b9ef;margin-top:5px}
+.logo{font-size:34px}
+.top-search{width:min(600px,55%);background:#f5f3fb}
+.profile{display:flex;align-items:center;gap:10px}
+.avatar{border-radius:50%;background:#eee5fa;padding:12px;font-size:20px}
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);min-height:calc(100vh - 72px)}
+aside{background:linear-gradient(160deg,#281535,#1d102a);color:#fff;padding:16px;display:flex;flex-direction:column;gap:5px}
+.nav{display:block;width:100%;text-align:left;background:transparent;color:#eee;padding:13px;border-radius:10px;margin:2px 0}
+.nav:hover,.nav.active{background:linear-gradient(90deg,#8737be,#7130ad)}
+.nav .count{float:right;background:#54346b;padding:3px 7px;border-radius:20px}
+.premium{margin-top:auto;border:1px solid #594369;border-radius:12px;padding:16px;background:#2d1c3d}
+.premium .ring{font-size:64px;text-align:center;padding:15px}
+main{padding:22px;min-width:0}
 .page{display:none}.page.active{display:block}
-h2{font-size:24px;margin:0 0 8px}h3{font-size:16px;margin:0 0 14px}
-.muted{color:var(--muted);font-size:13px}
-.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:17px;box-shadow:0 4px 18px #28133b08;min-width:0;margin-bottom:15px}
-.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0}
-.stat{font-size:28px;font-weight:800;margin:12px 0;color:#191733;overflow-wrap:anywhere}
-.staticon{display:inline-flex;width:45px;height:45px;border-radius:50%;align-items:center;justify-content:center;font-size:23px;margin-right:10px;background:#f0e1fc}
-.pink{background:#ffe3ef}.blue{background:#e0edff}.teal{background:#d9f8f1}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.row>*{flex:1;min-width:130px}
-.twocol{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:14px}
-.threecol{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(240px,.8fr) minmax(220px,.75fr);gap:14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
-.item{border:1px solid var(--border);padding:12px;border-radius:10px;overflow-wrap:anywhere}
-.item img{width:100%;height:145px;object-fit:contain;background:#faf9fc;border-radius:8px}
-.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
-.secondary{background:#625d70}.danger{background:#c6374d}.success{background:#1d9d81}.bluebtn{background:#428ce9}
-.hidden{display:none!important}
-.notice{padding:12px;border-radius:8px;margin:10px 0;overflow-wrap:anywhere}
-.error{background:#ffe9e9;color:#9c1d1d}.ok{background:#e5f8eb;color:#155e30}
+.welcome{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+h1{font-size:23px;margin:0 0 7px}h2{font-size:19px;margin:0 0 15px}h3{font-size:15px;margin:0 0 15px}
+.muted{color:var(--muted);font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:17px}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:17px;min-width:0;box-shadow:0 3px 12px #24133106;margin-bottom:15px}
+.stat-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.stat-icon{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#f1e1ff;color:#8535bb;font-size:24px}
+.stat{font-size:25px;font-weight:800;margin:12px 0}
+.trend{font-size:12px;color:#168d72}
+.dashboard-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr) minmax(240px,.85fr);gap:14px}
+.span2{grid-column:span 2}
+.chart{width:100%;height:220px;display:block}
+.chart text{font-size:11px;fill:#77788f}
+.legend{display:grid;gap:10px;margin-top:10px}
+.legend-row{display:flex;justify-content:space-between;gap:10px;font-size:12px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px}
+.activity{display:flex;align-items:center;gap:10px;margin:16px 0;font-size:12px}
+.activity-icon{width:35px;height:35px;border-radius:50%;background:#f2e5fb;display:grid;place-items:center;font-size:17px;flex-shrink:0}
+.activity small{display:block;color:var(--muted);margin-top:5px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{padding:9px 11px;background:#f1edf8;color:#564466;font-size:12px}
+.tabs button.active{background:var(--purple);color:#fff}
 .tablewrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:570px}
-th,td{text-align:left;padding:12px 9px;border-bottom:1px solid var(--border);vertical-align:top}
-th{font-size:12px;background:#faf8fc}
-.pill{display:inline-block;padding:6px 10px;border-radius:20px;background:#f1e7fc;color:#7736a4;font-size:12px}
-.status-pending{background:#fff0cb;color:#9a5a00}
-.status-confirmed,.status-delivered,.status-approved{background:#d9f7e8;color:#18794e}
-.status-processing{background:#e0efff;color:#2167b6}
-.status-shipped{background:#f1e3ff;color:#7738a6}
-.status-rejected,.status-cancelled{background:#ffe2e4;color:#b3233d}
-.activity{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid #eee}
-.activity-icon{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#f1e4ff;flex-shrink:0}
-.productmini{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
-.productmini img{width:52px;height:52px;object-fit:contain;border-radius:8px;background:#f7f4fb}
-.quick{display:block;width:100%;text-align:left;margin:9px 0}
-canvas{display:block;width:100%;height:230px}
-.small{font-size:12px}
-footer{padding:14px 24px;color:#77758b;background:#fff;border-top:1px solid var(--border);font-size:12px}
-@media(max-width:1150px){.threecol{grid-template-columns:1fr 1fr}.threecol>.card:first-child{grid-column:1/-1}}
-@media(max-width:800px){.layout{grid-template-columns:1fr}aside{display:flex;overflow-x:auto;gap:5px;padding:8px;position:sticky;top:0;z-index:5}.brand,.premium{display:none}.nav{width:auto;white-space:nowrap;flex:0 0 auto}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.twocol,.threecol{grid-template-columns:1fr}.threecol>.card:first-child{grid-column:auto}main{padding:12px}header{padding:10px 12px}.topsearch{display:none}}
-@media(max-width:420px){.cards{gap:8px}.stat{font-size:22px}.card{padding:13px}header h1{font-size:16px}}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{text-align:left;padding:12px 9px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
+th{background:#faf9fd;color:#64647c}
+.status{display:inline-block;padding:6px 9px;border-radius:20px;background:#fff0ce;color:#9a6500;font-size:11px;font-weight:700}
+.status.confirmed{background:#dff7eb;color:#147b54}
+.status.processing{background:#e3efff;color:#2463ad}
+.status.shipped{background:#f1e2ff;color:#7b32b0}
+.status.delivered{background:#dcf7f3;color:#147c78}
+.status.rejected,.status.cancelled{background:#ffe4e8;color:#b42337}
+.small-btn{padding:8px 10px;font-size:11px}
+.product-row{display:flex;align-items:center;gap:10px;margin:13px 0;font-size:12px}
+.product-pic{width:45px;height:45px;border-radius:9px;object-fit:cover;background:#f5f0fa}
+.product-pic.fallback{display:grid;place-items:center;font-size:22px}
+.product-row strong{display:block;margin-bottom:5px}
+.quick{display:block;width:100%;text-align:left;margin:8px 0}
+.quick:nth-of-type(2){background:#438de8}
+.quick:nth-of-type(3){background:#27ae94}
+.quick:nth-of-type(4){background:#e45b9d}
+.stock-row{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:12px}
+.stock-row .product-pic{width:35px;height:35px}
+.stock-num{color:#dc3545;margin-left:auto}
+.notice{padding:11px;border-radius:8px;margin:10px 0}
+.error{background:#ffe8e8;color:#a21d2b}.ok{background:#e2f8eb;color:#17643a}
+.hidden{display:none!important}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.form-grid label{display:block;font-size:12px;font-weight:bold}
+.form-grid input{width:100%;margin:7px 0 12px}
+footer{text-align:center;padding:18px;color:#77788f;font-size:11px}
+@media(max-width:1250px){.dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-grid .activity-card{grid-column:span 2}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+ header{padding:12px;height:auto;flex-wrap:wrap}.top-search{order:3;width:100%}
+ .layout{grid-template-columns:1fr}
+ aside{display:flex;flex-direction:row;overflow-x:auto;padding:8px}
+ .nav{width:auto;white-space:nowrap;flex:0 0 auto}
+ .premium{display:none}main{padding:12px}
+ .dashboard-grid{grid-template-columns:1fr}.dashboard-grid .activity-card,.span2{grid-column:auto}
+ .cards{gap:8px}.card{padding:13px}.stat{font-size:21px}
+ .profile .profile-text{display:none}
+}
+@media(max-width:420px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.stat-icon{width:36px;height:36px}.stat{font-size:18px}h1{font-size:20px}}
 </style>
 </head>
 <body>
-
 <header>
-  <h1>💎 Jewellery Store</h1>
-  <div class="topsearch"><input id="globalSearch" placeholder="Search orders, products, customers..."></div>
-  <span id="adminLabel">Admin Panel</span>
-  <button id="logoutBtn" class="danger hidden">Logout</button>
+  <div class="brand" style="background:#241331;margin:-12px 0 -12px -22px;padding:12px 22px;min-width:270px">
+    <span class="logo">💎</span><div><strong>Jewellery Store</strong><small>Admin Panel</small></div>
+  </div>
+  <input id="globalSearch" class="top-search" placeholder="⌕  Search orders, products, customers...">
+  <div class="profile"><span>🔔</span><span class="avatar">👤</span><div class="profile-text"><strong>Admin</strong><div class="muted">Super Admin</div></div></div>
+  <button id="logoutBtn" class="hidden" style="background:#c52d48">Logout</button>
 </header>
 
-<main id="loginArea" style="max-width:450px;margin:50px auto">
+<main id="loginArea" style="max-width:480px;margin:auto">
   <section class="card">
     <h2>Admin Login</h2>
-    <p class="muted">Sign in to manage your jewellery store.</p>
+    <p class="muted">Sign in to manage your store.</p>
     <form id="loginForm">
-      <label for="password">Admin password</label>
-      <input id="password" type="password" autocomplete="current-password" required>
+      <label>Admin password</label>
+      <input id="password" type="password" autocomplete="current-password" required style="width:100%;margin:8px 0 14px">
       <button id="loginBtn" style="width:100%">Login</button>
     </form>
     <div id="loginMessage" aria-live="polite"></div>
@@ -93,202 +120,125 @@ footer{padding:14px 24px;color:#77758b;background:#fff;border-top:1px solid var(
 
 <div id="app" class="layout hidden">
 <aside>
-  <div class="brand"><strong>💎 Jewellery Store</strong><small>Admin Panel</small></div>
   <button class="nav active" data-page="dashboard">⌂ &nbsp; Dashboard</button>
-  <button class="nav" data-page="orders">▣ &nbsp; Orders</button>
+  <button class="nav" data-page="orders">▣ &nbsp; Orders <span id="sideOrderCount" class="count">0</span></button>
   <button class="nav" data-page="products">◇ &nbsp; Products</button>
   <button class="nav" data-page="customers">♙ &nbsp; Customers</button>
   <button class="nav" data-page="payments">▤ &nbsp; Payments</button>
   <button class="nav" data-page="reports">▥ &nbsp; Reports</button>
-  <button class="nav" data-page="discounts">✧ &nbsp; Discounts</button>
+  <button class="nav" data-page="discounts">✥ &nbsp; Discounts</button>
   <button class="nav" data-page="coupons">♧ &nbsp; Coupons</button>
   <button class="nav" data-page="categories">▦ &nbsp; Categories</button>
   <button class="nav" data-page="settings">⚙ &nbsp; Settings</button>
-  <div class="premium"><strong>👑 Premium Store</strong><br><small>Manage your jewellery business with ease and efficiency.</small><br><br>💍 ✨</div>
+  <button class="nav" id="sideLogout">⇥ &nbsp; Logout</button>
+  <div class="premium"><strong>👑 Premium Store</strong><p class="muted" style="color:#ddd">Manage your jewellery business with ease and efficiency.</p><div class="ring">💍</div><div style="text-align:center;color:#e8c7ff;font-style:italic">Shine in Every Moment ♡</div></div>
 </aside>
-
-<div style="min-width:0">
 <main>
 <div id="message" aria-live="polite"></div>
-
 <section id="page-dashboard" class="page active">
-  <div class="row">
-    <div><h2>Welcome Back, Admin! 👋</h2><p class="muted">Here's what's happening with your jewellery store today.</p></div>
-    <button id="refreshAll">↻ Refresh All</button>
-  </div>
-
+  <div class="welcome"><div><h1>Welcome Back, Admin! 👋</h1><div class="muted">Here's what's happening with your jewellery store today.</div></div><div class="muted" id="todayDate"></div></div>
   <div class="cards">
-    <div class="card"><div><span class="staticon">◇</span><span class="muted">Total Products</span></div><div id="statProducts" class="stat">—</div><span class="muted">Current store products</span></div>
-    <div class="card"><div><span class="staticon teal">🛒</span><span class="muted">Total Orders</span></div><div id="statOrders" class="stat">—</div><span class="muted">Orders received</span></div>
-    <div class="card"><div><span class="staticon pink">◷</span><span class="muted">Pending Orders</span></div><div id="statPending" class="stat">—</div><span class="muted">Awaiting action</span></div>
-    <div class="card"><div><span class="staticon blue">₹</span><span class="muted">Total Revenue</span></div><div id="statSales" class="stat">—</div><span class="muted">Total order value</span></div>
+    <div class="card"><div class="stat-head"><span class="muted">Total Products</span><span class="stat-icon">◇</span></div><div class="stat" id="statProducts">—</div><div class="trend">↑ Store inventory</div></div>
+    <div class="card"><div class="stat-head"><span class="muted">Total Orders</span><span class="stat-icon" style="background:#d9f7f2;color:#159f91">🛒</span></div><div class="stat" id="statOrders">—</div><div class="trend">↑ All received orders</div></div>
+    <div class="card"><div class="stat-head"><span class="muted">Pending Orders</span><span class="stat-icon" style="background:#ffe3f0;color:#dc4b91">◷</span></div><div class="stat" id="statPending">—</div><div class="muted">Waiting for action</div></div>
+    <div class="card"><div class="stat-head"><span class="muted">Total Revenue</span><span class="stat-icon" style="background:#dceaff;color:#397de0">₹</span></div><div class="stat" id="statRevenue">—</div><div class="muted">Sum of order totals</div></div>
   </div>
-
-  <div class="twocol">
-    <div class="card"><h3>Sales Overview</h3><p class="muted">Order values from available data</p><canvas id="salesChart"></canvas></div>
-    <div class="card"><h3>Order Status</h3><canvas id="orderChart"></canvas><div id="orderStatusSummary" class="small muted"></div></div>
-  </div>
-
-  <div class="threecol">
-    <div class="card">
-      <h3>Recent Orders</h3>
-      <div class="tablewrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody id="recentOrders"><tr><td colspan="4">Login to load orders.</td></tr></tbody></table></div>
-      <button class="quick" data-goto="orders">View All Orders →</button>
-    </div>
-    <div class="card"><h3>Top Products</h3><div id="topProducts" class="muted">Products load after login.</div><button class="quick" data-goto="products">View Products →</button></div>
-    <div>
-      <div class="card"><h3>Quick Actions</h3>
-        <button class="quick" data-goto="products">＋ Add New Product</button>
-        <button class="quick bluebtn" data-goto="orders">🛒 Manage Orders</button>
-        <button class="quick success" data-goto="reports">▥ View Reports</button>
-        <button class="quick" data-goto="discounts">✧ Discounts</button>
-      </div>
-      <div class="card"><h3>Low Stock Alert</h3><p class="muted">Stock alerts need a stock field in your product database.</p><div id="stockAlert">Stock information is not available.</div></div>
-    </div>
+  <div class="dashboard-grid">
+    <section class="card span2"><div class="section-head"><h3>Sales Overview</h3><div class="tabs"><button class="active" data-range="7">7 Days</button><button data-range="30">30 Days</button><button data-range="90">3 Months</button></div></div><div id="salesChart"></div></section>
+    <section class="card"><h3>Order Status</h3><div id="orderStatusChart"></div><div id="orderLegend" class="legend"></div></section>
+    <section class="card activity-card"><div class="section-head"><h3>Recent Activity</h3><button class="small-btn" data-goto="orders">View All</button></div><div id="recentActivity" class="muted">Activity is based on available order data.</div></section>
+    <section class="card span2"><div class="section-head"><h3>Recent Orders</h3><div class="tabs"><button class="active" data-order-tab="all">Recent Orders</button><button data-order-tab="pending">Pending Orders</button><button data-order-tab="top">Top Products</button><button data-order-tab="low">Low Stock</button></div><button class="small-btn" data-goto="orders">View All Orders</button></div><div class="tablewrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="recentOrders"></tbody></table></div></section>
+    <section class="card"><div class="section-head"><h3>Top Products</h3><button class="small-btn" data-goto="products">View All</button></div><div id="topProducts"></div></section>
+    <section class="card"><h3>Quick Actions</h3><button class="quick" data-goto="products">⊕ &nbsp; Add New Product</button><button class="quick" data-goto="orders">🛒 &nbsp; Manage Orders</button><button class="quick" data-goto="reports">▥ &nbsp; View Reports</button><button class="quick" data-goto="discounts">◇ &nbsp; Add Discount</button></section>
+    <section class="card"><div class="section-head"><h3>Low Stock Alert</h3><button class="small-btn" data-goto="products">View All</button></div><div id="lowStock"></div><p class="muted">Stock alerts require stock quantities in the backend.</p></section>
   </div>
 </section>
 
-<section id="page-products" class="page">
-  <h2>Products</h2>
-  <div class="card">
-    <h3 id="productTitle">Add New Product</h3>
-    <form id="productForm">
-      <input id="productId" type="hidden">
-      <label>Product name</label><input id="productName" maxlength="200" required>
-      <label>Price (₹)</label><input id="productPrice" type="number" min="0" step=".01" required>
-      <label>Image URL (HTTPS)</label><input id="productImage" type="url" placeholder="https://example.com/image.jpg" required>
-      <div class="actions"><button id="saveProductBtn">Save Product</button><button type="button" id="cancelEdit" class="secondary hidden">Cancel Edit</button></div>
-    </form>
-  </div>
-  <div class="card"><input id="productSearch" placeholder="Search products..."><div id="productsList" class="grid"></div></div>
-</section>
+<section id="page-orders" class="page"><h2>Orders</h2><div class="card"><input id="orderSearch" placeholder="Search order, customer, phone..."><select id="orderFilter"><option value="">All statuses</option><option>pending</option><option>confirmed</option><option>processing</option><option>shipped</option><option>delivered</option><option>cancelled</option><option>rejected</option></select><button id="refreshOrders">Refresh Orders</button></div><div id="ordersList"></div></section>
 
-<section id="page-orders" class="page">
-  <h2>Customer Orders</h2>
-  <div class="card"><div class="row"><input id="orderSearch" placeholder="Search order, name, phone..."><select id="orderFilter"><option value="">All statuses</option><option>pending</option><option>confirmed</option><option>processing</option><option>shipped</option><option>delivered</option><option>cancelled</option><option>rejected</option></select></div><button id="refreshOrders">Refresh Orders</button></div>
-  <div id="ordersList"></div>
-</section>
+<section id="page-products" class="page"><h2>Products</h2><div class="card"><h3 id="productTitle">Add Product</h3><form id="productForm"><input id="productId" type="hidden"><div class="form-grid"><label>Product Name<input id="productName" required maxlength="200"></label><label>Price (₹)<input id="productPrice" type="number" min="0" step=".01" required></label><label style="grid-column:1/-1">Image URL (HTTPS)<input id="productImage" type="url" placeholder="https://example.com/image.jpg" required></label></div><button id="saveProductBtn">Save Product</button> <button id="cancelEdit" type="button" class="hidden" style="background:#666">Cancel</button></form></div><div class="card"><input id="productSearch" placeholder="Search products..."><div id="productsList"></div></div></section>
 
-<section id="page-customers" class="page">
-  <h2>Customers</h2><div class="card"><input id="customerSearch" placeholder="Search customers..."><div id="customersList"></div></div>
-</section>
-
-<section id="page-payments" class="page">
-  <h2>Payments</h2><div class="card"><p class="muted">Review and update payment status for existing orders.</p><input id="paymentSearch" placeholder="Search order or customer..."><div id="paymentsList"></div></div>
-</section>
-
-<section id="page-reports" class="page">
-  <h2>Reports</h2><div class="card"><div id="reportSummary"></div><button id="exportOrders">Export Orders CSV</button></div>
-</section>
-
-<section id="page-discounts" class="page">
-  <h2>Discounts</h2><div class="card"><p>Discounts and coupons can only be saved after the backend supports coupon storage and checkout validation.</p></div>
-</section>
-<section id="page-coupons" class="page">
-  <h2>Coupons</h2><div class="card"><p>Coupon creation and redemption need backend API support. This page does not create fake coupons.</p></div>
-</section>
-<section id="page-categories" class="page">
-  <h2>Categories</h2><div class="card"><p>Category management requires a categories table and backend APIs.</p></div>
-</section>
-<section id="page-settings" class="page">
-  <h2>Settings</h2><div class="card"><h3>Store configuration</h3><p class="muted">Update ADMIN_PASSWORD and DATABASE_URL in Render environment settings, not in this HTML file.</p><p>Do not put passwords or database credentials in public frontend code.</p></div></section>
+<section id="page-customers" class="page"><h2>Customers</h2><div class="card"><input id="customerSearch" placeholder="Search name, email, phone..."><div id="customersList"></div></div></section>
+<section id="page-payments" class="page"><h2>Payments</h2><div class="card"><input id="paymentSearch" placeholder="Search payments..."><div id="paymentsList"></div></div></section>
+<section id="page-reports" class="page"><h2>Reports</h2><div class="card"><div id="reportSummary"></div><button id="exportOrders">Export Orders CSV</button></div></section>
+<section id="page-discounts" class="page"><h2>Discounts</h2><div class="card"><p>Discount rules need backend and checkout support before they can change real prices.</p><p class="muted">This page is informational; it does not create active discounts.</p></div></section>
+<section id="page-coupons" class="page"><h2>Coupons</h2><div class="card"><p>Coupon creation needs backend storage and checkout validation.</p><p class="muted">This page does not save active coupon codes.</p></div></section>
+<section id="page-categories" class="page"><h2>Categories</h2><div class="card"><p>Category management needs a categories table and server API.</p><p class="muted">No categories are saved from this page yet.</p></div></section>
+<section id="page-settings" class="page"><h2>Settings</h2><div class="card"><p>Keep your admin password in Render Environment Variables.</p><p class="muted">Never put ADMIN_PASSWORD or DATABASE_URL in public HTML.</p></div></section>
 </main>
-<footer>Jewellery Store Admin Panel <span style="float:right">Secure · Fast · Reliable</span></footer>
 </div>
-</div>
+<footer>Jewellery Store Admin Panel &nbsp; • &nbsp; Secure &nbsp; • &nbsp; Fast &nbsp; • &nbsp; Reliable</footer>
 
 <script>
 (()=>{
 "use strict";
 const API="/api";
-let token="",products=[],orders=[];
+let token="",products=[],orders=[],rangeDays=7,orderTab="all";
 const $=id=>document.getElementById(id);
-const statuses=["pending","confirmed","processing","shipped","delivered","cancelled","rejected"];
-function node(tag,text,cls){const n=document.createElement(tag);n.textContent=text==null?"":String(text);if(cls)n.className=cls;return n}
-function money(v){return "₹"+Number(v||0).toLocaleString("en-IN",{maximumFractionDigits:2})}
-function msg(text,error=false,login=false){const n=$(login?"loginMessage":"message");n.textContent=text;n.className="notice "+(error?"error":"ok")}
-function clearMsg(){$("message").textContent="";$("message").className=""}
-function arr(d,key){if(Array.isArray(d))return d;return d&&Array.isArray(d[key])?d[key]:[]}
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
+const arr=(d,k)=>Array.isArray(d)?d:(Array.isArray(d?.[k])?d[k]:[]);
+function note(t,bad=false,login=false){const n=$(login?"loginMessage":"message");if(n){n.textContent=t;n.className="notice "+(bad?"error":"ok")}}
+function clearNote(){$("message").textContent="";$("message").className=""}
 async function api(path,options={}){
  const headers={...(options.headers||{})};
  if(options.body)headers["Content-Type"]="application/json";
  if(token)headers.Authorization="Bearer "+token;
- const c=new AbortController(),timer=setTimeout(()=>c.abort(),18000);
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
  try{
-  const r=await fetch(API+path,{...options,headers,signal:c.signal});
-  const raw=await r.text();let d={};
-  if(raw){try{d=JSON.parse(raw)}catch{d={message:raw}}}
-  if(!r.ok)throw Error(d.error||d.message||"HTTP "+r.status);
+  const r=await fetch(API+path,{...options,headers,signal:controller.signal});
+  const raw=await r.text();let d={};if(raw){try{d=JSON.parse(raw)}catch{d={message:raw}}}
+  if(!r.ok)throw Error(d.error||d.message||("HTTP "+r.status));
   return d;
- }catch(e){if(e.name==="AbortError")throw Error("Request timed out. Render server check karein.");throw e}
+ }catch(e){if(e.name==="AbortError")throw Error("Request timeout. Render server check karein.");throw e}
  finally{clearTimeout(timer)}
 }
-function showLogin(on){$("loginArea").classList.toggle("hidden",on);$("app").classList.toggle("hidden",!on);$("logoutBtn").classList.toggle("hidden",!on)}
-function go(page){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id==="page-"+page));document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.page===page));if(page==="customers")renderCustomers();if(page==="payments")renderPayments();if(page==="reports")renderReports()}
-document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
-document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.goto)));
-
+function loggedIn(v){$("loginArea").classList.toggle("hidden",v);$("app").classList.toggle("hidden",!v);$("logoutBtn").classList.toggle("hidden",!v)}
+function go(p){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id==="page-"+p));document.querySelectorAll(".nav[data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===p));if(p==="customers")renderCustomers();if(p==="payments")renderPayments();if(p==="reports")renderReports()}
+document.querySelectorAll(".nav[data-page]").forEach(b=>b.onclick=()=>go(b.dataset.page));
+document.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>go(b.dataset.goto));
+$("todayDate").textContent=new Date().toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"});
 $("loginForm").addEventListener("submit",async e=>{
  e.preventDefault();const b=$("loginBtn");b.disabled=true;b.textContent="Logging in...";
- try{const d=await api("/admin/login",{method:"POST",body:JSON.stringify({password:$("password").value})});if(!d.token)throw Error("Login token missing from server response.");token=d.token;$("password").value="";showLogin(true);msg("Login successful.");await refreshAll()}
- catch(e){msg("Login failed: "+e.message,true,true)}
+ try{const d=await api("/admin/login",{method:"POST",body:JSON.stringify({password:$("password").value})});if(!d.token)throw Error("Server ne login token return nahi kiya.");token=d.token;$("password").value="";loggedIn(true);note("Login successful.");await refreshAll()}
+ catch(err){note("Login failed: "+err.message,true,true)}
  finally{b.disabled=false;b.textContent="Login"}
 });
-$("logoutBtn").addEventListener("click",()=>{token="";products=[];orders=[];showLogin(false);clearMsg();$("loginMessage").textContent="You have logged out."});
-$("refreshAll").addEventListener("click",refreshAll);
-$("refreshOrders").addEventListener("click",loadOrders);
-$("orderSearch").addEventListener("input",renderOrders);
-$("orderFilter").addEventListener("change",renderOrders);
-$("productSearch").addEventListener("input",renderProducts);
-$("customerSearch").addEventListener("input",renderCustomers);
-$("paymentSearch").addEventListener("input",renderPayments);
-$("globalSearch").addEventListener("input",()=>{
- const q=$("globalSearch").value.trim();
- if(!q)return;
- $("orderSearch").value=q;$("productSearch").value=q;$("customerSearch").value=q;$("paymentSearch").value=q;
-});
-async function refreshAll(){clearMsg();await Promise.all([loadProducts(),loadOrders()]);updateStats();drawCharts()}
+function logout(){token="";products=[];orders=[];loggedIn(false);$("password").value="";$("loginMessage").textContent="";go("dashboard")}
+$("logoutBtn").onclick=logout;$("sideLogout").onclick=logout;
+
 async function loadProducts(){
- $("productsList").textContent="Loading products...";
+ $("productsList").textContent="Loading...";
  try{products=arr(await api("/products"),"products");renderProducts();updateStats();renderTopProducts()}
- catch(e){$("productsList").textContent="Products load failed: "+e.message}
+ catch(e){$("productsList").textContent="Products load nahi hue: "+e.message}
 }
 async function loadOrders(){
- $("ordersList").textContent="Loading orders...";
- try{orders=arr(await api("/orders"),"orders");renderOrders();renderRecent();updateStats();drawCharts();renderTopProducts();if($("page-customers").classList.contains("active"))renderCustomers();if($("page-payments").classList.contains("active"))renderPayments();if($("page-reports").classList.contains("active"))renderReports()}
- catch(e){$("ordersList").textContent="Orders load failed: "+e.message}
+ $("ordersList").textContent="Loading...";
+ try{orders=arr(await api("/orders"),"orders");renderOrders();renderDashboardOrders();renderRecentActivity();renderOrderStatus();updateStats();renderCustomers();renderPayments();renderReports()}
+ catch(e){$("ordersList").textContent="Orders load nahi hue: "+e.message}
 }
+async function refreshAll(){clearNote();await Promise.all([loadProducts(),loadOrders()])}
+$("refreshAll")?.addEventListener("click",refreshAll);
+$("refreshOrders").onclick=loadOrders;
+
 function updateStats(){
  $("statProducts").textContent=products.length;
  $("statOrders").textContent=orders.length;
- $("statCustomers").textContent=new Set(orders.map(o=>o.customer_email||o.phone||o.customer_name).filter(Boolean)).size;
- $("statSales").textContent=money(orders.reduce((s,o)=>s+Number(o.total||0),0));
  $("statPending").textContent=orders.filter(o=>String(o.status).toLowerCase()==="pending").length;
- $("statPayments").textContent=orders.filter(o=>String(o.payment_status||"pending").toLowerCase()==="pending").length;
- $("statPaid").textContent=orders.filter(o=>String(o.payment_status).toLowerCase()==="approved").length;
- $("statRejected").textContent=orders.filter(o=>String(o.status).toLowerCase()==="rejected").length;
+ $("statRevenue").textContent=money(orders.reduce((s,o)=>s+Number(o.total||0),0));
+ $("sideOrderCount").textContent=orders.filter(o=>String(o.status).toLowerCase()==="pending").length;
 }
 function renderProducts(){
+ const q=($("productSearch")?.value||"").toLowerCase(),list=products.filter(p=>(p.name||"").toLowerCase().includes(q));
  const box=$("productsList");box.replaceChildren();
- const q=$("productSearch").value.toLowerCase();
- const list=products.filter(p=>String(p.name||"").toLowerCase().includes(q));
- if(!list.length){box.append(node("p","No matching products."));return}
+ if(!list.length){box.textContent="No products found.";return}
  list.forEach(p=>{
-  const c=node("article","","item");
-  if(p.image){const im=node("img");im.src=p.image;im.alt=p.name||"Product";im.loading="lazy";im.onerror=()=>im.remove();c.append(im)}
-  c.append(node("h3",p.name||"Unnamed product"),node("p",money(p.price)));
-  const a=node("div","","actions"),edit=node("button","Edit"),del=node("button","Delete","danger");
-  edit.type=del.type="button";edit.addEventListener("click",()=>editProduct(p));del.addEventListener("click",()=>deleteProduct(p));a.append(edit,del);c.append(a);box.append(c)
- })
+  const card=document.createElement("div");card.className="product-row";
+  const img=document.createElement("img");img.className="product-pic";img.alt=p.name||"Product";img.src=p.image||"";img.onerror=()=>{img.style.display="none"};
+  const info=document.createElement("div");info.style.flex="1";info.innerHTML="<strong>"+esc(p.name||"Unnamed product")+"</strong>"+money(p.price);
+  const edit=document.createElement("button");edit.className="small-btn";edit.textContent="Edit";edit.onclick=()=>editProduct(p);
+  const del=document.createElement("button");del.className="small-btn";del.style.background="#c52d48";del.textContent="Delete";del.onclick=()=>deleteProduct(p);
+  card.append(img,info,edit,del);box.append(card);
+ });
 }
-function editProduct(p){$("productId").value=p.id||"";$("productName").value=p.name||"";$("productPrice").value=p.price??"";$("productImage").value=p.image||"";$("productTitle").textContent="Edit Product";$("saveProductBtn").textContent="Update Product";$("cancelEdit").classList.remove("hidden");$("productForm").scrollIntoView({behavior:"smooth"})}
-function resetProduct(){$("productForm").reset();$("productId").value="";$("productTitle").textContent="Add New Product";$("saveProductBtn").textContent="Save Product";$("cancelEdit").classList.add("hidden")}
-$("cancelEdit").addEventListener("click",resetProduct);
-$("productForm").addEventListener("submit",async e=>{
- e.preventDefault();const id=$("productId").value,name=$("productName").value.trim(),price=Number($("productPrice").value),image=$("productImage").value.trim(),b=$("saveProductBtn");
- if(!name||!image.startsWith("https://")||!Number.isFinite(price)||price<0){msg("Valid product name, price and HTTPS image URL enter karein.",true);return}
- b.disabled=true;
- try{await api(id?"/products/"+encodeURIComponent(id):"/products",{method:id?"PUT":"POST",body:JSON.stringify({name,price,image})});msg(id?"Product updated.":"Product added.");resetProduct();await loadProducts()}
- catch(e){msg("Product save failed: "+e.message,true)}finally{b.disabled=false}
-});
-async function deleteProduct(p){if(!confirm("Delete 
+function editProduct
