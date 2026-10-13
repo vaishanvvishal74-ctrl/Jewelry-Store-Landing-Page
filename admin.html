@@ -1,1 +1,102 @@
-admin.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jewellery Admin Panel</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f2eb;
+      color: #33251c;
+    }
+    header {
+      background: #5b3825;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    main {
+      max-width: 700px;
+      margin: 25px auto;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0001;
+    }
+    input, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin: 7px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background: #8b5e3c;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #products { padding-left: 20px; }
+    .note { color: #805b42; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Jewellery Store</h1>
+    <p>Admin Panel</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Add Product</h2>
+      <form id="productForm">
+        <input id="name" placeholder="Product name" required>
+        <input id="price" type="number" min="0" placeholder="Price in ₹" required>
+        <input id="image" type="url" placeholder="Product image URL" required>
+        <button type="submit">Add Product</button>
+      </form>
+      <p class="note">यह शुरुआती demo है। Products अभी इसी browser में सेव होंगे।</p>
+    </section>
+
+    <section class="card">
+      <h2>Product List</h2>
+      <ul id="products"></ul>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("productForm");
+    const list = document.getElementById("products");
+    let products = [];
+
+    function showProducts() {
+      list.replaceChildren();
+      products.forEach(product => {
+        const item = document.createElement("li");
+        item.textContent = `${product.name} — ₹${product.price}`;
+        list.appendChild(item);
+      });
+    }
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      products.push({
+        name: document.getElementById("name").value.trim(),
+        price: document.getElementById("price").value,
+        image: document.getElementById("image").value.trim()
+      });
+      showProducts();
+      form.reset();
+    });
+  </script>
+</body>
+</html>
