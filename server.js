@@ -738,4 +738,126 @@ app.patch("/api/orders/:id/payment", requireAdmin, async (req, res) => {
   }
 
   try {
-    con
+        const result = await pool.query(`
+      UPDATE orders
+      SET payment_status = $1,
+          payment_reference = $2
+      WHERE id = $3
+      RETURNING *
+    `, [status, reference || "", id]);
+
+    if (!result.rowCount) {
+      return res.status(404).json({
+        error: "Order not found"
+      });
+    }
+
+    res.json({
+      message: "Payment status updated",
+      order: result.rows[0]
+    });
+  } catch (error) {
+    console.error("Payment update failed:", error.message);
+    res.status(500).json({
+      error: "Could not update payment"
+    });
+  }
+});
+
+// Customer: view own orders
+app.get("/api/customer/orders", requireCustomer, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT * FROM orders
+       WHERE customer_id = $1
+       ORDER BY created_at DESC`,
+      [req.customerId]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Customer orders failed:", error.message);
+    res.status(500).json({
+      error: "Could not load your orders"
+    });
+  }
+});
+
+// Customer: submit feedback for their own order
+app.post("/api/orders/:id/feedback", requireCustomer, async (req, res) => {
+  const id = validId(req.params.id);
+  const feedback = req.body?.feedback;
+
+  if (
+    !id ||
+    typeof feedback !== "string" ||
+    !feedback.trim() ||
+    feedback.trim().length > 2000
+  ) {
+    return res.status(400).json({
+      error: "Enter valid feedback"
+    });
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE orders
+       SET feedback = $1
+       WHERE id = $2 AND customer_id = $3
+       RETURNING id, feedback`,
+      [feedback.trim(), id, req.customerId]
+    );
+
+    if (!result.rowCount) {
+      return res.status(404).json({
+        error: "Order not found or does not belong to you"
+      });
+    }
+
+    res.json({
+      message: "Feedback submitted successfully",
+      order: result.rows[0]
+    });
+  } catch (error) {
+    console.error("Feedback submission failed:", error.message);
+    res.status(500).json({
+      error: "Could not submit feedback"
+    });
+  }
+});
+
+// Unknown API routes
+app.use("/api", (req, res) => {
+  res.status(404).json({
+    error: "API endpoint not found"
+  });
+});
+
+// General error handler
+app.use((error, req, res, next) => {
+  console.error("Unexpected server error:", error.message);
+
+  if (res.headersSent) {
+    return next(error);
+  }
+
+  res.status(500).json({
+    error: "Internal server error"
+  });
+});
+
+// Start server
+async function startServer() {
+  try {
+    await initializeDatabase();
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Jewellery Store running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Server startup failed:", error.message);
+    process.exit(1);
+  }
+}
+
+startServer();
