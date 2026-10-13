@@ -25,15 +25,22 @@ app.get("/", (req, res, next) => {
   next();
 });
 
-// Serve the admin page if it is stored in the repository root.
-app.get("/admin.html", (req, res, next) => {
-  const adminFile = path.join(ROOT, "admin.html");
-  if (fs.existsSync(adminFile)) {
-    return res.sendFile(adminFile);
-  }
-  next();
-});
+// Serve the website homepage from public/index.html.
+app.get("/", (req, res, next) => {
+  const publicIndex = path.join(PUBLIC_DIR, "index.html");
 
+  if (fs.existsSync(publicIndex)) {
+    return res.sendFile(publicIndex);
+  }
+
+  if (fs.existsSync(ROOT_INDEX)) {
+    return res.sendFile(ROOT_INDEX);
+  }
+
+  return res.status(404).send(
+    "index.html not found. Check the public folder."
+  );
+});
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.DATABASE_URL
