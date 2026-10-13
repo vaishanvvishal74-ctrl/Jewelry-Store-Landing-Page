@@ -1,469 +1,450 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#8f5b3e">
-<title>Jewellery Store Admin</title>
-<style>
-:root{--p:#8f5b3e;--dark:#68402c;--bg:#f5f1ed;--white:#fff;--text:#29231f;--muted:#766d66;--border:#e9ded5;--red:#c0392b;--green:#18794e}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
-header{background:white;border-bottom:1px solid var(--border);padding:15px;position:sticky;top:0;z-index:5}
-.header-inner,main{max-width:1200px;margin:auto}
-.header-inner{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-main{padding:20px 14px 40px}
-h1{font-size:24px}h2{font-size:20px}
-.muted{font-size:13px;color:var(--muted)}
-.panel,.stat,.login-card{background:white;border:1px solid var(--border);border-radius:14px;padding:17px;margin-bottom:16px}
-.login-wrap{min-height:100vh;display:grid;place-items:center;padding:18px}
-.login-card{width:100%;max-width:420px;padding:25px}
-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
-input,select,textarea{width:100%;padding:11px;border:1px solid var(--border);border-radius:9px;background:white;color:var(--text)}
-button{border:0;border-radius:9px;padding:10px 13px;background:var(--p);color:white;font-weight:700}
-button:hover{filter:brightness(.95)}
-button:disabled{opacity:.5}
-.secondary{background:#f1e7df;color:var(--dark)}
-.danger{background:#fff0ee;color:var(--red)}
-.success{background:#e8f7ef;color:var(--green)}
-.full{width:100%;margin-top:16px}
-.actions{display:flex;gap:6px;flex-wrap:wrap}
-.actions button{font-size:12px;padding:8px}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.tab{background:white;color:var(--text);border:1px solid var(--border)}
-.tab.active{background:var(--p);color:white}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.stat strong{font-size:25px;display:block;margin-top:8px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
-.toolbar>*{flex:1;min-width:150px}
-.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:9px}
-table{width:100%;border-collapse:collapse;min-width:650px}
-th,td{text-align:left;padding:11px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top}
-th{background:#fffaf5}
-.badge{display:inline-block;background:#f1e7df;padding:5px 8px;border-radius:20px;font-size:11px;font-weight:700}
-.status-delivered,.status-approved{background:#e3f6e9;color:#17663b}
-.status-cancelled,.status-rejected{background:#ffe9e5;color:#a12b20}
-.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
-.span-2{grid-column:1/-1}
-.detail{border:1px solid var(--border);padding:13px;border-radius:10px;margin:10px 0;overflow-wrap:anywhere}
-.notice{padding:11px;border-radius:9px;margin:10px 0;background:#f1e7df;overflow-wrap:anywhere}
-.notice.error{background:#fff0ee;color:#9e2419}
-.notice.success{background:#e8f7ef;color:#14643f}
-.product-img{width:44px;height:44px;object-fit:cover;border-radius:7px;vertical-align:middle;margin-right:8px}
-@media(max-width:650px){.stats{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.span-2{grid-column:auto}.panel{padding:12px}.header-title{font-size:15px}}
-</style>
-</head>
-<body>
-
-<section id="loginView" class="login-wrap">
-<form id="loginForm" class="login-card">
-<h1>✦ Store Admin</h1>
-<p class="muted">अपने Jewellery Store को मैनेज करने के लिए Login करें।</p>
-<label for="password">Admin Password</label>
-<input id="password" type="password" required autocomplete="current-password">
-<button class="full" id="loginBtn" type="submit">Login</button>
-<div id="loginMessage" aria-live="polite"></div>
-</form>
-</section>
-
-<div id="adminView" class="hidden">
-<header><div class="header-inner">
-<div><strong class="header-title">✦ Jewellery Store Admin</strong><div class="muted">Products, Orders और Payments</div></div>
-<div class="actions">
-<button class="secondary" id="refreshBtn">Refresh</button>
-<button class="danger" id="logoutBtn">Logout</button>
-</div>
-</div></header>
-
-<main>
-<div id="globalMessage" aria-live="polite"></div>
-
-<div class="stats">
-<div class="stat">Total Products<strong id="productCount">0</strong></div>
-<div class="stat">Total Orders<strong id="orderCount">0</strong></div>
-<div class="stat">Pending Orders<strong id="pendingCount">0</strong></div>
-</div>
-
-<nav class="tabs">
-<button class="tab active" data-tab="orders">Orders</button>
-<button class="tab" data-tab="products">Products</button>
-</nav>
-
-<section id="ordersSection">
-<div class="panel">
-<h2>Customer Orders</h2>
-<div class="toolbar">
-<input id="orderSearch" placeholder="Order ID, Customer या Phone खोजें">
-<select id="orderStatusFilter">
-<option value="">सभी Status</option>
-<option value="pending">Pending</option>
-<option value="confirmed">Confirmed</option>
-<option value="processing">Processing</option>
-<option value="shipped">Shipped</option>
-<option value="delivered">Delivered</option>
-<option value="cancelled">Cancelled</option>
-</select>
-</div>
-<div class="table-wrap"><table>
-<thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
-<tbody id="ordersBody"><tr><td colspan="6">Orders लोड हो रहे हैं...</td></tr></tbody>
-</table></div>
-</div>
-<div id="orderDetailPanel" class="panel hidden">
-<div class="header-inner"><h2 id="detailTitle">Order Details</h2><button class="secondary" id="closeDetailsBtn">Close</button></div>
-<div id="orderDetails"></div>
-</div>
-</section>
-
-<section id="productsSection" class="hidden">
-<div class="panel">
-<div class="header-inner"><h2>Products</h2><button id="newProductBtn">+ Add Product</button></div>
-<div id="productFormWrap" class="detail hidden">
-<h3 id="productFormTitle">Add Product</h3>
-<form id="productForm">
-<div class="form-grid">
-<div class="span-2"><label>Product Name</label><input id="productName" required maxlength="200"></div>
-<div><label>Price (₹)</label><input id="productPrice" type="number" min="0" step="0.01" required></div>
-<div><label>Image URL (HTTPS)</label><input id="productImage" type="url" placeholder="https://..." required></div>
-</div>
-<div class="actions" style="margin-top:14px">
-<button id="saveProductBtn">Save Product</button>
-<button type="button" class="secondary" id="cancelProductBtn">Cancel</button>
-</div>
-<div id="productFormMessage"></div>
-</form>
-</div>
-<input id="productSearch" placeholder="Product खोजें" style="margin:12px 0">
-<div class="table-wrap"><table>
-<thead><tr><th>Product</th><th>Price</th><th>ID</th><th>Actions</th></tr></thead>
-<tbody id="productsBody"><tr><td colspan="4">Products लोड हो रहे हैं...</td></tr></tbody>
-</table></div>
-</div>
-</section>
-</main>
-</div>
-
-<script>
-"use strict";
-
-const API="/api";
-const TOKEN_KEY="jewelleryAdminToken";
-const STATUSES=["pending","confirmed","processing","shipped","delivered","cancelled"];
-let products=[],orders=[],editingProductId=null,selectedOrderId=null;
-const $=id=>document.getElementById(id);
-
-function esc(v){
- return String(v??"").replace(/[&<>"']/g,c=>({
-  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
- })[c]);
-}
-function money(v){
- const n=Number(v);
- return new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR"}).format(Number.isFinite(n)?n:0);
-}
-function date(v){
- const d=new Date(v);
- return v&&!Number.isNaN(d.getTime())?d.toLocaleString("en-IN"):"—";
-}
-function token(){return localStorage.getItem(TOKEN_KEY)||""}
-function msg(id,text,type=""){
- $(id).className=text?"notice "+type:"";
- $(id).textContent=text;
-}
-function globalMsg(text,type=""){msg("globalMessage",text,type)}
-
-async function api(path,options={}){
- const headers={...(options.headers||{})};
- if(options.body!==undefined)headers["Content-Type"]="application/json";
- if(token())headers.Authorization="Bearer "+token();
- const response=await fetch(API+path,{...options,headers});
- const raw=await response.text();
- let data={};
- try{data=raw?JSON.parse(raw):{}}catch{data={error:raw||"Invalid server response"}}
- if(response.status===401){
-  localStorage.removeItem(TOKEN_KEY);
-  $("adminView").classList.add("hidden");
-  $("loginView").classList.remove("hidden");
-  throw Error(data.error||"Session expired. Please login again.");
- }
- if(!response.ok)throw Error(data.error||data.message||"Request failed");
- return data;
-}
-function showLogin(){
- $("adminView").classList.add("hidden");
- $("loginView").classList.remove("hidden");
-}
-function showAdmin(){
- $("loginView").classList.add("hidden");
- $("adminView").classList.remove("hidden");
-}
-
-$("loginForm").addEventListener("submit",async e=>{
- e.preventDefault();
- $("loginBtn").disabled=true;
- msg("loginMessage","Login हो रहा है...");
- try{
-  const response=await fetch(API+"/admin/login",{
-   method:"POST",headers:{"Content-Type":"application/json"},
-   body:JSON.stringify({password:$("password").value})
-  });
-  const data=await response.json();
-  if(!response.ok)throw Error(data.error||"Login failed");
-  if(!data.token)throw Error("Login token नहीं मिला");
-  localStorage.setItem(TOKEN_KEY,data.token);
-  $("password").value="";
-  showAdmin();
-  await loadAll();
-  globalMsg("Login सफल हुआ","success");
- }catch(e){msg("loginMessage",e.message,"error")}
- finally{$("loginBtn").disabled=false}
-});
-
-$("logoutBtn").addEventListener("click",async()=>{
- try{await api("/admin/logout",{method:"POST"})}catch(e){}
- localStorage.removeItem(TOKEN_KEY);
- showLogin();
- msg("loginMessage","आप Logout हो गए हैं","success");
-});
-
-async function checkSession(){
- if(!token()){showLogin();return}
- try{
-  await api("/admin/check");
-  showAdmin();
-  await loadAll();
- }catch(e){
-  showLogin();
-  msg("loginMessage",e.message,"error");
- }
-}
-
-async function loadAll(){
- globalMsg("Data लोड हो रहा है...");
- const results=await Promise.allSettled([loadProducts(),loadOrders()]);
- const errors=results.filter(x=>x.status==="rejected");
- if(errors.length)globalMsg(errors.map(x=>x.reason.message).join(" | "),"error");
- else globalMsg("Data अपडेट हो गया","success");
- updateStats();
-}
-$("refreshBtn").addEventListener("click",loadAll);
-
-async function loadProducts(){
- const data=await api("/products");
- if(!Array.isArray(data))throw Error("Products response गलत है");
- products=data;
- renderProducts();
- updateStats();
-}
-async function loadOrders(){
- const data=await api("/orders");
- if(!Array.isArray(data))throw Error("Orders response गलत है");
- orders=data;
- renderOrders();
- updateStats();
- if(selectedOrderId!==null){
-  const o=orders.find(x=>String(x.id)===String(selectedOrderId));
-  if(o)renderOrderDetails(o);else closeDetails();
- }
-}
-function updateStats(){
- $("productCount").textContent=products.length;
- $("orderCount").textContent=orders.length;
- $("pendingCount").textContent=orders.filter(o=>o.status==="pending").length;
-}
-
-document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{
- document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));
- $("ordersSection").classList.toggle("hidden",b.dataset.tab!=="orders");
- $("productsSection").classList.toggle("hidden",b.dataset.tab!=="products");
-}));
-
-function renderOrders(){
- const q=$("orderSearch").value.trim().toLowerCase();
- const status=$("orderStatusFilter").value;
- const list=orders.filter(o=>{
-  const matches=[o.id,o.customer_name,o.customer_email,o.phone].some(v=>String(v??"").toLowerCase().includes(q));
-  return matches&&(!status||o.status===status);
- });
- if(!list.length){
-  $("ordersBody").innerHTML='<tr><td colspan="6">कोई Order नहीं मिला</td></tr>';return;
- }
- $("ordersBody").innerHTML=list.map(o=>`
- <tr>
- <td>#${esc(o.id)}</td>
- <td>${esc(o.customer_name)}<br><small>${esc(o.phone)}</small></td>
- <td>${money(o.total)}</td>
- <td><span class="badge">${esc(o.status)}</span></td>
- <td>${esc(date(o.created_at))}</td>
- <td><button data-view-order="${esc(o.id)}">Details</button></td>
- </tr>`).join("");
-}
-$("orderSearch").addEventListener("input",renderOrders);
-$("orderStatusFilter").addEventListener("change",renderOrders);
-
-$("ordersBody").addEventListener("click",e=>{
- const b=e.target.closest("[data-view-order]");
- if(!b)return;
- const order=orders.find(o=>String(o.id)===b.dataset.viewOrder);
- if(order)renderOrderDetails(order);
-});
-
-function renderOrderDetails(o){
- selectedOrderId=o.id;
- $("orderDetailPanel").classList.remove("hidden");
- $("detailTitle").textContent="Order #"+o.id;
- const items=Array.isArray(o.items)?o.items:[];
- $("orderDetails").innerHTML=`
- <div class="detail"><strong>Customer</strong><p>${esc(o.customer_name)}</p>
- <p>Email: ${esc(o.customer_email)}</p><p>Phone: ${esc(o.phone)}</p>
- <p>Address: ${esc(o.address)}</p><p>Date: ${esc(date(o.created_at))}</p></div>
- <div class="detail"><strong>Products</strong>
- ${items.map(i=>`<p>${esc(i.name)} × ${esc(i.quantity)} — ${money(i.line_total??Number(i.price)*Number(i.quantity))}</p>`).join("")}
- <hr><strong>Total: ${money(o.total)}</strong></div>
- <div class="detail"><strong>Order Status</strong>
- <p>Current: <span class="badge">${esc(o.status)}</span></p>
- <label for="newOrderStatus">Update Status</label>
- <select id="newOrderStatus">${STATUSES.map(s=>`<option value="${s}" ${s===o.status?"selected":""}>${s}</option>`).join("")}</select>
- <div class="actions" style="margin-top:10px">
- <button data-save-status="${esc(o.id)}">Save Status</button>
- <button class="success" data-quick-status="${esc(o.id)}" data-status="confirmed">Accept Order</button>
- <button class="danger" data-quick-status="${esc(o.id)}" data-status="cancelled">Reject Order</button>
- </div></div>
- <div class="detail"><strong>Payment</strong>
- <p>Method: ${esc(o.payment_method)}</p>
- <p>Current payment status: <span class="badge">${esc(o.payment_status)}</span></p>
- <p>Reference: ${esc(o.payment_reference||"Not provided")}</p>
- <p class="muted">Payment approve करने से पहले वास्तविक भुगतान की पुष्टि करें।</p>
- <div class="actions">
- <button class="success" data-payment="${esc(o.id)}" data-payment-status="approved">Approve Payment</button>
- <button class="danger" data-payment="${esc(o.id)}" data-payment-status="rejected">Reject Payment</button>
- <button class="secondary" data-payment="${esc(o.id)}" data-payment-status="pending">Set Pending</button>
- </div></div>
- <div class="detail"><strong>Customer Feedback</strong><p>${esc(o.feedback||"अभी कोई Feedback नहीं")}</p></div>`;
- $("orderDetailPanel").scrollIntoView({behavior:"smooth",block:"start"});
-}
-
-$("orderDetails").addEventListener("click",async e=>{
- const quick=e.target.closest("[data-quick-status]");
- const save=e.target.closest("[data-save-status]");
- const pay=e.target.closest("[data-payment]");
- try{
-  if(quick){
-   await api("/orders/"+encodeURIComponent(quick.dataset.quickStatus)+"/status",{
-    method:"PATCH",body:JSON.stringify({status:quick.dataset.status})
-   });
-   globalMsg("Order status अपडेट हो गया","success");
-   await loadOrders();
-  }else if(save){
-   const status=$("newOrderStatus").value;
-   await api("/orders/"+encodeURIComponent(save.dataset.saveStatus)+"/status",{
-    method:"PATCH",body:JSON.stringify({status})
-   });
-   globalMsg("Order status अपडेट हो गया","success");
-   await loadOrders();
-  }else if(pay){
-   const id=pay.dataset.payment;
-   const payment_status=pay.dataset.paymentStatus;
-   const reference=orders.find(o=>String(o.id)===id)?.payment_reference||"";
-   if(payment_status==="approved"&&!confirm("क्या आपने वास्तविक भुगतान verify कर लिया है?"))return;
-   await api("/orders/"+encodeURIComponent(id)+"/payment",{
-    method:"PATCH",body:JSON.stringify({payment_status,payment_reference:reference})
-   });
-   globalMsg("Payment status अपडेट हो गया","success");
-   await loadOrders();
-  }
- }catch(error){globalMsg(error.message,"error")}
-});
-function closeDetails(){
- selectedOrderId=null;
- $("orderDetailPanel").classList.add("hidden");
- $("orderDetails").innerHTML="";
-}
-$("closeDetailsBtn").addEventListener("click",closeDetails);
-
-function renderProducts(){
- const q=$("productSearch").value.trim().toLowerCase();
- const list=products.filter(p=>(p.name||"").toLowerCase().includes(q));
- if(!list.length){
-  $("productsBody").innerHTML='<tr><td colspan="4">कोई Product नहीं मिला</td></tr>';return;
- }
- $("productsBody").innerHTML=list.map(p=>`
- <tr><td>${p.image?`<img class="product-img" src="${esc(p.image)}" alt="" loading="lazy">`:""}${esc(p.name)}</td>
- <td>${money(p.price)}</td><td>${esc(p.id)}</td>
- <td><div class="actions">
- <button data-edit-product="${esc(p.id)}">Edit</button>
- <button class="danger" data-delete-product="${esc(p.id)}">Delete</button>
- </div></td></tr>`).join("");
-}
-$("productSearch").addEventListener("input",renderProducts);
-function openProductForm(p=null){
- editingProductId=p?p.id:null;
- $("productFormTitle").textContent=p?"Edit Product":"Add Product";
- $("productName").value=p?.name||"";
- $("productPrice").value=p?.price??"";
- $("productImage").value=p?.image||"";
- $("productFormWrap").classList.remove("hidden");
- msg("productFormMessage","");
- $("productFormWrap").scrollIntoView({behavior:"smooth",block:"start"});
-}
-function closeProductForm(){
- editingProductId=null;
- $("productForm").reset();
- $("productFormWrap").classList.add("hidden");
- msg("productFormMessage","");
-}
-$("newProductBtn").addEventListener("click",()=>openProductForm());
-$("cancelProductBtn").addEventListener("click",closeProductForm);
-$("productsBody").addEventListener("click",async e=>{
- const edit=e.target.closest("[data-edit-product]");
- const del=e.target.closest("[data-delete-product]");
- if(edit){
-  const p=products.find(x=>String(x.id)===edit.dataset.editProduct);
-  if(p)openProductForm(p);
- }
- if(del){
-  const p=products.find(x=>String(x.id)===del.dataset.deleteProduct);
-  if(!p||!confirm("Product '"+p.name+"' delete करना है?"))return;
-  try{
-   await api("/products/"+encodeURIComponent(p.id),{method:"DELETE"});
-   await loadProducts();
-   globalMsg("Product delete हो गया","success");
-  }catch(error){globalMsg(error.message,"error")}
- }
-});
-$("productForm").addEventListener("submit",async e=>{
- e.preventDefault();
- const button=$("saveProductBtn");
- button.disabled=true;
- const body={
-  name:$("productName").value.trim(),
-  price:$("productPrice").value,
-  image:$("productImage").value.trim()
- };
- if(!/^https:\/\/\S+$/i.test(body.image)){
-  msg("productFormMessage","HTTPS image URL दर्ज करें","error");
-  button.disabled=false;return;
- }
- try{
-  if(editingProductId!==null){
-   await api("/products/"+encodeURIComponent(editingProductId),{
-    method:"PUT",body:JSON.stringify(body)
-   });
-  }else{
-   await api("/products",{method:"POST",body:JSON.stringify(body)});
-  }
-  closeProductForm();
-  await loadProducts();
-  globalMsg("Product सेव हो गया","success");
- }catch(error){msg("productFormMessage",error.message,"error")}
- finally{button.disabled=false}
-});
-
-checkSession();
-</script>
-</body>
-  </html>
+<!DOCTYPE html>  <html lang="hi">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1">  
+<meta name="theme-color" content="#8f5b3e">  
+<title>Jewellery Store Admin</title>  
+<style>  
+:root{--p:#8f5b3e;--dark:#68402c;--bg:#f5f1ed;--white:#fff;--text:#29231f;--muted:#766d66;--border:#e9ded5;--red:#c0392b;--green:#18794e}  
+*{box-sizing:border-box}  
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif}  
+button,input,select,textarea{font:inherit}  
+button{cursor:pointer}  
+.hidden{display:none!important}  
+header{background:white;border-bottom:1px solid var(--border);padding:15px;position:sticky;top:0;z-index:5}  
+.header-inner,main{max-width:1200px;margin:auto}  
+.header-inner{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}  
+main{padding:20px 14px 40px}  
+h1{font-size:24px}h2{font-size:20px}  
+.muted{font-size:13px;color:var(--muted)}  
+.panel,.stat,.login-card{background:white;border:1px solid var(--border);border-radius:14px;padding:17px;margin-bottom:16px}  
+.login-wrap{min-height:100vh;display:grid;place-items:center;padding:18px}  
+.login-card{width:100%;max-width:420px;padding:25px}  
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}  
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--border);border-radius:9px;background:white;color:var(--text)}  
+button{border:0;border-radius:9px;padding:10px 13px;background:var(--p);color:white;font-weight:700}  
+button:hover{filter:brightness(.95)}  
+button:disabled{opacity:.5}  
+.secondary{background:#f1e7df;color:var(--dark)}  
+.danger{background:#fff0ee;color:var(--red)}  
+.success{background:#e8f7ef;color:var(--green)}  
+.full{width:100%;margin-top:16px}  
+.actions{display:flex;gap:6px;flex-wrap:wrap}  
+.actions button{font-size:12px;padding:8px}  
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}  
+.tab{background:white;color:var(--text);border:1px solid var(--border)}  
+.tab.active{background:var(--p);color:white}  
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}  
+.stat strong{font-size:25px;display:block;margin-top:8px}  
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}  
+.toolbar>*{flex:1;min-width:150px}  
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:9px}  
+table{width:100%;border-collapse:collapse;min-width:650px}  
+th,td{text-align:left;padding:11px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top}  
+th{background:#fffaf5}  
+.badge{display:inline-block;background:#f1e7df;padding:5px 8px;border-radius:20px;font-size:11px;font-weight:700}  
+.status-delivered,.status-approved{background:#e3f6e9;color:#17663b}  
+.status-cancelled,.status-rejected{background:#ffe9e5;color:#a12b20}  
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}  
+.span-2{grid-column:1/-1}  
+.detail{border:1px solid var(--border);padding:13px;border-radius:10px;margin:10px 0;overflow-wrap:anywhere}  
+.notice{padding:11px;border-radius:9px;margin:10px 0;background:#f1e7df;overflow-wrap:anywhere}  
+.notice.error{background:#fff0ee;color:#9e2419}  
+.notice.success{background:#e8f7ef;color:#14643f}  
+.product-img{width:44px;height:44px;object-fit:cover;border-radius:7px;vertical-align:middle;margin-right:8px}  
+@media(max-width:650px){.stats{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.span-2{grid-column:auto}.panel{padding:12px}.header-title{font-size:15px}}  
+</style>  
+</head>  
+<body>  <section id="loginView" class="login-wrap">  
+<form id="loginForm" class="login-card">  
+<h1>✦ Store Admin</h1>  
+<p class="muted">अपने Jewellery Store को मैनेज करने के लिए Login करें।</p>  
+<label for="password">Admin Password</label>  
+<input id="password" type="password" required autocomplete="current-password">  
+<button class="full" id="loginBtn" type="submit">Login</button>  
+<div id="loginMessage" aria-live="polite"></div>  
+</form>  
+</section>  <div id="adminView" class="hidden">  
+<header><div class="header-inner">  
+<div><strong class="header-title">✦ Jewellery Store Admin</strong><div class="muted">Products, Orders और Payments</div></div>  
+<div class="actions">  
+<button class="secondary" id="refreshBtn">Refresh</button>  
+<button class="danger" id="logoutBtn">Logout</button>  
+</div>  
+</div></header>  <main>  
+<div id="globalMessage" aria-live="polite"></div>  <div class="stats">  
+<div class="stat">Total Products<strong id="productCount">0</strong></div>  
+<div class="stat">Total Orders<strong id="orderCount">0</strong></div>  
+<div class="stat">Pending Orders<strong id="pendingCount">0</strong></div>  
+</div>  <nav class="tabs">  
+<button class="tab active" data-tab="orders">Orders</button>  
+<button class="tab" data-tab="products">Products</button>  
+</nav>  <section id="ordersSection">  
+<div class="panel">  
+<h2>Customer Orders</h2>  
+<div class="toolbar">  
+<input id="orderSearch" placeholder="Order ID, Customer या Phone खोजें">  
+<select id="orderStatusFilter">  
+<option value="">सभी Status</option>  
+<option value="pending">Pending</option>  
+<option value="confirmed">Confirmed</option>  
+<option value="processing">Processing</option>  
+<option value="shipped">Shipped</option>  
+<option value="delivered">Delivered</option>  
+<option value="cancelled">Cancelled</option>  
+</select>  
+</div>  
+<div class="table-wrap"><table>  
+<thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>  
+<tbody id="ordersBody"><tr><td colspan="6">Orders लोड हो रहे हैं...</td></tr></tbody>  
+</table></div>  
+</div>  
+<div id="orderDetailPanel" class="panel hidden">  
+<div class="header-inner"><h2 id="detailTitle">Order Details</h2><button class="secondary" id="closeDetailsBtn">Close</button></div>  
+<div id="orderDetails"></div>  
+</div>  
+</section>  <section id="productsSection" class="hidden">  
+<div class="panel">  
+<div class="header-inner"><h2>Products</h2><button id="newProductBtn">+ Add Product</button></div>  
+<div id="productFormWrap" class="detail hidden">  
+<h3 id="productFormTitle">Add Product</h3>  
+<form id="productForm">  
+<div class="form-grid">  
+<div class="span-2"><label>Product Name</label><input id="productName" required maxlength="200"></div>  
+<div><label>Price (₹)</label><input id="productPrice" type="number" min="0" step="0.01" required></div>  
+<div><label>Image URL (HTTPS)</label><input id="productImage" type="url" placeholder="https://..." required></div>  
+</div>  
+<div class="actions" style="margin-top:14px">  
+<button id="saveProductBtn">Save Product</button>  
+<button type="button" class="secondary" id="cancelProductBtn">Cancel</button>  
+</div>  
+<div id="productFormMessage"></div>  
+</form>  
+</div>  
+<input id="productSearch" placeholder="Product खोजें" style="margin:12px 0">  
+<div class="table-wrap"><table>  
+<thead><tr><th>Product</th><th>Price</th><th>ID</th><th>Actions</th></tr></thead>  
+<tbody id="productsBody"><tr><td colspan="4">Products लोड हो रहे हैं...</td></tr></tbody>  
+</table></div>  
+</div>  
+</section>  
+</main>  
+</div>  <script>  
+"use strict";  
   
+const API="/api";  
+const TOKEN_KEY="jewelleryAdminToken";  
+const STATUSES=["pending","confirmed","processing","shipped","delivered","cancelled"];  
+let products=[],orders=[],editingProductId=null,selectedOrderId=null;  
+const $=id=>document.getElementById(id);  
+  
+function esc(v){  
+ return String(v??"").replace(/[&<>"']/g,c=>({  
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"  
+ })[c]);  
+}  
+function money(v){  
+ const n=Number(v);  
+ return new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR"}).format(Number.isFinite(n)?n:0);  
+}  
+function date(v){  
+ const d=new Date(v);  
+ return v&&!Number.isNaN(d.getTime())?d.toLocaleString("en-IN"):"—";  
+}  
+function token(){return localStorage.getItem(TOKEN_KEY)||""}  
+function msg(id,text,type=""){  
+ $(id).className=text?"notice "+type:"";  
+ $(id).textContent=text;  
+}  
+function globalMsg(text,type=""){msg("globalMessage",text,type)}  
+  
+async function api(path,options={}){  
+ const headers={...(options.headers||{})};  
+ if(options.body!==undefined)headers["Content-Type"]="application/json";  
+ if(token())headers.Authorization="Bearer "+token();  
+ const response=await fetch(API+path,{...options,headers});  
+ const raw=await response.text();  
+ let data={};  
+ try{data=raw?JSON.parse(raw):{}}catch{data={error:raw||"Invalid server response"}}  
+ if(response.status===401){  
+  localStorage.removeItem(TOKEN_KEY);  
+  $("adminView").classList.add("hidden");  
+  $("loginView").classList.remove("hidden");  
+  throw Error(data.error||"Session expired. Please login again.");  
+ }  
+ if(!response.ok)throw Error(data.error||data.message||"Request failed");  
+ return data;  
+}  
+function showLogin(){  
+ $("adminView").classList.add("hidden");  
+ $("loginView").classList.remove("hidden");  
+}  
+function showAdmin(){  
+ $("loginView").classList.add("hidden");  
+ $("adminView").classList.remove("hidden");  
+}  
+  
+$("loginForm").addEventListener("submit",async e=>{  
+ e.preventDefault();  
+ $("loginBtn").disabled=true;  
+ msg("loginMessage","Login हो रहा है...");  
+ try{  
+  const response=await fetch(API+"/admin/login",{  
+   method:"POST",headers:{"Content-Type":"application/json"},  
+   body:JSON.stringify({password:$("password").value})  
+  });  
+  const data=await response.json();  
+  if(!response.ok)throw Error(data.error||"Login failed");  
+  if(!data.token)throw Error("Login token नहीं मिला");  
+  localStorage.setItem(TOKEN_KEY,data.token);  
+  $("password").value="";  
+  showAdmin();  
+  await loadAll();  
+  globalMsg("Login सफल हुआ","success");  
+ }catch(e){msg("loginMessage",e.message,"error")}  
+ finally{$("loginBtn").disabled=false}  
+});  
+  
+$("logoutBtn").addEventListener("click",async()=>{  
+ try{await api("/admin/logout",{method:"POST"})}catch(e){}  
+ localStorage.removeItem(TOKEN_KEY);  
+ showLogin();  
+ msg("loginMessage","आप Logout हो गए हैं","success");  
+});  
+  
+async function checkSession(){  
+ if(!token()){showLogin();return}  
+ try{  
+  await api("/admin/check");  
+  showAdmin();  
+  await loadAll();  
+ }catch(e){  
+  showLogin();  
+  msg("loginMessage",e.message,"error");  
+ }  
+}  
+  
+async function loadAll(){  
+ globalMsg("Data लोड हो रहा है...");  
+ const results=await Promise.allSettled([loadProducts(),loadOrders()]);  
+ const errors=results.filter(x=>x.status==="rejected");  
+ if(errors.length)globalMsg(errors.map(x=>x.reason.message).join(" | "),"error");  
+ else globalMsg("Data अपडेट हो गया","success");  
+ updateStats();  
+}  
+$("refreshBtn").addEventListener("click",loadAll);  
+  
+async function loadProducts(){  
+ const data=await api("/products");  
+ if(!Array.isArray(data))throw Error("Products response गलत है");  
+ products=data;  
+ renderProducts();  
+ updateStats();  
+}  
+async function loadOrders(){  
+ const data=await api("/orders");  
+ if(!Array.isArray(data))throw Error("Orders response गलत है");  
+ orders=data;  
+ renderOrders();  
+ updateStats();  
+ if(selectedOrderId!==null){  
+  const o=orders.find(x=>String(x.id)===String(selectedOrderId));  
+  if(o)renderOrderDetails(o);else closeDetails();  
+ }  
+}  
+function updateStats(){  
+ $("productCount").textContent=products.length;  
+ $("orderCount").textContent=orders.length;  
+ $("pendingCount").textContent=orders.filter(o=>o.status==="pending").length;  
+}  
+  
+document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{  
+ document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));  
+ $("ordersSection").classList.toggle("hidden",b.dataset.tab!=="orders");  
+ $("productsSection").classList.toggle("hidden",b.dataset.tab!=="products");  
+}));  
+  
+function renderOrders(){  
+ const q=$("orderSearch").value.trim().toLowerCase();  
+ const status=$("orderStatusFilter").value;  
+ const list=orders.filter(o=>{  
+  const matches=[o.id,o.customer_name,o.customer_email,o.phone].some(v=>String(v??"").toLowerCase().includes(q));  
+  return matches&&(!status||o.status===status);  
+ });  
+ if(!list.length){  
+  $("ordersBody").innerHTML='<tr><td colspan="6">कोई Order नहीं मिला</td></tr>';return;  
+ }  
+ $("ordersBody").innerHTML=list.map(o=>`  
+ <tr>  
+ <td>#${esc(o.id)}</td>  
+ <td>${esc(o.customer_name)}<br><small>${esc(o.phone)}</small></td>  
+ <td>${money(o.total)}</td>  
+ <td><span class="badge">${esc(o.status)}</span></td>  
+ <td>${esc(date(o.created_at))}</td>  
+ <td><button data-view-order="${esc(o.id)}">Details</button></td>  
+ </tr>`).join("");  
+}  
+$("orderSearch").addEventListener("input",renderOrders);  
+$("orderStatusFilter").addEventListener("change",renderOrders);  
+  
+$("ordersBody").addEventListener("click",e=>{  
+ const b=e.target.closest("[data-view-order]");  
+ if(!b)return;  
+ const order=orders.find(o=>String(o.id)===b.dataset.viewOrder);  
+ if(order)renderOrderDetails(order);  
+});  
+  
+function renderOrderDetails(o){  
+ selectedOrderId=o.id;  
+ $("orderDetailPanel").classList.remove("hidden");  
+ $("detailTitle").textContent="Order #"+o.id;  
+ const items=Array.isArray(o.items)?o.items:[];  
+ $("orderDetails").innerHTML=`  
+ <div class="detail"><strong>Customer</strong><p>${esc(o.customer_name)}</p>  
+ <p>Email: ${esc(o.customer_email)}</p><p>Phone: ${esc(o.phone)}</p>  
+ <p>Address: ${esc(o.address)}</p><p>Date: ${esc(date(o.created_at))}</p></div>  
+ <div class="detail"><strong>Products</strong>  
+ ${items.map(i=>`<p>${esc(i.name)} × ${esc(i.quantity)} — ${money(i.line_total??Number(i.price)*Number(i.quantity))}</p>`).join("")}  
+ <hr><strong>Total: ${money(o.total)}</strong></div>  
+ <div class="detail"><strong>Order Status</strong>  
+ <p>Current: <span class="badge">${esc(o.status)}</span></p>  
+ <label for="newOrderStatus">Update Status</label>  
+ <select id="newOrderStatus">${STATUSES.map(s=>`<option value="${s}" ${s===o.status?"selected":""}>${s}</option>`).join("")}</select>  
+ <div class="actions" style="margin-top:10px">  
+ <button data-save-status="${esc(o.id)}">Save Status</button>  
+ <button class="success" data-quick-status="${esc(o.id)}" data-status="confirmed">Accept Order</button>  
+ <button class="danger" data-quick-status="${esc(o.id)}" data-status="cancelled">Reject Order</button>  
+ </div></div>  
+ <div class="detail"><strong>Payment</strong>  
+ <p>Method: ${esc(o.payment_method)}</p>  
+ <p>Current payment status: <span class="badge">${esc(o.payment_status)}</span></p>  
+ <p>Reference: ${esc(o.payment_reference||"Not provided")}</p>  
+ <p class="muted">Payment approve करने से पहले वास्तविक भुगतान की पुष्टि करें।</p>  
+ <div class="actions">  
+ <button class="success" data-payment="${esc(o.id)}" data-payment-status="approved">Approve Payment</button>  
+ <button class="danger" data-payment="${esc(o.id)}" data-payment-status="rejected">Reject Payment</button>  
+ <button class="secondary" data-payment="${esc(o.id)}" data-payment-status="pending">Set Pending</button>  
+ </div></div>  
+ <div class="detail"><strong>Customer Feedback</strong><p>${esc(o.feedback||"अभी कोई Feedback नहीं")}</p></div>`;  
+ $("orderDetailPanel").scrollIntoView({behavior:"smooth",block:"start"});  
+}  
+  
+$("orderDetails").addEventListener("click",async e=>{  
+ const quick=e.target.closest("[data-quick-status]");  
+ const save=e.target.closest("[data-save-status]");  
+ const pay=e.target.closest("[data-payment]");  
+ try{  
+  if(quick){  
+   await api("/orders/"+encodeURIComponent(quick.dataset.quickStatus)+"/status",{  
+    method:"PATCH",body:JSON.stringify({status:quick.dataset.status})  
+   });  
+   globalMsg("Order status अपडेट हो गया","success");  
+   await loadOrders();  
+  }else if(save){  
+   const status=$("newOrderStatus").value;  
+   await api("/orders/"+encodeURIComponent(save.dataset.saveStatus)+"/status",{  
+    method:"PATCH",body:JSON.stringify({status})  
+   });  
+   globalMsg("Order status अपडेट हो गया","success");  
+   await loadOrders();  
+  }else if(pay){  
+   const id=pay.dataset.payment;  
+   const payment_status=pay.dataset.paymentStatus;  
+   const reference=orders.find(o=>String(o.id)===id)?.payment_reference||"";  
+   if(payment_status==="approved"&&!confirm("क्या आपने वास्तविक भुगतान verify कर लिया है?"))return;  
+   await api("/orders/"+encodeURIComponent(id)+"/payment",{  
+    method:"PATCH",body:JSON.stringify({payment_status,payment_reference:reference})  
+   });  
+   globalMsg("Payment status अपडेट हो गया","success");  
+   await loadOrders();  
+  }  
+ }catch(error){globalMsg(error.message,"error")}  
+});  
+function closeDetails(){  
+ selectedOrderId=null;  
+ $("orderDetailPanel").classList.add("hidden");  
+ $("orderDetails").innerHTML="";  
+}  
+$("closeDetailsBtn").addEventListener("click",closeDetails);  
+  
+function renderProducts(){  
+ const q=$("productSearch").value.trim().toLowerCase();  
+ const list=products.filter(p=>(p.name||"").toLowerCase().includes(q));  
+ if(!list.length){  
+  $("productsBody").innerHTML='<tr><td colspan="4">कोई Product नहीं मिला</td></tr>';return;  
+ }  
+ $("productsBody").innerHTML=list.map(p=>`  
+ <tr><td>${p.image?`<img class="product-img" src="${esc(p.image)}" alt="" loading="lazy">`:""}${esc(p.name)}</td>  
+ <td>${money(p.price)}</td><td>${esc(p.id)}</td>  
+ <td><div class="actions">  
+ <button data-edit-product="${esc(p.id)}">Edit</button>  
+ <button class="danger" data-delete-product="${esc(p.id)}">Delete</button>  
+ </div></td></tr>`).join("");  
+}  
+$("productSearch").addEventListener("input",renderProducts);  
+function openProductForm(p=null){  
+ editingProductId=p?p.id:null;  
+ $("productFormTitle").textContent=p?"Edit Product":"Add Product";  
+ $("productName").value=p?.name||"";  
+ $("productPrice").value=p?.price??"";  
+ $("productImage").value=p?.image||"";  
+ $("productFormWrap").classList.remove("hidden");  
+ msg("productFormMessage","");  
+ $("productFormWrap").scrollIntoView({behavior:"smooth",block:"start"});  
+}  
+function closeProductForm(){  
+ editingProductId=null;  
+ $("productForm").reset();  
+ $("productFormWrap").classList.add("hidden");  
+ msg("productFormMessage","");  
+}  
+$("newProductBtn").addEventListener("click",()=>openProductForm());  
+$("cancelProductBtn").addEventListener("click",closeProductForm);  
+$("productsBody").addEventListener("click",async e=>{  
+ const edit=e.target.closest("[data-edit-product]");  
+ const del=e.target.closest("[data-delete-product]");  
+ if(edit){  
+  const p=products.find(x=>String(x.id)===edit.dataset.editProduct);  
+  if(p)openProductForm(p);  
+ }  
+ if(del){  
+  const p=products.find(x=>String(x.id)===del.dataset.deleteProduct);  
+  if(!p||!confirm("Product '"+p.name+"' delete करना है?"))return;  
+  try{  
+   await api("/products/"+encodeURIComponent(p.id),{method:"DELETE"});  
+   await loadProducts();  
+   globalMsg("Product delete हो गया","success");  
+  }catch(error){globalMsg(error.message,"error")}  
+ }  
+});  
+$("productForm").addEventListener("submit",async e=>{  
+ e.preventDefault();  
+ const button=$("saveProductBtn");  
+ button.disabled=true;  
+ const body={  
+  name:$("productName").value.trim(),  
+  price:$("productPrice").value,  
+  image:$("productImage").value.trim()  
+ };  
+ if(!/^https:\/\/\S+$/i.test(body.image)){  
+  msg("productFormMessage","HTTPS image URL दर्ज करें","error");  
+  button.disabled=false;return;  
+ }  
+ try{  
+  if(editingProductId!==null){  
+   await api("/products/"+encodeURIComponent(editingProductId),{  
+    method:"PUT",body:JSON.stringify(body)  
+   });  
+  }else{  
+   await api("/products",{method:"POST",body:JSON.stringify(body)});  
+  }  
+  closeProductForm();  
+  await loadProducts();  
+  globalMsg("Product सेव हो गया","success");  
+ }catch(error){msg("productFormMessage",error.message,"error")}  
+ finally{button.disabled=false}  
+});  
+  
+checkSession();  
+</script>  </body>  
+  </html>  
