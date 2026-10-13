@@ -4,81 +4,123 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jewellery Admin Panel</title>
+  <title>Jewellery Admin Login</title>
   <style>
-    body{font-family:Arial;background:#f7f2eb;color:#33251c;margin:0}
-    header{background:#5b3825;color:white;text-align:center;padding:20px}
-    main{max-width:700px;margin:25px auto;padding:16px}
-    section{background:white;padding:20px;margin-bottom:20px;border-radius:12px}
+    body{font-family:Arial,sans-serif;background:#f7f2eb;color:#33251c;margin:0}
+    header{background:#5b3825;color:white;text-align:center;padding:18px}
+    main{max-width:650px;margin:25px auto;padding:16px}
+    section{background:white;padding:20px;margin-bottom:18px;border-radius:12px}
     input,button{box-sizing:border-box;width:100%;padding:12px;margin:7px 0;font-size:16px}
-    button{background:#8b5e3c;color:white;border:0;border-radius:6px}
-    li{margin:12px 0;overflow-wrap:anywhere}
+    button{background:#8b5e3c;color:white;border:0;border-radius:6px;cursor:pointer}
     img{max-width:100px;display:block;margin-top:6px}
-    #status{overflow-wrap:anywhere}
+    li{margin:12px 0;overflow-wrap:anywhere}
+    [hidden]{display:none!important}
   </style>
 </head>
 <body>
-  <header><h1>Jewellery Store</h1><p>Admin Panel Demo</p></header>
+  <header><h1>Jewellery Store</h1><p>Admin Panel</p></header>
   <main>
-    <section>
+    <section id="loginBox">
+      <h2>Admin Login</h2>
+      <form id="loginForm">
+        <input id="password" type="password" placeholder="Admin password" autocomplete="current-password" required>
+        <button type="submit">Login</button>
+      </form>
+      <p id="loginStatus" role="status"></p>
+    </section>
+
+    <section id="adminBox" hidden>
       <h2>Add Product</h2>
-      <form id="form">
+      <form id="productForm">
         <input id="name" placeholder="Product name" required>
         <input id="price" type="number" min="0" step="0.01" placeholder="Price in ₹" required>
-        <input id="image" type="url" placeholder="Image URL (https://...)" required>
+        <input id="image" type="url" placeholder="HTTPS image URL" required>
         <button type="submit">Add Product</button>
       </form>
+      <button id="logoutButton" type="button">Logout</button>
       <p id="status" role="status"></p>
-    </section>
-    <section>
       <h2>Products</h2>
       <ul id="products"></ul>
     </section>
   </main>
+
   <script>
-    const form = document.getElementById("form");
-    const list = document.getElementById("products");
+    let token = null;
+    const loginBox = document.getElementById("loginBox");
+    const adminBox = document.getElementById("adminBox");
+    const loginStatus = document.getElementById("loginStatus");
     const statusText = document.getElementById("status");
+    const list = document.getElementById("products");
 
-    async function loadProducts() {
-      try {
-        const response = await fetch("/api/products");
-        if (!response.ok) throw new Error("Could not load products");
-        const products = await response.json();
-        list.replaceChildren();
+    async function api(path, options = {}) {
+      const headers = {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      };
+      if (token) headers["x-admin-token"] = token;
 
-        products.forEach(product => {
-          const item = document.createElement("li");
-          item.append(document.createTextNode(
-            product.name + " — ₹" + product.price
-          ));
-
-          if (product.image) {
-            const img = document.createElement("img");
-            img.src = product.image;
-            img.alt = product.name;
-            img.onerror = () => img.remove();
-            item.appendChild(img);
-          }
-          list.appendChild(item);
-        });
-
-        if (products.length === 0) {
-          list.textContent = "No products yet.";
-        }
-      } catch (error) {
-        statusText.textContent = "Products load nahi hue. Server check karein.";
-      }
+      const response = await fetch(path, { ...options, headers });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Request failed");
+      return data;
     }
 
-    form.addEventListener("submit", async event => {
+    async function loadProducts() {
+      const products = await api("/api/products");
+      list.replaceChildren();
+
+      if (products.length === 0) {
+        list.textContent = "No products yet.";
+        return;
+      }
+
+      products.forEach(product => {
+        const item = document.createElement("li");
+        item.append(document.createTextNode(
+          product.name + " — ₹" + product.price
+        ));
+        if (product.image) {
+          const img = document.createElement("img");
+          img.src = product.image;
+          img.alt = product.name;
+          img.onerror = () => img.remove();
+          item.appendChild(img);
+        }
+        list.appendChild(item);
+      });
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", async event => {
       event.preventDefault();
-      statusText.textContent = "Saving product...";
+      loginStatus.textContent = "Checking password...";
 
       try {
-        const response = await fetch("/api/products", {
+        const result = await api("/api/login", {
           method: "POST",
-          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            password: document.getElementById("password").value
+          })
+        });
+
+        token = result.token;
+        document.getElementById("password").value = "";
+        loginBox.hidden = true;
+        adminBox.hidden = false;
+        await loadProducts();
+        loginStatus.textContent = "";
+      } catch (error) {
+        token = null;
+        loginStatus.textContent = error.message;
+      }
+    });
+
+    document.getElementById("productForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      statusText.textContent = "Saving...";
+
+      try {
+        await api("/api/products", {
+          method: "POST",
           body: JSON.stringify({
             name: document.getElementById("name").value.trim(),
             price: document.getElementById("price").value,
@@ -86,18 +128,27 @@
           })
         });
 
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || "Save failed");
-
-        form.reset();
-        statusText.textContent = "Product added successfully!";
+        event.target.reset();
+        statusText.textContent = "Product added!";
         await loadProducts();
       } catch (error) {
-        statusText.textContent = "Product add nahi hua. Server check karein.";
+        statusText.textContent = error.message;
       }
     });
 
-    loadProducts();
+    document.getElementById("logoutButton").addEventListener("click", async () => {
+      try {
+        await api("/api/logout", { method: "POST" });
+      } catch (error) {
+        // Clear the local session even if the server request fails.
+      }
+      token = null;
+      adminBox.hidden = true;
+      loginBox.hidden = false;
+      list.replaceChildren();
+      statusText.textContent = "";
+      loginStatus.textContent = "Logged out.";
+    });
   </script>
 </body>
 </html>
