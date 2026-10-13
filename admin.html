@@ -242,3 +242,505 @@ function renderProducts(){
  });
 }
 function editProduct
+(p){
+  $("productId").value=p.id||"";
+  $("productName").value=p.name||"";
+  $("productPrice").value=p.price??"";
+  $("productImage").value=p.image||"";
+  $("productTitle").textContent="Edit Product";
+  $("saveProductBtn").textContent="Update Product";
+  $("cancelEdit").classList.remove("hidden");
+  go("products");
+  $("productName").focus();
+}
+
+function resetProductForm(){
+  $("productForm").reset();
+  $("productId").value="";
+  $("productTitle").textContent="Add Product";
+  $("saveProductBtn").textContent="Save Product";
+  $("cancelEdit").classList.add("hidden");
+}
+
+$("cancelEdit").onclick=resetProductForm;
+
+$("productForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const id=$("productId").value;
+  const product={
+    name:$("productName").value.trim(),
+    price:Number($("productPrice").value),
+    image:$("productImage").value.trim()
+  };
+
+  if(!product.name || !Number.isFinite(product.price) || product.price<0){
+    note("Product name aur valid price enter karein.",true);
+    return;
+  }
+  if(!/^https:\/\//i.test(product.image)){
+    note("Image URL HTTPS hona chahiye.",true);
+    return;
+  }
+
+  const b=$("saveProductBtn");
+  b.disabled=true;
+  try{
+    await api(id?"/products/"+encodeURIComponent(id):"/products",{
+      method:id?"PUT":"POST",
+      body:JSON.stringify(product)
+    });
+    resetProductForm();
+    await loadProducts();
+    note(id?"Product update ho gaya.":"Product save ho gaya.");
+  }catch(err){
+    note("Product save nahi hua: "+err.message,true);
+  }finally{
+    b.disabled=false;
+  }
+});
+
+async function deleteProduct(p){
+  if(!confirm('"' + (p.name||"Product") + '" ko delete karna hai?')) return;
+  try{
+    await api("/products/"+encodeURIComponent(p.id),{method:"DELETE"});
+    await loadProducts();
+    note("Product delete ho gaya.");
+  }catch(err){
+    note("Delete failed: "+err.message,true);
+  }
+}
+
+function statusClass(s){
+  return String(s||"pending").toLowerCase().replace(/[^a-z-]/g,"");
+}
+function statusBadge(s){
+  const v=String(s||"pending");
+  return '<span class="status '+esc(statusClass(v))+'">'+esc(v)+'</span>';
+}
+function dateText(v){
+  if(!v) return "—";
+  const d=new Date(v);
+  return Number.isNaN(d.getTime())?"—":d.toLocaleDateString("en-IN");
+}
+function orderItems(o){
+  let v=o.items;
+  if(typeof v==="string"){
+    try{v=JSON.parse(v)}catch{v=[]}
+  }
+  return Array.isArray(v)?v:[];
+}
+function customerName(o){
+  return o.customer_name||o.name||"Customer";
+}
+function orderId(o){
+  return String(o.id||"").slice(0,12)||"—";
+}
+
+function renderDashboardOrders(){
+  const body=$("recentOrders");
+  body.replaceChildren();
+  const q=($("globalSearch").value||"").toLowerCase();
+  let list=[...orders].filter(o=>
+    [o.id,customerName(o),o.customer_email,o.phone]
+      .some(v=>String(v||"").toLowerCase().includes(q))
+  );
+
+  if(orderTab==="pending"){
+    list=list.filter(o=>String(o.status).toLowerCase()==="pending");
+  }else if(orderTab==="top"||orderTab==="low"){
+    list=[];
+  }
+  list.slice(0,8).forEach(o=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=
+      "<td>"+esc(orderId(o))+"</td>"+
+      "<td>"+esc(customerName(o))+"</td>"+
+      "<td>"+money(o.total)+"</td>"+
+      "<td>"+statusBadge(o.status)+"</td>"+
+      "<td>"+dateText(o.created_at)+"</td>"+
+      '<td><button class="small-btn" data-order="'+esc(o.id)+'">View</button></td>';
+    tr.querySelector("button").onclick=()=>go("orders");
+    body.append(tr);
+  });
+  if(!body.children.length){
+    body.innerHTML='<tr><td colspan="6">Abhi koi matching order nahi hai.</td></tr>';
+  }
+}
+
+document.querySelectorAll("[data-order-tab]").forEach(b=>{
+  b.onclick=()=>{
+    orderTab=b.dataset.orderTab;
+    document.querySelectorAll("[data-order-tab]").forEach(x=>x.classList.toggle("active",x===b));
+    renderDashboardOrders();
+    if(orderTab==="top") renderTopProducts();
+    if(orderTab==="low") renderLowStock();
+  };
+});
+
+function renderOrders(){
+  const box=$("ordersList");
+  box.replaceChildren();
+  const q=(($("orderSearch").value||"")+" "+($("globalSearch").value||"")).trim().toLowerCase();
+  const f=$("orderFilter").value.toLowerCase();
+  const list=orders.filter(o=>{
+    const hay=[o.id,o.customer_name,o.customer_email,o.phone,o.address,o.status]
+      .join(" ").toLowerCase();
+    return hay.includes(q)&&(!f||String(o.status).toLowerCase()===f);
+  });
+
+  if(!list.length){
+    box.textContent="Koi order nahi mila.";
+    return;
+  }
+
+  list.forEach(o=>{
+    const card=document.createElement("div");
+    card.className="card";
+    const title=document.createElement("div");
+    title.className="section-head";
+    title.innerHTML="<strong>Order #"+esc(orderId(o))+"</strong>"+statusBadge(o.status);
+
+    const details=document.createElement("p");
+    details.textContent=customerName(o)+" • "+(o.phone||"Phone nahi diya")+
+      " • "+dateText(o.created_at);
+
+    const address=document.createElement("p");
+    address.className="muted";
+    address.textContent=o.customer_email||"";
+    if(o.address) address.textContent+=" | "+o.address;
+
+    const itemInfo=document.createElement("p");
+    const items=orderItems(o);
+    itemInfo.textContent=items.length
+      ?items.map(i=>(i.name||i.product_name||"Item")+" × "+(i.quantity||i.qty||1)).join(", ")
+      :"Order item details available nahi hain.";
+
+    const total=document.createElement("p");
+    total.innerHTML="<strong>Total: "+money(o.total)+"</strong>";
+
+    const controls=document.createElement("div");
+    controls.className="form-grid";
+
+    const status=document.createElement("select");
+    ["pending","confirmed","processing","shipped","delivered","cancelled","rejected"].forEach(s=>{
+      const opt=document.createElement("option");
+      opt.value=s;opt.textContent=s;
+      if(String(o.status||"pending").toLowerCase()===s)opt.selected=true;
+      status.append(opt);
+    });
+
+    const saveStatus=document.createElement("button");
+    saveStatus.textContent="Update Order Status";
+    saveStatus.onclick=async()=>{
+      saveStatus.disabled=true;
+      try{
+        await api("/orders/"+encodeURIComponent(o.id)+"/status",{
+          method:"PATCH",body:JSON.stringify({status:status.value})
+        });
+        await loadOrders();
+        note("Order status update ho gaya.");
+      }catch(e){note("Status update nahi hua: "+e.message,true)}
+      finally{saveStatus.disabled=false}
+    };
+
+    const payment=document.createElement("select");
+    ["pending","approved","rejected"].forEach(s=>{
+      const opt=document.createElement("option");
+      opt.value=s;opt.textContent=s;
+      if(String(o.payment_status||"pending").toLowerCase()===s)opt.selected=true;
+      payment.append(opt);
+    });
+
+    const reference=document.createElement("input");
+    reference.placeholder="Payment reference";
+    reference.value=o.payment_reference||"";
+    reference.maxLength=200;
+
+    const savePayment=document.createElement("button");
+    savePayment.textContent="Update Payment";
+    savePayment.onclick=async()=>{
+      savePayment.disabled=true;
+      try{
+        await api("/orders/"+encodeURIComponent(o.id)+"/payment",{
+          method:"PATCH",
+          body:JSON.stringify({
+            payment_status:payment.value,
+            payment_reference:reference.value.trim()
+          })
+        });
+        await loadOrders();
+        note("Payment status update ho gaya.");
+      }catch(e){note("Payment update nahi hua: "+e.message,true)}
+      finally{savePayment.disabled=false}
+    };
+
+    controls.append(status,saveStatus,payment,reference,savePayment);
+    card.append(title,details,address,itemInfo,total,controls);
+    box.append(card);
+  });
+}
+
+function renderTopProducts(){
+  const box=$("topProducts");
+  if(!box)return;
+  box.replaceChildren();
+
+  const counts={};
+  orders.forEach(o=>orderItems(o).forEach(i=>{
+    const name=i.name||i.product_name||"Product";
+    counts[name]=(counts[name]||0)+Number(i.quantity||i.qty||1);
+  }));
+
+  const ranked=[...products].sort((a,b)=>
+    (counts[b.name]||0)-(counts[a.name]||0)
+  ).slice(0,5);
+
+  if(!ranked.length){
+    box.textContent="Products available nahi hain.";
+    return;
+  }
+
+  ranked.forEach(p=>{
+    const row=document.createElement("div");
+    row.className="product-row";
+    const img=document.createElement("img");
+    img.className="product-pic";
+    img.alt=p.name||"Product";
+    img.src=p.image||"";
+    img.onerror=()=>img.style.display="none";
+
+    const info=document.createElement("div");
+    info.innerHTML="<strong>"+esc(p.name)+"</strong>"+money(p.price);
+
+    const count=document.createElement("span");
+    count.className="muted";
+    count.textContent=(counts[p.name]||0)+" sold";
+
+    row.append(img,info,count);
+    box.append(row);
+  });
+}
+
+function renderLowStock(){
+  const box=$("lowStock");
+  if(box)box.textContent="Stock quantity database mein available nahi hai.";
+}
+
+function renderOrderStatus(){
+  const box=$("orderStatusChart");
+  const legend=$("orderLegend");
+  if(!box||!legend)return;
+  const counts={};
+  orders.forEach(o=>{
+    const s=String(o.status||"pending").toLowerCase();
+    counts[s]=(counts[s]||0)+1;
+  });
+  box.replaceChildren();
+  legend.replaceChildren();
+
+  const entries=Object.entries(counts);
+  if(!entries.length){
+    box.textContent="Order data abhi available nahi hai.";
+    return;
+  }
+  entries.forEach(([name,count])=>{
+    const row=document.createElement("div");
+    row.className="legend-row";
+    const left=document.createElement("span");
+    left.textContent=name;
+    const right=document.createElement("strong");
+    right.textContent=String(count);
+    row.append(left,right);
+    legend.append(row);
+  });
+}
+
+function renderRecentActivity(){
+  const box=$("recentActivity");
+  if(!box)return;
+  box.replaceChildren();
+  if(!orders.length){
+    box.textContent="Abhi recent activity nahi hai.";
+    return;
+  }
+  orders.slice(0,5).forEach(o=>{
+    const row=document.createElement("div");
+    row.className="activity";
+    const icon=document.createElement("div");
+    icon.className="activity-icon";
+    icon.textContent="🛍️";
+    const textBox=document.createElement("div");
+    const strong=document.createElement("strong");
+    strong.textContent="Order #"+orderId(o)+" — "+customerName(o);
+    const small=document.createElement("small");
+    small.textContent=money(o.total)+" • "+dateText(o.created_at)+" • "+(o.status||"pending");
+    textBox.append(strong,small);
+    row.append(icon,textBox);
+    box.append(row);
+  });
+}
+
+function renderCustomers(){
+  const box=$("customersList");
+  if(!box)return;
+  box.replaceChildren();
+  const q=($("customerSearch").value||"").toLowerCase();
+  const map=new Map();
+  orders.forEach(o=>{
+    const key=String(o.customer_email||o.phone||o.customer_name||o.id);
+    if(!map.has(key))map.set(key,o);
+  });
+  const list=[...map.values()].filter(o=>
+    [o.customer_name,o.customer_email,o.phone].join(" ").toLowerCase().includes(q)
+  );
+  if(!list.length){box.textContent="Customer data nahi mila.";return}
+  const table=document.createElement("div");
+  table.className="tablewrap";
+  const t=document.createElement("table");
+  t.innerHTML="<thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Orders</th></tr></thead>";
+  const body=document.createElement("tbody");
+  list.forEach(o=>{
+    const count=orders.filter(x=>
+      (o.customer_email&&x.customer_email===o.customer_email)||
+      (o.phone&&x.phone===o.phone)
+    ).length;
+    const tr=document.createElement("tr");
+    tr.innerHTML="<td>"+esc(customerName(o))+"</td><td>"+esc(o.customer_email||"—")+"</td><td>"+esc(o.phone||"—")+"</td><td>"+count+"</td>";
+    body.append(tr);
+  });
+  t.append(body);table.append(t);box.append(table);
+}
+
+function renderPayments(){
+  const box=$("paymentsList");
+  if(!box)return;
+  box.replaceChildren();
+  const q=($("paymentSearch").value||"").toLowerCase();
+  const list=orders.filter(o=>
+    [o.id,o.customer_name,o.payment_status,o.payment_method,o.payment_reference]
+      .join(" ").toLowerCase().includes(q)
+  );
+  if(!list.length){box.textContent="Payment records nahi mile.";return}
+  const table=document.createElement("div");
+  table.className="tablewrap";
+  const t=document.createElement("table");
+  t.innerHTML="<thead><tr><th>Order</th><th>Customer</th><th>Amount</th><th>Method</th><th>Payment</th><th>Reference</th></tr></thead>";
+  const body=document.createElement("tbody");
+  list.forEach(o=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML="<td>"+esc(orderId(o))+"</td><td>"+esc(customerName(o))+"</td><td>"+money(o.total)+"</td><td>"+esc(o.payment_method||"—")+"</td><td>"+statusBadge(o.payment_status||"pending")+"</td><td>"+esc(o.payment_reference||"—")+"</td>";
+    body.append(tr);
+  });
+  t.append(body);table.append(t);box.append(table);
+}
+
+function renderReports(){
+  const box=$("reportSummary");
+  if(!box)return;
+  const revenue=orders.reduce((s,o)=>s+Number(o.total||0),0);
+  const delivered=orders.filter(o=>String(o.status).toLowerCase()==="delivered").length;
+  box.textContent="Products: "+products.length+
+    " | Orders: "+orders.length+
+    " | Delivered: "+delivered+
+    " | Total order value: "+money(revenue);
+}
+
+function renderSalesChart(){
+  const box=$("salesChart");
+  if(!box)return;
+  const cutoff=Date.now()-rangeDays*86400000;
+  const totals={};
+  orders.forEach(o=>{
+    const d=new Date(o.created_at);
+    if(!Number.isNaN(d.getTime())&&d.getTime()>=cutoff){
+      const key=d.toLocaleDateString("en-IN");
+      totals[key]=(totals[key]||0)+Number(o.total||0);
+    }
+  });
+  const rows=Object.entries(totals).slice(-rangeDays);
+  box.replaceChildren();
+  if(!rows.length){
+    box.textContent="Selected period mein sales data nahi hai.";
+    return;
+  }
+  const list=document.createElement("div");
+  list.className="legend";
+  rows.forEach(([day,total])=>{
+    const row=document.createElement("div");
+    row.className="legend-row";
+    const a=document.createElement("span");a.textContent=day;
+    const b=document.createElement("strong");b.textContent=money(total);
+    row.append(a,b);list.append(row);
+  });
+  box.append(list);
+}
+
+document.querySelectorAll("[data-range]").forEach(b=>{
+  b.onclick=()=>{
+    rangeDays=Number(b.dataset.range)||7;
+    document.querySelectorAll("[data-range]").forEach(x=>x.classList.toggle("active",x===b));
+    renderSalesChart();
+  };
+});
+
+function refreshDashboard(){
+  updateStats();
+  renderDashboardOrders();
+  renderTopProducts();
+  renderLowStock();
+  renderOrderStatus();
+  renderRecentActivity();
+  renderSalesChart();
+  renderReports();
+}
+
+const oldUpdateStats=updateStats;
+updateStats=function(){
+  oldUpdateStats();
+  refreshDashboard();
+};
+
+$("productSearch").addEventListener("input",renderProducts);
+$("orderSearch").addEventListener("input",renderOrders);
+$("orderFilter").addEventListener("change",renderOrders);
+$("customerSearch").addEventListener("input",renderCustomers);
+$("paymentSearch").addEventListener("input",renderPayments);
+$("globalSearch").addEventListener("input",()=>{
+  renderDashboardOrders();
+  renderOrders();
+});
+
+$("exportOrders").onclick=()=>{
+  const columns=[
+    "id","customer_name","customer_email","phone","address",
+    "total","status","payment_method","payment_status",
+    "payment_reference","feedback","created_at"
+  ];
+  const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  const csv=[
+    columns.join(","),
+    ...orders.map(o=>columns.map(k=>quote(o[k])).join(","))
+  ].join("\r\n");
+  const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="jewellery-orders.csv";a.click();
+  URL.revokeObjectURL(url);
+};
+
+const originalLoadProducts=loadProducts;
+loadProducts=async function(){
+  await originalLoadProducts();
+  renderReports();
+  renderTopProducts();
+  renderSalesChart();
+};
+
+const originalLoadOrders=loadOrders;
+loadOrders=async function(){
+  await originalLoadOrders();
+  refreshDashboard();
+};
+
+})();
+ 
