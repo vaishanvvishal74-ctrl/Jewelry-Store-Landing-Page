@@ -1,440 +1,643 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=editor_choice"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous"
-    />
-    <title>Jewellery</title>
-  </head>
-  <body>
-    <!--  -->
-    <div class="popupBeforePage">
-      <img src="bangleExclusivepngwing.png" width="200" alt="Bangle Image" />
-      <h1 class="h1BeforePage">Precious</h1>
-      <h2 class="h2BeforePage">Jewellery Store</h2>
-    </div>
-    <!--  -->
-    <div class="timecalladdress" id="startnavMain">
-      <div class="shopTiming">
-        <span
-          >Mon - Sun | <i class="fa-regular fa-clock"></i> 10:30 AM - 10:00
-          PM</span
-        >
-      </div>
-      <a href="tel:+910123456789" class="call-us"
-        ><i class="fa-solid fa-phone"></i> <span>+91 0123456789</span></a
-      >
-      <a href="#">
-        <i class="fa-solid fa-location-dot"></i
-        ><span>Shop No. 12, Gopal Heights Andheri West, Mumbai</span>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#9b6b43">
+  <title>My Jewellery Store</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --gold: #9b6b43;
+      --dark: #211912;
+      --cream: #fbf7f1;
+      --white: #fff;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--dark);
+      background: var(--white);
+      font-family: Poppins, sans-serif;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; }
+    img { max-width: 100%; }
+    .container { width: min(1120px, 92%); margin: auto; }
+
+    .topbar {
+      padding: 10px 4%;
+      background: var(--dark);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12px;
+    }
+    .topbar i { color: #e9c18b; margin-right: 6px; }
+
+    header {
+      background: white;
+      border-bottom: 1px solid #eee4d8;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .navbar {
+      min-height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .logo {
+      width: 55px;
+      height: 55px;
+      object-fit: contain;
+      display: none;
+    }
+    .brand h1 {
+      font: 700 25px "Playfair Display", serif;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+    .brand p { margin: 3px 0 0; color: #806b57; font-size: 12px; }
+    nav { display: flex; align-items: center; gap: 24px; }
+    nav a { font-size: 13px; font-weight: 500; }
+    nav a:hover { color: var(--gold); }
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: 0;
+      font-size: 24px;
+      color: var(--gold);
+    }
+
+    .hero {
+      background: linear-gradient(110deg, #201810ee, #20181055), var(--gold);
+      background-size: cover;
+      background-position: center;
+      color: white;
+      min-height: 430px;
+      display: flex;
+      align-items: center;
+      padding: 70px 0;
+    }
+    .hero h2 {
+      font: 700 clamp(38px, 6vw, 66px) "Playfair Display", serif;
+      margin: 0 0 18px;
+      max-width: 700px;
+    }
+    .hero p { max-width: 540px; line-height: 1.9; }
+    .eyebrow {
+      color: #f1cf9c;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font-size: 12px;
+    }
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 9px;
+      background: var(--gold);
+      color: white;
+      border: 1px solid var(--gold);
+      border-radius: 3px;
+      padding: 13px 22px;
+      margin-top: 15px;
+    }
+    .btn:hover { filter: brightness(.9); color: white; }
+
+    section { padding: 65px 0; }
+    .section-heading { text-align: center; margin-bottom: 34px; }
+    .section-heading span {
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: 11px;
+    }
+    .section-heading h2 {
+      font: 600 clamp(27px, 4vw, 39px) "Playfair Display", serif;
+      margin: 8px 0;
+    }
+    .section-heading p { color: #786e65; font-size: 13px; }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .feature {
+      text-align: center;
+      padding: 28px 15px;
+      background: var(--cream);
+    }
+    .feature i { color: var(--gold); font-size: 29px; }
+    .feature h3 { font: 600 19px "Playfair Display", serif; }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 20px;
+    }
+    .product {
+      border: 1px solid #eee6dd;
+      background: white;
+      overflow: hidden;
+    }
+    .product img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      background: var(--cream);
+      display: block;
+    }
+    .product-info { padding: 16px; }
+    .product h3 {
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 8px;
+    }
+    .price { color: var(--gold); font-weight: 600; }
+    .empty {
+      text-align: center;
+      color: #786e65;
+      padding: 30px 10px;
+      grid-column: 1 / -1;
+    }
+
+    .story {
+      background: var(--cream);
+      text-align: center;
+    }
+    .story p {
+      max-width: 720px;
+      margin: 15px auto;
+      line-height: 1.9;
+      color: #6e6257;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .contact-card {
+      border: 1px solid #eee4d8;
+      padding: 24px 12px;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+    .contact-card i { color: var(--gold); font-size: 26px; }
+    .contact-card h3 {
+      font: 600 18px "Playfair Display", serif;
+    }
+
+    .socials {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    .socials a { font-size: 22px; color: white; }
+    .socials a:hover { color: #e9c18b; }
+
+    footer {
+      background: var(--dark);
+      color: white;
+      padding: 42px 0 18px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 35px;
+    }
+    footer h2 { font: 600 25px "Playfair Display", serif; }
+    footer p { color: #d5c8bb; line-height: 1.8; font-size: 13px; }
+    .copyright {
+      text-align: center;
+      border-top: 1px solid #ffffff25;
+      margin-top: 30px;
+      padding-top: 18px;
+      color: #d5c8bb;
+      font-size: 12px;
+    }
+
+    .floating {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 9;
+    }
+    .floating a {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--gold);
+      color: white;
+      box-shadow: 0 3px 12px #0002;
+      font-size: 21px;
+    }
+    .status {
+      text-align: center;
+      font-size: 12px;
+      color: #786e65;
+      margin-top: 15px;
+    }
+
+    @media (max-width: 760px) {
+      .navbar { min-height: 72px; }
+      .brand h1 { font-size: 21px; }
+      .nav-toggle { display: block; }
+      nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 20px 4%;
+        border-bottom: 1px solid #eee4d8;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+      }
+      nav.open { display: flex; }
+      .hero { min-height: 360px; padding: 48px 0; }
+      .features { grid-template-columns: 1fr; gap: 12px; }
+      .products { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .product img { height: 175px; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 15px; }
+      section { padding: 48px 0; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <span><i class="fa-regular fa-clock"></i> Jewellery for every occasion</span>
+    <a id="topPhone" href="tel:"><i class="fa-solid fa-phone"></i><span id="topPhoneText">Contact our store</span></a>
+  </div>
+
+  <header>
+    <div class="container navbar">
+      <a class="brand" href="#">
+        <img id="storeLogo" class="logo" alt="Store logo">
+        <div>
+          <h1 id="storeName">My Jewellery Store</h1>
+          <p>Elegance in every detail</p>
+        </div>
       </a>
-    </div>
-    <header class="nameNav">
-      <h1>Precious</h1>
-      <h3>Jewellery Store</h3>
-      <i class="fa-solid fa-bars toggleBar" onclick="toggleBar()"></i>
-      <nav class="navBar" id="navBar">
-        <ul>
-          <li><a href="#productBox">Products</a></li>
-          <li><a href="#newProduct">Latest Products</a></li>
-          <li><a href="#testinomials">Testinomial</a></li>
-        </ul>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <nav id="mainNav">
+        <a href="#">Home</a>
+        <a href="#products">Collections</a>
+        <a href="#about">Our Story</a>
+        <a href="#contact">Contact</a>
       </nav>
-    </header>
-    <section class="heroSection">
-      <div class="imgPart">
-        <img src="bangleExclusivepngwing.png" width="500" alt="Ring Image" />
-      </div>
-      <div class="contentPart">
-        <div class="headContentPart">
-          <strong>Gold</strong><br /><strong>Jewellery</strong>
-        </div>
-        <div class="secondContentPart">
-          <p>
-            Shine brighter with our exquisite gold jewelry,crafted for every
-            moment!
-          </p>
-        </div>
-      </div>
-      <a href="#productBox" class="adownArr">
-        <i class="fa-solid fa-arrow-down downArrPro"></i>
-      </a>
-    </section>
+    </div>
+  </header>
 
-    <!-- Variety of Product Showcase -->
-    <section class="varietyOfProduct" id="productBox">
-      <div class="productBox">
-        <img src="Banglepngwing.png" alt="bangles image" />
-      </div>
-      <div class="productBox">
-        <img src="Earingpngwing.png" alt="earring image" />
-      </div>
-      <div class="productBox necklace1">
-        <img src="necklace1.png" alt="necklace image" />
+  <main>
+    <section class="hero" id="hero">
+      <div class="container">
+        <span class="eyebrow">Timeless elegance</span>
+        <h2 id="heroTitle">Jewellery that tells your story</h2>
+        <p id="heroText">Discover beautiful designs for life's most memorable moments.</p>
+        <a class="btn" href="#products">Explore Collection <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </section>
 
-    <!-- Modal 1 With Some Content -->
+    <section>
+      <div class="container features">
+        <div class="feature">
+          <i class="fa-solid fa-gem"></i>
+          <h3>Beautiful Designs</h3>
+          <p>Discover pieces for every occasion.</p>
+        </div>
+        <div class="feature">
+          <i class="fa-solid fa-award"></i>
+          <h3>Quality First</h3>
+          <p>Find your next treasured piece.</p>
+        </div>
+        <div class="feature">
+          <i class="fa-solid fa-heart"></i>
+          <h3>Made for You</h3>
+          <p>Celebrate the moments that matter.</p>
+        </div>
+      </div>
+    </section>
 
-    <div class="modalOneDiv">
-      <img src="modal.jpg" alt="modal Image" />
-      <div class="sideContentOfModalOne">
-        <strong
-          >Design <br />
-          <span>for</span> Love</strong
-        >
-        <p>
-          Discover a treasure trove of jewelry in our store, designed to
-          captivate and delight your other half. From timeless pieces to modern
-          designs, our collection offers stunning jewelry perfect for
-          day-to-night elegance, creating a dazzling diamond-inspired allure.
-        </p>
+    <section id="products" style="background:var(--cream)">
+      <div class="container">
+        <div class="section-heading">
+          <span>Our collection</span>
+          <h2>Featured Jewellery</h2>
+          <p>Products added through your Admin Panel appear here.</p>
+        </div>
+        <div class="products" id="productGrid">
+          <div class="empty">Loading products...</div>
+        </div>
+        <p class="status" id="productStatus" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="story" id="about">
+      <div class="container">
+        <div class="section-heading">
+          <span>About us</span>
+          <h2 id="aboutTitle">A little sparkle, a lot of meaning</h2>
+        </div>
+        <p id="aboutText">We help you discover jewellery for celebrations, gifts and everyday elegance. Explore our collection and contact us for more information.</p>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="container">
+        <div class="section-heading">
+          <span>We are here to help</span>
+          <h2>Contact Our Store</h2>
+          <p>Use the details configured in your Store Settings.</p>
+        </div>
+
+        <div class="contact-grid">
+          <div class="contact-card">
+            <i class="fa-solid fa-phone"></i>
+            <h3>Phone</h3>
+            <a id="contactPhone" href="tel:">Add phone in Store Settings</a>
+          </div>
+          <div class="contact-card">
+            <i class="fa-brands fa-whatsapp"></i>
+            <h3>WhatsApp</h3>
+            <a id="contactWhatsApp" href="#contact">Contact us</a>
+          </div>
+          <div class="contact-card">
+            <i class="fa-solid fa-envelope"></i>
+            <h3>Email</h3>
+            <a id="contactEmail" href="mailto:">Add email in Store Settings</a>
+          </div>
+          <div class="contact-card" style="grid-column:1/-1">
+            <i class="fa-solid fa-location-dot"></i>
+            <h3>Shop Address</h3>
+            <p id="storeAddress">Add your shop address in Store Settings.</p>
+            <a id="mapLink" href="#contact" target="_blank" rel="noopener" hidden>Open Google Maps</a>
+            <p id="storeCity"></p>
+          </div>
+        </div>
+
+        <div class="section-heading" style="margin:35px 0 0">
+          <h2>Follow Us</h2>
+          <div class="socials" id="socialLinks" style="justify-content:center">
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <h2 id="footerStoreName">My Jewellery Store</h2>
+        <p id="footerAddress">Discover jewellery for every special moment.</p>
+      </div>
+      <div>
+        <h3>Quick Links</h3>
+        <p><a href="#products">Our Products</a></p>
+        <p><a href="#about">About Us</a></p>
+        <p><a href="#contact">Contact</a></p>
+        <p id="footerUPI"></p>
       </div>
     </div>
+    <div class="container copyright" id="footerText">Thank you for visiting our store.</div>
+  </footer>
 
-    <!-- Modal 2 With Some Content -->
+  <div class="floating">
+    <a id="floatingWhatsApp" href="#contact" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+    <a id="floatingPhone" href="tel:" aria-label="Call store"><i class="fa-solid fa-phone"></i></a>
+    <a href="#" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></a>
+  </div>
 
-    <div class="modalTwoDiv">
-      <div class="contentpartMT">
-        <strong>
-          platinum <br />
-          collections
-        </strong>
-        <a href="#" class="contactmTD">Contact Us</a>
-      </div>
-      <img src="modal2pixelcut.png" alt="Modal Image" />
-    </div>
+  <script>
+    const $ = (id) => document.getElementById(id);
 
-    <!-- New Products -->
+    function validHttps(value) {
+      if (typeof value !== "string" || !value.trim()) return "";
+      try {
+        const url = new URL(value.trim());
+        return url.protocol === "https:" ? url.href : "";
+      } catch {
+        return "";
+      }
+    }
 
-    <section class="varietyOfProduct newProdustsSection" id="newProduct">
-      <div class="productBox newProductBox">
-        <img src="ring1.jpg" alt="bangles image" />
-        <div class="productContent">
-          <p>Band Ring in Platinum With Diamonds</p>
-          <strong>&#8377; 20,600 - &#8377; 60,400</strong>
-        </div>
-      </div>
-      <div class="productBox newProductBox">
-        <img src="ring2.jpg" alt="earring image" />
-        <div class="productContent">
-          <p>Classic Solitaire Ring with a Round Brilliant Diamond</p>
-          <strong>&#8377; 20,600 - &#8377; 60,400</strong>
-        </div>
-      </div>
-      <div class="productBox necklace1 newProductBox">
-        <img src="ring3.jpg" alt="necklace image" />
-        <div class="productContent">
-          <p>Radiant Diamond Eternity ring in Platinum</p>
-          <strong>&#8377; 20,600 - &#8377; 60,400</strong>
-        </div>
-      </div>
-      <div class="productBox necklace1 newProductBox">
-        <img src="ring4.jpg" alt="necklace image" />
-        <div class="productContent">
-          <p>Diamond Ring with a Contemporary Twist</p>
-          <strong>&#8377; 20,600 - &#8377; 60,400</strong>
-        </div>
-      </div>
-    </section>
+    function setContactLink(id, value, protocol) {
+      const element = $(id);
+      if (!element || !value) return;
 
-    <!-- Customer Stories -->
-    <section class="reviewSection" id="testinomials">
-      <strong class="headCustomerSories">Customer Stories</strong>
-      <div class="reviewHere">
-        <div class="testimonial-card">
-          <div class="user-info">
-            <span class="userProfileName" style="background-color: red">P</span>
-            <div>
-              <div class="name">Priya Sharma</div>
-            </div>
-            <div class="stars">★★★★★</div>
-          </div>
-          <div class="testimonial-content">
-            I absolutely love the diamond necklace I purchased from here! The
-            design is so unique, and the craftsmanship is impeccable. The staff
-            was very helpful in guiding me to the perfect piece. Will definitely
-            shop here again!
-          </div>
-        </div>
-        <!--  -->
-        <div class="testimonial-card">
-          <div class="user-info">
-            <span class="userProfileName" style="background-color: green"
-              >R</span
-            >
-            <div>
-              <div class="name">Rahul Mehta</div>
-            </div>
-            <div class="stars">★★★★★</div>
-          </div>
-          <div class="testimonial-content">
-            I bought a gold ring for my wife, and she was thrilled with it! The
-            quality is top-notch, and the packaging was elegant. The team even
-            helped me customize the ring with an engraving, which made it extra
-            special.
-          </div>
-        </div>
-        <!--  -->
-        <div class="testimonial-card">
-          <div class="user-info">
-            <span class="userProfileName" style="background-color: blue"
-              >A</span
-            >
-            <div>
-              <div class="name">Anjali Desai</div>
-            </div>
-            <div class="stars">★★★★★</div>
-          </div>
-          <div class="testimonial-content">
-            This is my go-to place for all things jewelry! I recently bought a
-            pair of diamond earrings, and they are stunning. The attention to
-            detail and the friendly service make shopping here a delightful
-            experience every time.
-          </div>
-        </div>
-        <!--  -->
-        <div class="testimonial-card">
-          <div class="user-info">
-            <span class="userProfileName" style="background-color: violet"
-              >N</span
-            >
-            <div>
-              <div class="name">Neha Kapoor</div>
-            </div>
-            <div class="stars">★★★★★</div>
-          </div>
-          <div class="testimonial-content">
-            Amazing collection and excellent service! I was looking for a
-            platinum band, and they had so many beautiful options. The staff
-            patiently explained everything, from the quality to the
-            certification. Highly recommend this store for premium jewelry.
-          </div>
-        </div>
-        <!--  -->
-      </div>
-      <a class="viewAllReviews" href="#">View All Reviews</a>
-    </section>
-    <!-- Accordian -->
+      element.textContent = value;
+      element.href = protocol + value.replace(/[^\d+]/g, "");
+    }
 
-    <strong class="faqs">FAQs</strong>
+    async function loadSettings() {
+      try {
+        const response = await fetch("/api/settings", { cache: "no-store" });
+        if (!response.ok) throw new Error("Settings request failed");
 
-    <div class="accordion" id="accordionExample">
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingOne">
-          <button
-            class="accordion-button"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapseOne"
-            aria-expanded="true"
-            aria-controls="collapseOne"
-          >
-            What is the difference in cost between different materials like gold
-            and platinum?
-          </button>
-        </h2>
-        <div
-          id="collapseOne"
-          class="accordion-collapse collapse show"
-          aria-labelledby="headingOne"
-          data-bs-parent="#accordionExample"
-        >
-          <div class="accordion-body">
-            Gold and platinum differ in price due to their rarity, durability,
-            and market value. Gold is typically more affordable and comes in
-            various karats (e.g., 18K, 22K), with each karat affecting the
-            price. Platinum, being denser and more durable, is generally more
-            expensive than gold and is highly resistant to tarnishing, making it
-            ideal for long-term wear. The final cost also depends on the weight,
-            design complexity, and whether the piece includes gemstones. Our
-            team can provide a detailed breakdown to help you make an informed
-            choice.
-          </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingTwo">
-          <button
-            class="accordion-button collapsed"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapseTwo"
-            aria-expanded="false"
-            aria-controls="collapseTwo"
-          >
-            What is your return or exchange policy?
-          </button>
-        </h2>
-        <div
-          id="collapseTwo"
-          class="accordion-collapse collapse"
-          aria-labelledby="headingTwo"
-          data-bs-parent="#accordionExample"
-        >
-          <div class="accordion-body">
-            We want you to be completely satisfied with your purchase. If you’re
-            not happy with your item, you can return or exchange it within 7
-            days of purchase, provided it’s in its original condition and
-            packaging, with the receipt. Customized or engraved pieces are
-            non-refundable. For online orders, please contact our customer
-            support to initiate the return or exchange process. Terms and
-            conditions apply—please refer to our detailed policy on our website.
-          </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingThree">
-          <button
-            class="accordion-button collapsed"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapseThree"
-            aria-expanded="false"
-            aria-controls="collapseThree"
-          >
-            How do I care for and clean my jewelry?
-          </button>
-        </h2>
-        <div
-          id="collapseThree"
-          class="accordion-collapse collapse"
-          aria-labelledby="headingThree"
-          data-bs-parent="#accordionExample"
-        >
-          <div class="accordion-body">
-            To keep your jewelry looking its best, clean it regularly with a
-            soft, lint-free cloth to remove dirt and oils. For deeper cleaning,
-            use a mild soap solution with warm water and gently scrub with a
-            soft toothbrush. Avoid exposing your jewelry to harsh chemicals,
-            perfumes, or household cleaners, as they can damage the metal or
-            gemstones. Store each piece separately in a jewelry box or pouch to
-            prevent scratches. For professional cleaning or maintenance, visit
-            our store—we’re happy to help!
-          </div>
-        </div>
-      </div>
-    </div>
+        const s = await response.json();
 
-    <!-- Contact Here -->
+        if (s.storeName) {
+          $("storeName").textContent = s.storeName;
+          $("footerStoreName").textContent = s.storeName;
+          document.title = s.storeName;
+        }
 
-    <strong class="strongContactDetails">Contact Details</strong>
+        if (s.logo) {
+          const logo = validHttps(s.logo);
+          if (logo) {
+            $("storeLogo").src = logo;
+            $("storeLogo").style.display = "block";
+          }
+        }
 
-    <section class="contactDetails">
-      <div class="phone contactBoxDetail">
-        <a href="tel:+910123456789">
-          <i class="fa-solid fa-phone"></i> +91 - 0123 456 789
-        </a>
-      </div>
-      <div class="whatsapp contactBoxDetail">
-        <a href="https://wa.me/yourNumber?text=Hi" target="_blank">
-          <i class="fa-brands fa-whatsapp"></i> 1234 567 890
-        </a>
-      </div>
-      <div class="emailId contactBoxDetail">
-        <a
-          href="mailto:jewelry@gmail.com?subject=I want to know about Products or services"
-          ><i class="fa-solid fa-envelope"></i> jewelry@gmail.com</a
-        >
-      </div>
-    </section>
+        if (s.phone) {
+          const digits = s.phone.replace(/[^\d+]/g, "");
+          $("topPhoneText").textContent = s.phone;
+          $("topPhone").href = "tel:" + digits;
+          setContactLink("contactPhone", s.phone, "tel:");
+          $("floatingPhone").href = "tel:" + digits;
+        }
 
-    <!-- Footer -->
+        if (s.email) {
+          $("contactEmail").textContent = s.email;
+          $("contactEmail").href = "mailto:" + s.email;
+        }
 
-    <footer class="FooterSection">
-      <div class="footerMain">
-        <div class="footerHead">
-          <h1>Precious</h1>
-          <span>Jewellery Store</span>
-          <p>
-            We create unique jewelry for those who appreciate proven quality and
-            exquisite style
-          </p>
-          <a href="#" class="addressFooterHead">
-            <i class="fa-solid fa-location-dot"></i
-            ><span class="spanaddressFooterHead"
-              >Shop No. 12, Gopal Heights Andheri West, Mumbai</span
-            >
-          </a>
-        </div>
-        <div class="bestSeller">
-          <strong class="bestSeller">Best Seller</strong>
-          <div class="best1">
-            <img src="Earingpngwing.png" width="100" alt="image" />
-            <p>
-              Rose Gold Ring with Sparkling Accent Diamonds
-              <span>&#8377; 40,500 - &#8377; 50,500</span>
-            </p>
-          </div>
-          <div class="best1">
-            <img src="diamondswlp.png" width="100" alt="image" />
-            <p>
-              Rose Gold Ring with Sparkling Accent Diamonds
-              <span>&#8377; 40,500 - &#8377; 50,500</span>
-            </p>
-          </div>
-        </div>
-        <div class="tagsContent">
-          <strong>Tags</strong>
-          <div class="tags">
-            <span>gold</span>
-            <span>diamond</span>
-            <span>wedding</span>
-            <span>luxary</span>
-            <span>sale</span>
-            <span>new design</span>
-          </div>
-        </div>
-        <div class="sociols">
-          <strong>Socials</strong>
-          <div class="socialLinks">
-            <i class="fa-brands fa-instagram"></i>
-            <i class="fa-brands fa-facebook"></i>
-            <i class="fa-brands fa-x-twitter"></i>
-          </div>
-        </div>
-      </div>
-      <div class="copyright">&copy; Precious All Rights Reserved.</div>
-    </footer>
+        if (s.whatsapp) {
+          let wa = validHttps(s.whatsapp);
+          if (!wa) {
+            const digits = s.whatsapp.replace(/\D/g, "");
+            if (digits) wa = "https://wa.me/" + digits;
+          }
 
-    <a
-      href="https://wa.me/+910123456789?text=Hi"
-      target="_blank"
-      class="bottomWhatsapp"
-    >
-      <i class="fa-brands fa-whatsapp"></i>
-    </a>
+          if (wa) {
+            $("contactWhatsApp").href = wa;
+            $("contactWhatsApp").textContent = "Chat on WhatsApp";
+            $("floatingWhatsApp").href = wa;
+            $("contactWhatsApp").target = "_blank";
+            $("floatingWhatsApp").target = "_blank";
+            $("contactWhatsApp").rel = "noopener noreferrer";
+            $("floatingWhatsApp").rel = "noopener noreferrer";
+          }
+        }
 
-    <a href="tel:+910123456789" class="bottomCallUs">
-      <i class="fa-solid fa-phone"></i>
-    </a>
+        if (s.address) {
+          $("storeAddress").textContent = s.address;
+          $("footerAddress").textContent = s.address;
+        }
 
-    <a class="gotoTop" href="#startnavMain">
-      <i class="fa-solid fa-arrow-up"></i>
-    </a>
-  </body>
-  <!--  -->
-  <script src="script.js"></script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"
-  ></script>
+        if (s.city) $("storeCity").textContent = s.city;
+
+        const map = validHttps(s.mapLink);
+        if (map) {
+          $("mapLink").href = map;
+          $("mapLink").hidden = false;
+        }
+
+        if (s.banner) {
+          const banner = validHttps(s.banner);
+          if (banner) {
+            $("hero").style.backgroundImage =
+              'linear-gradient(110deg, #201810ee, #20181055), url("' +
+              banner.replace(/["\\]/g, "") + '")';
+          }
+        }
+
+        if (/^#[0-9a-f]{6}$/i.test(s.primaryColor || "")) {
+          document.documentElement.style.setProperty("--gold", s.primaryColor);
+          document.querySelector('meta[name="theme-color"]').content = s.primaryColor;
+        }
+
+        if (s.footerText) $("footerText").textContent = s.footerText;
+
+        if (s.upiId) $("footerUPI").textContent = "UPI ID: " + s.upiId;
+
+        const socials = [
+          { name: "Instagram", url: s.instagram, icon: "fa-brands fa-instagram" },
+          { name: "Facebook", url: s.facebook, icon: "fa-brands fa-facebook" },
+          { name: "Other Social", url: s.otherSocial, icon: "fa-solid fa-link" }
+        ];
+
+        socials.forEach(item => {
+          const url = validHttps(item.url);
+          if (!url) return;
+          const a = document.createElement("a");
+          a.href = url;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.setAttribute("aria-label", item.name);
+
+          const icon = document.createElement("i");
+          icon.className = item.icon;
+          a.appendChild(icon);
+          $("socialLinks").appendChild(a);
+        });
+      } catch (error) {
+        console.error("Could not load Store Settings:", error);
+      }
+    }
+
+    function renderProducts(products) {
+      const grid = $("productGrid");
+      grid.replaceChildren();
+
+      if (!Array.isArray(products) || products.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No products yet. Add products in your Admin Panel.";
+        grid.appendChild(empty);
+        $("productStatus").textContent = "";
+        return;
+      }
+
+      products.forEach(product => {
+        const image = validHttps(product.image);
+        const card = document.createElement("article");
+        card.className = "product";
+
+        const img = document.createElement("img");
+        img.loading = "lazy";
+        img.alt = product.name || "Jewellery product";
+        img.src = image || "";
+        img.onerror = function() {
+          this.style.display = "none";
+        };
+
+        const info = document.createElement("div");
+        info.className = "product-info";
+
+        const name = document.createElement("h3");
+        name.textContent = product.name || "Jewellery";
+
+        const price = document.createElement("div");
+        price.className = "price";
+        const amount = Number(product.price);
+        price.textContent = Number.isFinite(amount)
+          ? "₹" + amount.toLocaleString("en-IN")
+          : "Contact for price";
+
+        info.append(name, price);
+        card.append(img, info);
+        grid.appendChild(card);
+      });
+
+      $("productStatus").textContent = products.length + " product(s)";
+    }
+
+    async function loadProducts() {
+      try {
+        const response = await fetch("/api/products", { cache: "no-store" });
+        if (!response.ok) throw new Error("Products request failed");
+        renderProducts(await response.json());
+      } catch (error) {
+        console.error("Could not load products:", error);
+        $("productGrid").innerHTML =
+          '<div class="empty">Products could not load. Please check the server and database.</div>';
+      }
+    }
+
+    $("navToggle").addEventListener("click", () => {
+      $("mainNav").classList.toggle("open");
+    });
+
+    document.querySelectorAll("#mainNav a").forEach(link => {
+      link.addEventListener("click", () => $("mainNav").classList.remove("open"));
+    });
+
+    loadSettings();
+    loadProducts();
+  </script>
+</body>
 </html>
