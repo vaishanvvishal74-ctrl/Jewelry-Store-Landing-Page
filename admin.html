@@ -1,239 +1,768 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jewellery Store Admin</title>
-<style>
-:root{--gold:#9b6b43;--bg:#f7f4f0}
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#30251d}
-header{background:#30251d;color:white;padding:18px}
-header h2{margin:0}
-nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-button{border:0;border-radius:8px;padding:11px 14px;background:var(--gold);color:white;cursor:pointer}
-nav button{background:#594333}
-main{max-width:1000px;margin:auto;padding:16px}
-.card{background:white;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 2px 10px #0000000c}
-input,textarea{width:100%;padding:12px;margin:6px 0 14px;border:1px solid #d8cfc6;border-radius:8px;font:inherit}
-label{font-weight:bold;font-size:14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-h3{margin-top:0}
-.hidden{display:none!important}
-.product{border-top:1px solid #eee;padding:12px 0}
-.product img{width:75px;height:75px;object-fit:cover;border-radius:8px;float:left;margin-right:12px}
-.danger{background:#a83232}
-#status{padding:10px;border-radius:8px;white-space:pre-wrap}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#8f5b3e">
+  <title>Jewellery Store Admin</title>
+
+  <style>
+    :root {
+      --primary: #8f5b3e;
+      --primary-dark: #68402c;
+      --cream: #fffaf5;
+      --bg: #f5f1ed;
+      --white: #fff;
+      --text: #29231f;
+      --muted: #766d66;
+      --border: #e9ded5;
+      --success: #18794e;
+      --danger: #c0392b;
+      --shadow: 0 8px 30px rgba(65, 42, 28, .07);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .hidden { display: none !important; }
+
+    .login-wrap {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 30px;
+      border-radius: 20px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .brand-icon {
+      width: 55px;
+      height: 55px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: var(--primary);
+      color: white;
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: 25px; }
+    h2 { font-size: 21px; }
+    h3 { font-size: 17px; }
+    .muted { color: var(--muted); font-size: 14px; }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      min-width: 0;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: 2px solid #d8b69f;
+      border-color: var(--primary);
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .btn:hover { background: var(--primary-dark); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+    .btn-light {
+      background: #f1e7df;
+      color: var(--primary-dark);
+    }
+
+    .btn-light:hover { background: #e7d7ca; }
+
+    .btn-danger {
+      background: #fff0ee;
+      color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: #ffded9;
+      color: var(--danger);
+    }
+
+    .full { width: 100%; margin-top: 18px; }
+
+    .notice {
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 10px;
+      background: #f1e7df;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .notice.error { background: #fff0ee; color: #9e2419; }
+    .notice.success { background: #e8f7ef; color: #14643f; }
+
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .header-inner {
+      max-width: 1250px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .header-title { font-weight: 800; font-size: 18px; }
+    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    main {
+      max-width: 1250px;
+      margin: 24px auto;
+      padding: 0 16px 40px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat, .panel {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat { padding: 18px; }
+    .stat-number { font-size: 26px; font-weight: 800; margin-top: 8px; }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-weight: 700;
+    }
+
+    .tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .panel { padding: 20px; margin-bottom: 18px; }
+    .panel-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .panel-heading h2 { margin: 0; }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .toolbar input, .toolbar select { flex: 1; min-width: 150px; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 650px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th { background: var(--cream); font-size: 12px; }
+    tr:last-child td { border-bottom: 0; }
+
+    .product-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 180px;
+    }
+
+    .product-img {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: var(--bg);
+    }
+
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .actions .btn { padding: 8px 10px; font-size: 12px; }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 8px;
+      border-radius: 20px;
+      background: #f1e7df;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status-delivered { background: #e3f6e9; color: #17663b; }
+    .status-cancelled { background: #ffe9e5; color: #a12b20; }
+    .status-shipped { background: #e6f0ff; color: #174f9a; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 14px;
+    }
+
+    .span-2 { grid-column: 1 / -1; }
+
+    .empty {
+      padding: 30px 10px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .order-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr);
+      gap: 16px;
+    }
+
+    .detail-block {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-block p:last-child { margin-bottom: 0; }
+    .order-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .order-item:last-child { border-bottom: 0; }
+
+    .mobile-note { font-size: 12px; color: var(--muted); }
+
+    @media (max-width: 650px) {
+      main { margin-top: 16px; }
+      .stats { grid-template-columns: 1fr; gap: 10px; }
+      .stat { padding: 14px; }
+      .stat-number { font-size: 22px; }
+      .panel { padding: 14px; }
+      .form-grid, .order-layout { grid-template-columns: 1fr; }
+      .span-2 { grid-column: auto; }
+      .login-card { padding: 22px; }
+      header { padding: 13px; }
+      .header-title { font-size: 16px; }
+    }
+  </style>
 </head>
+
 <body>
-<header>
-<h2 id="heading">Jewellery Store Admin</h2>
-<nav id="menu" class="hidden">
-<button onclick="show('dashboard')">Dashboard</button>
-<button onclick="show('products')">Products</button>
-<button onclick="show('settings')">Store Settings</button>
-<button onclick="logout()">Logout</button>
-</nav>
-</header>
+  <section id="loginView" class="login-wrap">
+    <form id="loginForm" class="login-card">
+      <div class="brand-icon">✦</div>
+      <h1>Store Admin</h1>
+      <p class="muted">Sign in to manage your jewellery store.</p>
 
-<main>
-<div id="status" role="status"></div>
+      <label for="password">Admin Password</label>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        required
+        maxlength="200"
+        placeholder="Enter admin password"
+      >
 
-<section id="login" class="card">
-<h3>Admin Login</h3>
-<label>Admin Password</label>
-<input id="password" type="password" autocomplete="current-password" placeholder="Enter admin password">
-<button onclick="login()">Login</button>
-</section>
+      <button class="btn full" id="loginBtn" type="submit">Login</button>
+      <div id="loginMessage" role="status" aria-live="polite"></div>
+    </form>
+  </section>
 
-<section id="dashboard" class="card hidden">
-<h3>Dashboard</h3>
-<p>Welcome to your jewellery store admin panel.</p>
-<p>Total products: <strong id="count">0</strong></p>
-<button onclick="show('products')">Manage Products</button>
-<button onclick="show('settings')">Edit Store Settings</button>
-</section>
+  <div id="adminView" class="hidden">
+    <header>
+      <div class="header-inner">
+        <div>
+          <div class="header-title">✦ Jewellery Store Admin</div>
+          <div class="muted">Products and orders dashboard</div>
+        </div>
 
-<section id="products" class="card hidden">
-<h3>Product Management</h3>
-<form id="productForm">
-<input id="editId" type="hidden">
-<label>Product Name</label>
-<input id="pName" required maxlength="120" placeholder="Gold Necklace">
-<label>Price (INR)</label>
-<input id="pPrice" type="number" min="0" step="0.01" required placeholder="1500">
-<label>HTTPS Image URL</label>
-<input id="pImage" type="url" required placeholder="https://example.com/image.jpg">
-<button type="submit">Save Product</button>
-<button type="button" onclick="resetProduct()">Clear</button>
-</form>
-<h3>Existing Products</h3>
-<div id="productList"></div>
-</section>
+        <div class="header-actions">
+          <button class="btn btn-light" id="refreshBtn" type="button">Refresh</button>
+          <button class="btn btn-danger" id="logoutBtn" type="button">Logout</button>
+        </div>
+      </div>
+    </header>
 
-<section id="settings" class="card hidden">
-<h3>Store Settings</h3>
-<p>Fill in the details and tap Save Settings.</p>
-<form id="settingsForm">
-<div class="grid">
-<div><label>Store Name</label><input name="storeName" maxlength="200"></div>
-<div><label>Logo Image URL</label><input name="logo" type="url" placeholder="https://..."></div>
-<div><label>Contact Phone</label><input name="phone" type="tel"></div>
-<div><label>WhatsApp Number / Link</label><input name="whatsapp" placeholder="+91... or https://wa.me/..."></div>
-<div><label>Email</label><input name="email" type="email"></div>
-<div><label>City</label><input name="city"></div>
-<div><label>Shop Address</label><textarea name="address" rows="2"></textarea></div>
-<div><label>Google Maps Link</label><input name="mapLink" type="url" placeholder="https://maps.google.com/..."></div>
-<div><label>Instagram URL</label><input name="instagram" type="url" placeholder="https://instagram.com/..."></div>
-<div><label>Facebook URL</label><input name="facebook" type="url" placeholder="https://facebook.com/..."></div>
-<div><label>Other Social Media URL</label><input name="otherSocial" type="url" placeholder="https://..."></div>
-<div><label>UPI ID</label><input name="upiId" placeholder="yourname@bank"></div>
-<div><label>Website Banner Image URL</label><input name="banner" type="url" placeholder="https://..."></div>
-<div><label>Website Main Color</label><input name="primaryColor" type="text" placeholder="#9b6b43" maxlength="7"></div>
-</div>
-<label>Footer Text</label>
-<textarea name="footerText" rows="2"></textarea>
-<button type="submit">Save Settings</button>
-</form>
-</section>
-</main>
+    <main>
+      <div id="globalMessage" role="status" aria-live="polite"></div>
 
-<script>
-let token = "";
-let products = [];
+      <section class="stats">
+        <div class="stat">
+          <div class="muted">Total Products</div>
+          <div class="stat-number" id="productCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="muted">Total Orders</div>
+          <div class="stat-number" id="orderCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="muted">Pending Orders</div>
+          <div class="stat-number" id="pendingCount">0</div>
+        </div>
+      </section>
 
-const $ = id => document.getElementById(id);
-function message(text, error=false) {
-  $("status").textContent = text;
-  $("status").style.color = error ? "#a83232" : "#245b35";
-}
-async function api(path, options={}) {
-  const headers = {...(options.headers || {})};
-  if (options.body) headers["Content-Type"] = "application/json";
-  if (token) headers["x-admin-token"] = token;
-  const response = await fetch(path, {...options, headers});
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || "Request failed");
-  return data;
-}
-async function login() {
-  try {
-    const data = await api("/api/login", {
-      method:"POST",
-      body:JSON.stringify({password:$("password").value})
-    });
-    token = data.token;
-    $("login").classList.add("hidden");
-    $("menu").classList.remove("hidden");
-    show("dashboard");
-    await Promise.all([loadProducts(), loadSettings()]);
-    message("Login successful");
-  } catch (e) { message(e.message, true); }
-}
-function show(id) {
-  ["dashboard","products","settings"].forEach(section =>
-    $(section).classList.toggle("hidden", section !== id)
-  );
-}
-async function logout() {
-  try { await api("/api/logout",{method:"POST"}); } catch(e) {}
-  token = "";
-  $("menu").classList.add("hidden");
-  ["dashboard","products","settings"].forEach(id => $(id).classList.add("hidden"));
-  $("login").classList.remove("hidden");
-  $("password").value = "";
-  message("Logged out");
-}
-function resetProduct() {
-  $("productForm").reset();
-  $("editId").value = "";
-}
-async function loadProducts() {
-  products = await api("/api/products");
-  $("count").textContent = products.length;
-  $("productList").replaceChildren();
-  products.forEach(p => {
-    const item = document.createElement("div");
-    item.className = "product";
-    const img = document.createElement("img");
-    img.src = p.image;
-    img.alt = p.name;
-    img.onerror = () => img.remove();
-    const title = document.createElement("strong");
-    title.textContent = p.name;
-    const price = document.createElement("p");
-    price.textContent = "₹" + p.price;
-    const edit = document.createElement("button");
-    edit.textContent = "Edit";
-    edit.onclick = () => {
-      $("editId").value = p.id;
-      $("pName").value = p.name;
-      $("pPrice").value = p.price;
-      $("pImage").value = p.image;
-      window.scrollTo(0,0);
-    };
-    const del = document.createElement("button");
-    del.textContent = "Delete";
-    del.className = "danger";
-    del.style.marginLeft = "8px";
-    del.onclick = async () => {
-      if (!confirm("Delete this product?")) return;
+      <nav class="tabs" aria-label="Admin sections">
+        <button class="tab active" data-tab="orders" type="button">Orders</button>
+        <button class="tab" data-tab="products" type="button">Products</button>
+      </nav>
+
+      <section id="ordersSection">
+        <div class="panel">
+          <div class="panel-heading">
+            <h2>Customer Orders</h2>
+            <button class="btn btn-light" id="refreshOrdersBtn" type="button">
+              Refresh Orders
+            </button>
+          </div>
+
+          <div class="toolbar">
+            <input id="orderSearch" type="search" placeholder="Search order ID, name or phone">
+            <select id="orderStatusFilter" aria-label="Filter orders by status">
+              <option value="">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="ordersBody">
+                <tr><td colspan="6" class="empty">Loading orders...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mobile-note">On mobile, swipe the table horizontally to see all columns.</p>
+        </div>
+
+        <div id="orderDetailPanel" class="panel hidden">
+          <div class="panel-heading">
+            <h2 id="detailTitle">Order Details</h2>
+            <button class="btn btn-light" id="closeDetailsBtn" type="button">Close</button>
+          </div>
+
+          <div id="orderDetails"></div>
+        </div>
+      </section>
+
+      <section id="productsSection" class="hidden">
+        <div class="panel">
+          <div class="panel-heading">
+            <h2>Product Management</h2>
+            <button class="btn" id="newProductBtn" type="button">+ Add Product</button>
+          </div>
+
+          <div id="productFormWrap" class="detail-block hidden">
+            <h3 id="productFormTitle">Add Product</h3>
+
+            <form id="productForm">
+              <div class="form-grid">
+                <div class="span-2">
+                  <label for="productName">Product Name</label>
+                  <input id="productName" required maxlength="200">
+                </div>
+
+                <div>
+                  <label for="productPrice">Price (₹)</label>
+                  <input id="productPrice" type="number" min="0" max="100000000" step="0.01" required>
+                </div>
+
+                <div>
+                  <label for="productImage">Image HTTPS URL</label>
+                  <input id="productImage" type="url" placeholder="https://..." maxlength="2048">
+                </div>
+              </div>
+
+              <div class="header-actions" style="margin-top:16px">
+                <button class="btn" id="saveProductBtn" type="submit">Save Product</button>
+                <button class="btn btn-light" id="cancelProductBtn" type="button">Cancel</button>
+              </div>
+
+              <div id="productFormMessage" role="status" aria-live="polite"></div>
+            </form>
+          </div>
+
+          <div class="toolbar">
+            <input id="productSearch" type="search" placeholder="Search products">
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>ID</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="productsBody">
+                <tr><td colspan="4" class="empty">Loading products...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    "use strict";
+
+    const API = "/api";
+    const TOKEN_KEY = "jewelleryAdminToken";
+
+    const ORDER_STATUSES = [
+      "pending",
+      "confirmed",
+      "processing",
+      "shipped",
+      "delivered",
+      "cancelled"
+    ];
+
+    let products = [];
+    let orders = [];
+    let editingProductId = null;
+    let selectedOrderId = null;
+
+    const $ = (id) => document.getElementById(id);
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function money(value) {
+      const amount = Number(value);
+      if (!Number.isFinite(amount)) return "₹0.00";
+
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 2
+      }).format(amount);
+    }
+
+    function formatDate(value) {
+      if (!value) return "—";
+
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "—";
+
+      return date.toLocaleString("en-IN");
+    }
+
+    function token() {
+      return localStorage.getItem(TOKEN_KEY) || "";
+    }
+
+    async function api(path, options = {}) {
+      const headers = { ...(options.headers || {}) };
+
+      if (options.body !== undefined) {
+        headers["Content-Type"] = "application/json";
+      }
+
+      if (token()) {
+        headers.Authorization = "Bearer " + token();
+      }
+
+      const response = await fetch(API + path, {
+        ...options,
+        headers,
+        credentials: "same-origin"
+      });
+
+      const text = await response.text();
+      let data = {};
+
       try {
-        await api("/api/products/" + p.id, {method:"DELETE"});
-        await loadProducts();
-        message("Product deleted");
-      } catch(e) { message(e.message,true); }
-    };
-    item.append(img,title,price,edit,del);
-    $("productList").append(item);
-  });
-}
-$("productForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  const id = $("editId").value;
-  const body = JSON.stringify({
-    name:$("pName").value,
-    price:$("pPrice").value,
-    image:$("pImage").value
-  });
-  try {
-    await api(id ? "/api/products/" + id : "/api/products", {
-      method:id ? "PUT" : "POST", body
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { error: text || "Unexpected server response." };
+      }
+
+      if (response.status === 401) {
+        localStorage.removeItem(TOKEN_KEY);
+
+        if (!$("loginView").classList.contains("hidden")) {
+          throw new Error(data.message || data.error || "Login failed.");
+        }
+
+        showLogin();
+        throw new Error("Session expired. Please log in again.");
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || data.message || "Request failed (" + response.status + ")."
+        );
+      }
+
+      return data;
+    }
+
+    function message(element, text, type = "") {
+      element.className = text ? "notice " + type : "";
+      element.textContent = text;
+    }
+
+    function globalMessage(text, type = "") {
+      message($("globalMessage"), text, type);
+    }
+
+    function showLogin() {
+      $("adminView").classList.add("hidden");
+      $("loginView").classList.remove("hidden");
+    }
+
+    function showAdmin() {
+      $("loginView").classList.add("hidden");
+      $("adminView").classList.remove("hidden");
+    }
+
+    async function checkSession() {
+      if (!token()) {
+        showLogin();
+        return;
+      }
+
+      try {
+        await api("/admin/check");
+        showAdmin();
+        await loadAll();
+      } catch (error) {
+        showLogin();
+        message($("loginMessage"), error.message, "error");
+      }
+    }
+
+    $("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const password = $("password").value;
+      const button = $("loginBtn");
+
+      button.disabled = true;
+      message($("loginMessage"), "Signing in...");
+
+      try {
+        const result = await fetch(API + "/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ password })
+        });
+
+        const data = await result.json().catch(() => ({}));
+
+        if (!result.ok) {
+          throw new Error(data.message || data.error || "Login failed.");
+        }
+
+        if (!data.token) {
+          throw new Error("Login response did not include a session token.");
+        }
+
+        localStorage.setItem(TOKEN_KEY, data.token);
+        $("password").value = "";
+
+        showAdmin();
+        await loadAll();
+        globalMessage("Login successful.", "success");
+      } catch (error) {
+        message($("loginMessage"), error.message, "error");
+      } finally {
+        button.disabled = false;
+      }
     });
-    resetProduct();
-    await loadProducts();
-    message("Product saved successfully");
-  } catch(e) { message(e.message,true); }
-});
-async function loadSettings() {
-  const data = await api("/api/settings");
-  const form = $("settingsForm");
-  Object.keys(data).forEach(key => {
-    if (form.elements[key]) form.elements[key].value = data[key] || "";
-  });
-  if (/^#[0-9a-f]{6}$/i.test(data.primaryColor || "")) {
-    document.documentElement.style.setProperty("--gold",data.primaryColor);
-  }
-  $("heading").textContent = data.storeName || "Jewellery Store Admin";
-}
-$("settingsForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  const form = $("settingsForm");
-  const data = {};
-  for (const [key,value] of new FormData(form).entries()) {
-    data[key] = value;
-  }
-  if (data.primaryColor && !/^#[0-9a-f]{6}$/i.test(data.primaryColor)) {
-    message("Color must be in format #9b6b43",true);
-    return;
-  }
-  try {
-    await api("/api/settings", {method:"PUT",body:JSON.stringify(data)});
-    await loadSettings();
-    message("Settings saved successfully");
-  } catch(e) { message(e.message,true); }
-});
-</script>
-</body>
-</html>
+
+    $("logoutBtn").addEventListener("click", async () => {
+      try {
+        await api("/admin/logout", { method: "POST" });
+      } catch (error) {
+        console.warn("Logout request:", error.message);
+      }
+
+      localStorage.removeItem(TOKEN_KEY);
+      showLogin();
+      globalMessage("");
+      message($("loginMessage"), "You have logged out.", "success");
+    });
+
+    async function loadAll() {
+      globalMessage("Loading store data...");
+
+      const results = await Promise.allSettled([
+        loadProducts(),
+        loadOrders()
+      ]);
+
+      const failed = results.filter((result) => result.status === "rejected");
+
+      if (failed.length) {
+        globalMessage(
+          failed.map((result) => result.reason.message).join(" "),
+          "error"
+        );
+      } else {
+        globalMessage("Data refreshed successfully.", "success");
+      }
+
+      updateStats();
+    }
+
+    $("refreshBtn").addEventListener("click", loadAll);
+    $("refreshOrdersBtn").addEventListener("click", async () => {
+      try {
+        await loadOrders();
+        globalMessage("Orders refreshed.", "success");
+      } catch (error) {
+        globalMessage(error.message, "error");
+      }
+    });
+
+    async function loadProducts() {
+      const result = await api("/products");
+
+      if (!Array.isArray(result)) {
+        throw new Error("Products API returned an unexpected response.");
+      }
+
+      products = result;
+      renderProducts();
+      updateStats();
+    }
+
+    async function loadOrders() {
+      const result = await api("/orders");
+
+      if (!Array.isArray(result)) {
+        throw new Error("Orders API returned an unexpected response.");
+      }
+
+      orders = result;
+      renderOrders();
+      updateStats();
+
+      if (selectedOrderId !== null) {
+        const selected = orders.find(
+          (order) => String(order.id) === String(selectedOrderId)
+        );
+
+        if (selected) renderOrderDetails(selected);
+        else closeOrderDetails();
+      }
+    }
+
+    function updateStats() {
+      $("productCount").textContent = products.length;
+      $("orderCount").textContent = orders.length;
+      $("pendingCount").textContent =
+        orders.filter((order) => order.status === "pending").length;
+    }
+
+    document.querySelectorAll("[data-tab]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const tab = button.datase
