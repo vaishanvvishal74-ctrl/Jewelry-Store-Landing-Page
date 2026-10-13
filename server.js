@@ -1,11 +1,38 @@
-
 const express = require("express");
 const { Pool } = require("pg");
 const crypto = require("crypto");
+const path = require("path");
+const fs = require("fs");
 
 const app = express();
+
 app.use(express.json({ limit: "1mb" }));
-app.use(express.static("public"));
+
+const ROOT = __dirname;
+const PUBLIC_DIR = path.join(ROOT, "public");
+const ROOT_INDEX = path.join(ROOT, "index.html");
+
+// Serve only the public folder, if it exists.
+if (fs.existsSync(PUBLIC_DIR)) {
+  app.use(express.static(PUBLIC_DIR));
+}
+
+// Serve the root index.html explicitly, without exposing other root files.
+app.get("/", (req, res, next) => {
+  if (fs.existsSync(ROOT_INDEX)) {
+    return res.sendFile(ROOT_INDEX);
+  }
+  next();
+});
+
+// Serve the admin page if it is stored in the repository root.
+app.get("/admin.html", (req, res, next) => {
+  const adminFile = path.join(ROOT, "admin.html");
+  if (fs.existsSync(adminFile)) {
+    return res.sendFile(adminFile);
+  }
+  next();
+});
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -16,7 +43,6 @@ const pool = new Pool({
 
 const PORT = process.env.PORT || 10000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-
 const sessions = new Map();
 
 const DEFAULT_SETTINGS = {
@@ -68,7 +94,6 @@ function getSettingsRow(row) {
 }
 
 async function initializeDatabase() {
-  // Products table
   await pool.query(`
     CREATE TABLE IF NOT EXISTS products (
       id SERIAL PRIMARY KEY,
@@ -82,7 +107,6 @@ async function initializeDatabase() {
     )
   `);
 
-  // Store settings table for new installations
   await pool.query(`
     CREATE TABLE IF NOT EXISTS store_settings (
       id INTEGER PRIMARY KEY,
@@ -90,7 +114,6 @@ async function initializeDatabase() {
     )
   `);
 
-  // Compatibility with older database schemas
   await pool.query(`
     ALTER TABLE store_settings
     ADD COLUMN IF NOT EXISTS settings JSONB
@@ -101,24 +124,19 @@ async function initializeDatabase() {
     ADD COLUMN IF NOT EXISTS data JSONB
   `);
 
-  // Fill missing values without overwriting existing settings.
   await pool.query(`
     UPDATE store_settings
     SET settings = COALESCE(settings, data, '{}'::jsonb),
         data = COALESCE(data, settings, '{}'::jsonb)
   `);
 
-  // Create the default row if it doesn't exist.
   await pool.query(
-    `
-    INSERT INTO store_settings (id, settings, data)
-    VALUES ($1, $2::jsonb, $2::jsonb)
-    ON CONFLICT (id) DO NOTHING
-    `,
+    `INSERT INTO store_settings (id, settings, data)
+     VALUES ($1, $2::jsonb, $2::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
     [1, JSON.stringify(DEFAULT_SETTINGS)]
   );
 
-  // Orders table
   await pool.query(`
     CREATE TABLE IF NOT EXISTS orders (
       id SERIAL PRIMARY KEY,
@@ -141,18 +159,12 @@ async function initializeDatabase() {
   console.log("Database tables are ready");
 }
 
-// Health check
 app.get("/api/health", async (req, res) => {
   try {
     await pool.query("SELECT 1");
-
-    res.json({
-      success: true,
-      database: "connected",
-    });
+    res.json({ success: true, database: "connected" });
   } catch (error) {
     console.error("Health check failed:", error.message);
-
     res.status(500).json({
       success: false,
       database: "disconnected",
@@ -160,20 +172,17 @@ app.get("/api/health", async (req, res) => {
   }
 });
 
-// Public store settings
 app.get("/api/settings", async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM store_settings WHERE id = 1"
     );
-
     res.json({
       success: true,
       settings: getSettingsRow(result.rows[0]),
     });
   } catch (error) {
     console.error("Settings error:", error.message);
-
     res.status(500).json({
       success: false,
       message: "Could not load store settings",
@@ -181,7 +190,6 @@ app.get("/api/settings", async (req, res) => {
   }
 });
 
-// Admin login
 app.post("/api/admin/login", (req, res) => {
   if (!ADMIN_PASSWORD) {
     return res.status(500).json({
@@ -190,9 +198,7 @@ app.post("/api/admin/login", (req, res) => {
     });
   }
 
-  const password = String(req.body?.password || "");
-
-  const supplied = Buffer.from(password);
+  const supplied = Buffer.from(String(req.body?.password || ""));
   const expected = Buffer.from(ADMIN_PASSWORD);
 
   const valid =
@@ -209,32 +215,24 @@ app.post("/api/admin/login", (req, res) => {
   const token = makeToken();
   sessions.set(token, true);
 
-  res.json({
-    success: true,
-    token,
-  });
+  res.json({ success: true, token });
 });
 
-// Check admin session
 app.get("/api/admin/check", requireAdmin, (req, res) => {
   res.json({ success: true });
 });
 
-// Admin logout
 app.post("/api/admin/logout", requireAdmin, (req, res) => {
   const token = (req.headers.authorization || "").slice(7);
   sessions.delete(token);
-
   res.json({ success: true });
 });
 
-// List products
 app.get("/api/products", async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM products ORDER BY id DESC"
     );
-
     res.json(result.rows);
   } catch (error) {
     console.error("Products error:", error.message);
@@ -242,7 +240,6 @@ app.get("/api/products", async (req, res) => {
   }
 });
 
-// Add product
 app.post("/api/products", requireAdmin, async (req, res) => {
   const {
     name,
@@ -275,7 +272,6 @@ app.post("/api/products", requireAdmin, async (req, res) => {
         Math.max(0, Number.parseInt(stock, 10) || 0),
       ]
     );
-
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error("Add product error:", error.message);
@@ -283,7 +279,6 @@ app.post("/api/products", requireAdmin, async (req, res) => {
   }
 });
 
-// Update product
 app.put("/api/products/:id", requireAdmin, async (req, res) => {
   const {
     name,
@@ -304,12 +299,8 @@ app.put("/api/products/:id", requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(
       `UPDATE products
-       SET name = $1,
-           description = $2,
-           price = $3,
-           image = $4,
-           category = $5,
-           stock = $6
+       SET name = $1, description = $2, price = $3,
+           image = $4, category = $5, stock = $6
        WHERE id = $7
        RETURNING *`,
       [
@@ -326,7 +317,6 @@ app.put("/api/products/:id", requireAdmin, async (req, res) => {
     if (!result.rowCount) {
       return res.status(404).json({ message: "Product not found" });
     }
-
     res.json(result.rows[0]);
   } catch (error) {
     console.error("Update product error:", error.message);
@@ -334,18 +324,15 @@ app.put("/api/products/:id", requireAdmin, async (req, res) => {
   }
 });
 
-// Delete product
 app.delete("/api/products/:id", requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(
       "DELETE FROM products WHERE id = $1 RETURNING id",
       [req.params.id]
     );
-
     if (!result.rowCount) {
       return res.status(404).json({ message: "Product not found" });
     }
-
     res.json({ success: true });
   } catch (error) {
     console.error("Delete product error:", error.message);
@@ -353,7 +340,6 @@ app.delete("/api/products/:id", requireAdmin, async (req, res) => {
   }
 });
 
-// Update store settings
 app.put("/api/settings", requireAdmin, async (req, res) => {
   const settings = req.body?.settings;
 
@@ -366,7 +352,6 @@ app.put("/api/settings", requireAdmin, async (req, res) => {
 
   try {
     const json = JSON.stringify(settings);
-
     await pool.query(
       `INSERT INTO store_settings (id, settings, data)
        VALUES (1, $1::jsonb, $1::jsonb)
@@ -375,7 +360,6 @@ app.put("/api/settings", requireAdmin, async (req, res) => {
                      data = EXCLUDED.data`,
       [json]
     );
-
     res.json({ success: true, settings });
   } catch (error) {
     console.error("Update settings error:", error.message);
@@ -383,15 +367,8 @@ app.put("/api/settings", requireAdmin, async (req, res) => {
   }
 });
 
-// Create COD order
 app.post("/api/orders", async (req, res) => {
-  const {
-    customer_name,
-    phone,
-    address,
-    items,
-    total,
-  } = req.body || {};
+  const { customer_name, phone, address, items, total } = req.body || {};
 
   if (
     !customer_name ||
@@ -422,14 +399,9 @@ app.post("/api/orders", async (req, res) => {
         Number(total),
       ]
     );
-
-    res.status(201).json({
-      success: true,
-      order: result.rows[0],
-    });
+    res.status(201).json({ success: true, order: result.rows[0] });
   } catch (error) {
     console.error("Create order error:", error.message);
-
     res.status(500).json({
       success: false,
       message: "Could not create order",
@@ -437,13 +409,11 @@ app.post("/api/orders", async (req, res) => {
   }
 });
 
-// Admin: list orders
 app.get("/api/orders", requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM orders ORDER BY created_at DESC"
     );
-
     res.json(result.rows);
   } catch (error) {
     console.error("List orders error:", error.message);
@@ -451,7 +421,6 @@ app.get("/api/orders", requireAdmin, async (req, res) => {
   }
 });
 
-// Admin: update order status
 app.patch("/api/orders/:id", requireAdmin, async (req, res) => {
   const allowedStatuses = [
     "Pending",
@@ -461,7 +430,6 @@ app.patch("/api/orders/:id", requireAdmin, async (req, res) => {
     "Delivered",
     "Cancelled",
   ];
-
   const { status } = req.body || {};
 
   if (!allowedStatuses.includes(status)) {
@@ -473,28 +441,21 @@ app.patch("/api/orders/:id", requireAdmin, async (req, res) => {
 
   try {
     const result = await pool.query(
-      `UPDATE orders
-       SET status = $1
-       WHERE id = $2
-       RETURNING *`,
+      `UPDATE orders SET status = $1
+       WHERE id = $2 RETURNING *`,
       [status, req.params.id]
     );
 
     if (!result.rowCount) {
       return res.status(404).json({ message: "Order not found" });
     }
-
-    res.json({
-      success: true,
-      order: result.rows[0],
-    });
+    res.json({ success: true, order: result.rows[0] });
   } catch (error) {
     console.error("Update order error:", error.message);
     res.status(500).json({ message: "Could not update order" });
   }
 });
 
-// Unknown API route
 app.use("/api", (req, res) => {
   res.status(404).json({
     success: false,
@@ -502,10 +463,12 @@ app.use("/api", (req, res) => {
   });
 });
 
-// Error handler
+app.use((req, res) => {
+  res.status(404).send("Page not found");
+});
+
 app.use((error, req, res, next) => {
   console.error("Request error:", error.message);
-
   res.status(500).json({
     success: false,
     message: "Internal server error",
@@ -515,7 +478,6 @@ app.use((error, req, res, next) => {
 async function startServer() {
   try {
     await initializeDatabase();
-
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Jewellery Store server running on port ${PORT}`);
     });
@@ -526,4 +488,3 @@ async function startServer() {
 }
 
 startServer();
-  
