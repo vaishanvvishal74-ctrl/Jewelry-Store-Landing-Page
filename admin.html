@@ -2,618 +2,293 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jewellery Store - Admin Panel</title>
-
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f5f9;
-      color: #222;
-    }
-    header {
-      background: #211a2b;
-      color: white;
-      padding: 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    header h1 { margin: 0; font-size: 21px; }
-    main { max-width: 1100px; margin: 20px auto; padding: 12px; }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 18px;
-      box-shadow: 0 2px 10px #0000000d;
-    }
-    h2 { margin-top: 0; font-size: 20px; }
-    input, textarea, select, button {
-      width: 100%;
-      padding: 11px;
-      margin: 6px 0;
-      border: 1px solid #ccc;
-      border-radius: 7px;
-      font: inherit;
-    }
-    button {
-      border: 0;
-      cursor: pointer;
-      background: #6c3f8c;
-      color: white;
-      font-weight: bold;
-    }
-    button:disabled { opacity: .6; cursor: wait; }
-    .secondary { background: #555; }
-    .danger { background: #bd3030; }
-    .success { background: #227747; }
-    .hidden { display: none !important; }
-    .message { padding: 10px; border-radius: 7px; margin: 10px 0; }
-    .error { background: #ffe8e8; color: #9d1515; }
-    .ok { background: #e4f7e9; color: #145d2c; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 12px;
-    }
-    .item {
-      border: 1px solid #e2e2e2;
-      border-radius: 9px;
-      padding: 13px;
-      overflow-wrap: anywhere;
-    }
-    .item img {
-      width: 100%;
-      height: 150px;
-      object-fit: contain;
-      background: #f7f7f7;
-      border-radius: 6px;
-    }
-    .item button { width: auto; margin-right: 5px; padding: 9px 12px; }
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .actions button { flex: 1; min-width: 110px; }
-    .muted { color: #666; font-size: 14px; }
-    .order-details { white-space: pre-wrap; overflow-wrap: anywhere; }
-    #status { overflow-wrap: anywhere; }
-    @media (max-width: 500px) {
-      header h1 { font-size: 18px; }
-      .card { padding: 14px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jewellery Store | Admin Panel</title>
+<style>
+:root{--purple:#8138b7;--dark:#251333;--bg:#f5f5fc;--muted:#77758b;--border:#e9e7f2;--white:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#191733;font:14px Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:8px;padding:11px 14px;color:white;background:linear-gradient(100deg,#9141c1,#7029a4);font-weight:600}
+button:disabled{opacity:.55}
+input,select{padding:11px;border:1px solid #e3dfed;border-radius:8px;background:#fff;width:100%;margin:6px 0 12px}
+label{font-weight:bold;font-size:13px}
+header{height:70px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:12px 22px;gap:12px}
+header h1{font-size:20px;margin:0}
+.topsearch{max-width:580px;flex:1}
+.topsearch input{margin:0;background:#f5f3fc}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:calc(100vh - 70px)}
+aside{background:linear-gradient(180deg,#29143b,#21112f);color:#fff;padding:16px 10px}
+.brand{padding:6px 10px 20px;border-bottom:1px solid #ffffff20;margin-bottom:12px}
+.brand strong{font-size:21px}.brand small{display:block;color:#d8b7f1;margin-top:6px}
+.nav{display:block;width:100%;text-align:left;margin:5px 0;background:transparent;color:#f8f2ff}
+.nav.active,.nav:hover{background:linear-gradient(100deg,#9b42c9,#7025a5)}
+.premium{margin-top:35px;padding:18px 12px;border:1px solid #ffffff30;border-radius:12px;color:#e5c7ff;line-height:1.6}
+main{padding:24px;min-width:0;max-width:1800px;width:100%;margin:auto}
+.page{display:none}.page.active{display:block}
+h2{font-size:24px;margin:0 0 8px}h3{font-size:16px;margin:0 0 14px}
+.muted{color:var(--muted);font-size:13px}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:17px;box-shadow:0 4px 18px #28133b08;min-width:0;margin-bottom:15px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0}
+.stat{font-size:28px;font-weight:800;margin:12px 0;color:#191733;overflow-wrap:anywhere}
+.staticon{display:inline-flex;width:45px;height:45px;border-radius:50%;align-items:center;justify-content:center;font-size:23px;margin-right:10px;background:#f0e1fc}
+.pink{background:#ffe3ef}.blue{background:#e0edff}.teal{background:#d9f8f1}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row>*{flex:1;min-width:130px}
+.twocol{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:14px}
+.threecol{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(240px,.8fr) minmax(220px,.75fr);gap:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.item{border:1px solid var(--border);padding:12px;border-radius:10px;overflow-wrap:anywhere}
+.item img{width:100%;height:145px;object-fit:contain;background:#faf9fc;border-radius:8px}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.secondary{background:#625d70}.danger{background:#c6374d}.success{background:#1d9d81}.bluebtn{background:#428ce9}
+.hidden{display:none!important}
+.notice{padding:12px;border-radius:8px;margin:10px 0;overflow-wrap:anywhere}
+.error{background:#ffe9e9;color:#9c1d1d}.ok{background:#e5f8eb;color:#155e30}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:570px}
+th,td{text-align:left;padding:12px 9px;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-size:12px;background:#faf8fc}
+.pill{display:inline-block;padding:6px 10px;border-radius:20px;background:#f1e7fc;color:#7736a4;font-size:12px}
+.status-pending{background:#fff0cb;color:#9a5a00}
+.status-confirmed,.status-delivered,.status-approved{background:#d9f7e8;color:#18794e}
+.status-processing{background:#e0efff;color:#2167b6}
+.status-shipped{background:#f1e3ff;color:#7738a6}
+.status-rejected,.status-cancelled{background:#ffe2e4;color:#b3233d}
+.activity{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid #eee}
+.activity-icon{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#f1e4ff;flex-shrink:0}
+.productmini{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
+.productmini img{width:52px;height:52px;object-fit:contain;border-radius:8px;background:#f7f4fb}
+.quick{display:block;width:100%;text-align:left;margin:9px 0}
+canvas{display:block;width:100%;height:230px}
+.small{font-size:12px}
+footer{padding:14px 24px;color:#77758b;background:#fff;border-top:1px solid var(--border);font-size:12px}
+@media(max-width:1150px){.threecol{grid-template-columns:1fr 1fr}.threecol>.card:first-child{grid-column:1/-1}}
+@media(max-width:800px){.layout{grid-template-columns:1fr}aside{display:flex;overflow-x:auto;gap:5px;padding:8px;position:sticky;top:0;z-index:5}.brand,.premium{display:none}.nav{width:auto;white-space:nowrap;flex:0 0 auto}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.twocol,.threecol{grid-template-columns:1fr}.threecol>.card:first-child{grid-column:auto}main{padding:12px}header{padding:10px 12px}.topsearch{display:none}}
+@media(max-width:420px){.cards{gap:8px}.stat{font-size:22px}.card{padding:13px}header h1{font-size:16px}}
+</style>
 </head>
-
 <body>
-  <header>
-    <h1>Jewellery Store Admin</h1>
-    <button id="logoutBtn" class="danger hidden"
-      style="width:auto;margin:0">Logout</button>
-  </header>
 
-  <main>
-    <div id="status" aria-live="polite"></div>
+<header>
+  <h1>💎 Jewellery Store</h1>
+  <div class="topsearch"><input id="globalSearch" placeholder="Search orders, products, customers..."></div>
+  <span id="adminLabel">Admin Panel</span>
+  <button id="logoutBtn" class="danger hidden">Logout</button>
+</header>
 
-    <!-- LOGIN -->
-    <section id="loginSection" class="card">
-      <h2>Admin Login</h2>
-      <p class="muted">Enter your administrator password.</p>
+<main id="loginArea" style="max-width:450px;margin:50px auto">
+  <section class="card">
+    <h2>Admin Login</h2>
+    <p class="muted">Sign in to manage your jewellery store.</p>
+    <form id="loginForm">
+      <label for="password">Admin password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button id="loginBtn" style="width:100%">Login</button>
+    </form>
+    <div id="loginMessage" aria-live="polite"></div>
+  </section>
+</main>
 
-      <form id="loginForm">
-        <label for="password">Admin Password</label>
-        <input id="password" type="password"
-          placeholder="Enter admin password"
-          autocomplete="current-password" required>
-        <button id="loginBtn" type="submit">Login</button>
-      </form>
-    </section>
+<div id="app" class="layout hidden">
+<aside>
+  <div class="brand"><strong>💎 Jewellery Store</strong><small>Admin Panel</small></div>
+  <button class="nav active" data-page="dashboard">⌂ &nbsp; Dashboard</button>
+  <button class="nav" data-page="orders">▣ &nbsp; Orders</button>
+  <button class="nav" data-page="products">◇ &nbsp; Products</button>
+  <button class="nav" data-page="customers">♙ &nbsp; Customers</button>
+  <button class="nav" data-page="payments">▤ &nbsp; Payments</button>
+  <button class="nav" data-page="reports">▥ &nbsp; Reports</button>
+  <button class="nav" data-page="discounts">✧ &nbsp; Discounts</button>
+  <button class="nav" data-page="coupons">♧ &nbsp; Coupons</button>
+  <button class="nav" data-page="categories">▦ &nbsp; Categories</button>
+  <button class="nav" data-page="settings">⚙ &nbsp; Settings</button>
+  <div class="premium"><strong>👑 Premium Store</strong><br><small>Manage your jewellery business with ease and efficiency.</small><br><br>💍 ✨</div>
+</aside>
 
-    <!-- ADMIN DASHBOARD -->
-    <section id="dashboard" class="hidden">
-      <div class="card">
-        <h2>Dashboard</h2>
-        <div class="actions">
-          <button id="loadProductsBtn">Refresh Products</button>
-          <button id="loadOrdersBtn" class="secondary">Refresh Orders</button>
-        </div>
+<div style="min-width:0">
+<main>
+<div id="message" aria-live="polite"></div>
+
+<section id="page-dashboard" class="page active">
+  <div class="row">
+    <div><h2>Welcome Back, Admin! 👋</h2><p class="muted">Here's what's happening with your jewellery store today.</p></div>
+    <button id="refreshAll">↻ Refresh All</button>
+  </div>
+
+  <div class="cards">
+    <div class="card"><div><span class="staticon">◇</span><span class="muted">Total Products</span></div><div id="statProducts" class="stat">—</div><span class="muted">Current store products</span></div>
+    <div class="card"><div><span class="staticon teal">🛒</span><span class="muted">Total Orders</span></div><div id="statOrders" class="stat">—</div><span class="muted">Orders received</span></div>
+    <div class="card"><div><span class="staticon pink">◷</span><span class="muted">Pending Orders</span></div><div id="statPending" class="stat">—</div><span class="muted">Awaiting action</span></div>
+    <div class="card"><div><span class="staticon blue">₹</span><span class="muted">Total Revenue</span></div><div id="statSales" class="stat">—</div><span class="muted">Total order value</span></div>
+  </div>
+
+  <div class="twocol">
+    <div class="card"><h3>Sales Overview</h3><p class="muted">Order values from available data</p><canvas id="salesChart"></canvas></div>
+    <div class="card"><h3>Order Status</h3><canvas id="orderChart"></canvas><div id="orderStatusSummary" class="small muted"></div></div>
+  </div>
+
+  <div class="threecol">
+    <div class="card">
+      <h3>Recent Orders</h3>
+      <div class="tablewrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody id="recentOrders"><tr><td colspan="4">Login to load orders.</td></tr></tbody></table></div>
+      <button class="quick" data-goto="orders">View All Orders →</button>
+    </div>
+    <div class="card"><h3>Top Products</h3><div id="topProducts" class="muted">Products load after login.</div><button class="quick" data-goto="products">View Products →</button></div>
+    <div>
+      <div class="card"><h3>Quick Actions</h3>
+        <button class="quick" data-goto="products">＋ Add New Product</button>
+        <button class="quick bluebtn" data-goto="orders">🛒 Manage Orders</button>
+        <button class="quick success" data-goto="reports">▥ View Reports</button>
+        <button class="quick" data-goto="discounts">✧ Discounts</button>
       </div>
+      <div class="card"><h3>Low Stock Alert</h3><p class="muted">Stock alerts need a stock field in your product database.</p><div id="stockAlert">Stock information is not available.</div></div>
+    </div>
+  </div>
+</section>
 
-      <!-- PRODUCTS -->
-      <div class="card">
-        <h2 id="productFormTitle">Add Product</h2>
+<section id="page-products" class="page">
+  <h2>Products</h2>
+  <div class="card">
+    <h3 id="productTitle">Add New Product</h3>
+    <form id="productForm">
+      <input id="productId" type="hidden">
+      <label>Product name</label><input id="productName" maxlength="200" required>
+      <label>Price (₹)</label><input id="productPrice" type="number" min="0" step=".01" required>
+      <label>Image URL (HTTPS)</label><input id="productImage" type="url" placeholder="https://example.com/image.jpg" required>
+      <div class="actions"><button id="saveProductBtn">Save Product</button><button type="button" id="cancelEdit" class="secondary hidden">Cancel Edit</button></div>
+    </form>
+  </div>
+  <div class="card"><input id="productSearch" placeholder="Search products..."><div id="productsList" class="grid"></div></div>
+</section>
 
-        <form id="productForm">
-          <input id="productId" type="hidden">
+<section id="page-orders" class="page">
+  <h2>Customer Orders</h2>
+  <div class="card"><div class="row"><input id="orderSearch" placeholder="Search order, name, phone..."><select id="orderFilter"><option value="">All statuses</option><option>pending</option><option>confirmed</option><option>processing</option><option>shipped</option><option>delivered</option><option>cancelled</option><option>rejected</option></select></div><button id="refreshOrders">Refresh Orders</button></div>
+  <div id="ordersList"></div>
+</section>
 
-          <label for="productName">Product Name</label>
-          <input id="productName" maxlength="200"
-            placeholder="Gold Necklace" required>
+<section id="page-customers" class="page">
+  <h2>Customers</h2><div class="card"><input id="customerSearch" placeholder="Search customers..."><div id="customersList"></div></div>
+</section>
 
-          <label for="productPrice">Price (₹)</label>
-          <input id="productPrice" type="number"
-            min="0" step="0.01" placeholder="2500" required>
+<section id="page-payments" class="page">
+  <h2>Payments</h2><div class="card"><p class="muted">Review and update payment status for existing orders.</p><input id="paymentSearch" placeholder="Search order or customer..."><div id="paymentsList"></div></div>
+</section>
 
-          <label for="productImage">Image URL</label>
-          <input id="productImage" type="url"
-            placeholder="https://example.com/image.jpg">
+<section id="page-reports" class="page">
+  <h2>Reports</h2><div class="card"><div id="reportSummary"></div><button id="exportOrders">Export Orders CSV</button></div>
+</section>
 
-          <div class="actions">
-            <button id="saveProductBtn" type="submit">Save Product</button>
-            <button id="cancelEditBtn" class="secondary hidden"
-              type="button">Cancel Edit</button>
-          </div>
-        </form>
-      </div>
-
-      <div class="card">
-        <h2>Products</h2>
-        <div id="productsList" class="grid">
-          <p>Products have not been loaded yet.</p>
-        </div>
-      </div>
-
-      <!-- ORDERS -->
-      <div class="card">
-        <h2>Customer Orders</h2>
-        <div id="ordersList">
-          <p>Orders have not been loaded yet.</p>
-        </div>
-      </div>
-    </section>
-  </main>
+<section id="page-discounts" class="page">
+  <h2>Discounts</h2><div class="card"><p>Discounts and coupons can only be saved after the backend supports coupon storage and checkout validation.</p></div>
+</section>
+<section id="page-coupons" class="page">
+  <h2>Coupons</h2><div class="card"><p>Coupon creation and redemption need backend API support. This page does not create fake coupons.</p></div>
+</section>
+<section id="page-categories" class="page">
+  <h2>Categories</h2><div class="card"><p>Category management requires a categories table and backend APIs.</p></div>
+</section>
+<section id="page-settings" class="page">
+  <h2>Settings</h2><div class="card"><h3>Store configuration</h3><p class="muted">Update ADMIN_PASSWORD and DATABASE_URL in Render environment settings, not in this HTML file.</p><p>Do not put passwords or database credentials in public frontend code.</p></div></section>
+</main>
+<footer>Jewellery Store Admin Panel <span style="float:right">Secure · Fast · Reliable</span></footer>
+</div>
+</div>
 
 <script>
-(() => {
-  "use strict";
-
-  const API = "/api";
-  let adminToken = "";
-  let products = [];
-
-  const $ = (id) => document.getElementById(id);
-
-  function showMessage(message, isError = false) {
-    const el = $("status");
-    el.textContent = message;
-    el.className = "message " + (isError ? "error" : "ok");
-    el.classList.remove("hidden");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function clearMessage() {
-    $("status").textContent = "";
-    $("status").className = "hidden";
-  }
-
-  function setLoggedIn(value) {
-    $("loginSection").classList.toggle("hidden", value);
-    $("dashboard").classList.toggle("hidden", !value);
-    $("logoutBtn").classList.toggle("hidden", !value);
-  }
-
-  async function apiRequest(path, options = {}) {
-    const headers = { ...(options.headers || {}) };
-
-    if (options.body && !headers["Content-Type"]) {
-      headers["Content-Type"] = "application/json";
-    }
-
-    if (adminToken) {
-      headers["Authorization"] = "Bearer " + adminToken;
-    }
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
-
-    try {
-      const response = await fetch(API + path, {
-        ...options,
-        headers,
-        signal: controller.signal
-      });
-
-      const raw = await response.text();
-      let data = {};
-
-      if (raw) {
-        try {
-          data = JSON.parse(raw);
-        } catch {
-          data = { message: raw };
-        }
-      }
-
-      if (!response.ok) {
-        throw new Error(
-          data.error || data.message || ("Request failed: " + response.status)
-        );
-      }
-
-      return data;
-    } catch (error) {
-      if (error.name === "AbortError") {
-        throw new Error(
-          "Request timed out. Check your Render server and database."
-        );
-      }
-      throw error;
-    } finally {
-      clearTimeout(timeout);
-    }
-  }
-
-  function getArray(data, key) {
-    if (Array.isArray(data)) return data;
-    if (data && Array.isArray(data[key])) return data[key];
-    return [];
-  }
-
-  function formatPrice(value) {
-    const amount = Number(value || 0);
-    return "₹" + amount.toLocaleString("en-IN", {
-      maximumFractionDigits: 2
-    });
-  }
-
-  function makeText(tag, text, className) {
-    const el = document.createElement(tag);
-    el.textContent = text == null ? "" : String(text);
-    if (className) el.className = className;
-    return el;
-  }
-
-  // LOGIN
-  $("loginForm").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    clearMessage();
-
-    const password = $("password").value;
-    const button = $("loginBtn");
-    button.disabled = true;
-    button.textContent = "Logging in...";
-
-    try {
-      const data = await apiRequest("/admin/login", {
-        method: "POST",
-        body: JSON.stringify({ password })
-      });
-
-      if (!data.token) {
-        throw new Error(
-          "Server did not return a login token. Check server.js."
-        );
-      }
-
-      adminToken = data.token;
-      $("password").value = "";
-      setLoggedIn(true);
-      showMessage("Login successful.");
-
-      await Promise.allSettled([
-        loadProducts(),
-        loadOrders()
-      ]);
-    } catch (error) {
-      showMessage("Login failed: " + error.message, true);
-    } finally {
-      button.disabled = false;
-      button.textContent = "Login";
-    }
-  });
-
-  // OPTIONAL SESSION CHECK
-  async function checkExistingLogin() {
-    try {
-      const data = await apiRequest("/admin/check");
-      if (data.authenticated === true || data.ok === true) {
-        setLoggedIn(true);
-        await Promise.allSettled([loadProducts(), loadOrders()]);
-      }
-    } catch {
-      // Login manually if this server does not support session checking.
-    }
-  }
-
-  // PRODUCTS: LOAD
-  async function loadProducts() {
-    $("productsList").replaceChildren(makeText("p", "Loading products..."));
-
-    try {
-      const data = await apiRequest("/products");
-      products = getArray(data, "products");
-      renderProducts();
-    } catch (error) {
-      $("productsList").replaceChildren(
-        makeText("p", "Could not load products: " + error.message)
-      );
-    }
-  }
-
-  function renderProducts() {
-    const container = $("productsList");
-    container.replaceChildren();
-
-    if (!products.length) {
-      container.appendChild(makeText("p", "No products found."));
-      return;
-    }
-
-    products.forEach((product) => {
-      const card = document.createElement("article");
-      card.className = "item";
-
-      if (product.image) {
-        const img = document.createElement("img");
-        img.src = product.image;
-        img.alt = product.name || "Product";
-        img.loading = "lazy";
-        img.onerror = () => img.remove();
-        card.appendChild(img);
-      }
-
-      card.appendChild(makeText("h3", product.name || "Unnamed product"));
-      card.appendChild(makeText("p", formatPrice(product.price)));
-
-      const editButton = makeText("button", "Edit");
-      editButton.type = "button";
-      editButton.addEventListener("click", () => editProduct(product));
-      card.appendChild(editButton);
-
-      const deleteButton = makeText("button", "Delete", "danger");
-      deleteButton.type = "button";
-      deleteButton.addEventListener("click", () => deleteProduct(product));
-      card.appendChild(deleteButton);
-
-      container.appendChild(card);
-    });
-  }
-
-  // PRODUCTS: EDIT
-  function editProduct(product) {
-    $("productId").value = product.id ?? "";
-    $("productName").value = product.name || "";
-    $("productPrice").value = product.price ?? "";
-    $("productImage").value = product.image || "";
-    $("productFormTitle").textContent = "Edit Product";
-    $("saveProductBtn").textContent = "Update Product";
-    $("cancelEditBtn").classList.remove("hidden");
-    $("productForm").scrollIntoView({ behavior: "smooth" });
-  }
-
-  function resetProductForm() {
-    $("productForm").reset();
-    $("productId").value = "";
-    $("productFormTitle").textContent = "Add Product";
-    $("saveProductBtn").textContent = "Save Product";
-    $("cancelEditBtn").classList.add("hidden");
-  }
-
-  $("cancelEditBtn").addEventListener("click", resetProductForm);
-
-  // PRODUCTS: CREATE / UPDATE
-  $("productForm").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    clearMessage();
-
-    const id = $("productId").value;
-    const name = $("productName").value.trim();
-    const price = Number($("productPrice").value);
-    const image = $("productImage").value.trim();
-
-    if (!name) {
-      showMessage("Please enter the product name.", true);
-      return;
-    }
-
-    if (!Number.isFinite(price) || price < 0) {
-      showMessage("Please enter a valid product price.", true);
-      return;
-    }
-
-    const button = $("saveProductBtn");
-    button.disabled = true;
-
-    try {
-      const payload = { name, price, image: image || null };
-      const path = id ? "/products/" + encodeURIComponent(id) : "/products";
-      const method = id ? "PUT" : "POST";
-
-      await apiRequest(path, {
-        method,
-        body: JSON.stringify(payload)
-      });
-
-      showMessage(id ? "Product updated." : "Product added.");
-      resetProductForm();
-      await loadProducts();
-    } catch (error) {
-      showMessage("Could not save product: " + error.message, true);
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-  // PRODUCTS: DELETE
-  async function deleteProduct(product) {
-    if (!confirm('Delete "' + (product.name || "this product") + '"?')) {
-      return;
-    }
-
-    try {
-      await apiRequest(
-        "/products/" + encodeURIComponent(product.id),
-        { method: "DELETE" }
-      );
-
-      showMessage("Product deleted.");
-      await loadProducts();
-    } catch (error) {
-      showMessage("Could not delete product: " + error.message, true);
-    }
-  }
-
-  // ORDERS: LOAD
-  async function loadOrders() {
-    $("ordersList").replaceChildren(makeText("p", "Loading orders..."));
-
-    try {
-      const data = await apiRequest("/orders");
-      const orders = getArray(data, "orders");
-      renderOrders(orders);
-    } catch (error) {
-      $("ordersList").replaceChildren(
-        makeText("p", "Could not load orders: " + error.message)
-      );
-    }
-  }
-
-  function renderOrders(orders) {
-    const container = $("ordersList");
-    container.replaceChildren();
-
-    if (!orders.length) {
-      container.appendChild(makeText("p", "No orders found."));
-      return;
-    }
-
-    orders.forEach((order) => {
-      const card = document.createElement("article");
-      card.className = "item";
-      card.style.marginBottom = "12px";
-
-      card.appendChild(makeText("h3", "Order #" + order.id));
-
-      card.appendChild(makeText("p",
-        "Customer: " + (order.customer_name || "N/A")));
-      card.appendChild(makeText("p",
-        "Email: " + (order.customer_email || "N/A")));
-      card.appendChild(makeText("p",
-        "Phone: " + (order.phone || "N/A")));
-      card.appendChild(makeText("p",
-        "Address: " + (order.address || "N/A")));
-      card.appendChild(makeText("p",
-        "Total: " + formatPrice(order.total)));
-      card.appendChild(makeText("p",
-        "Payment method: " + (order.payment_method || "N/A")));
-      card.appendChild(makeText("p",
-        "Payment reference: " + (order.payment_reference || "N/A")));
-      card.appendChild(makeText("p",
-        "Feedback: " + (order.feedback || "N/A")));
-      card.appendChild(makeText("p",
-        "Created: " + (order.created_at || "N/A")));
-
-      let items = order.items;
-      if (typeof items === "string") {
-        try { items = JSON.parse(items); } catch { /* keep as text */ }
-      }
-
-      const details = document.createElement("div");
-      details.className = "order-details";
-      details.textContent = "Items: " +
-        (typeof items === "object" ? JSON.stringify(items, null, 2) :
-          (items || "N/A"));
-      card.appendChild(details);
-
-      // Order status
-      card.appendChild(makeText("label", "Order Status"));
-      const orderStatus = document.createElement("select");
-
-      ["pending", "approved", "processing", "shipped",
-       "delivered", "rejected", "cancelled"].forEach((value) => {
-        const option = document.createElement("option");
-        option.value = value;
-        option.textContent = value;
-        orderStatus.appendChild(option);
-      });
-
-      orderStatus.value = order.status || "pending";
-      card.appendChild(orderStatus);
-
-      const orderButton = makeText("button", "Update Order Status");
-      orderButton.type = "button";
-      orderButton.addEventListener("click", async () => {
-        await updateOrder(order.id, { status: orderStatus.value }, "status");
-      });
-      card.appendChild(orderButton);
-
-      // Payment status
-      card.appendChild(makeText("label", "Payment Status"));
-      const paymentStatus = document.createElement("select");
-
-      ["pending", "approved", "paid", "rejected", "failed", "refunded"]
-        .forEach((value) => {
-          const option = document.createElement("option");
-          option.value = value;
-          option.textContent = value;
-          paymentStatus.appendChild(option);
-        });
-
-      paymentStatus.value = order.payment_status || "pending";
-      card.appendChild(paymentStatus);
-
-      const paymentButton = makeText("button", "Update Payment Status");
-      paymentButton.type = "button";
-      paymentButton.className = "success";
-      paymentButton.addEventListener("click", async () => {
-        await updateOrder(
-          order.id,
-          { payment_status: paymentStatus.value },
-          "payment"
-        );
-      });
-      card.appendChild(paymentButton);
-
-      container.appendChild(card);
-    });
-  }
-
-  async function updateOrder(id, payload, type) {
-    try {
-      const endpoint = type === "payment"
-        ? "/orders/" + encodeURIComponent(id) + "/payment"
-        : "/orders/" + encodeURIComponent(id) + "/status";
-
-      await apiRequest(endpoint, {
-        method: "PATCH",
-        body: JSON.stringify(payload)
-      });
-
-      showMessage(type === "payment"
-        ? "Payment status updated."
-        : "Order status updated.");
-
-      await loadOrders();
-    } catch (error) {
-      showMessage("Could not update order: " + error.message, true);
-    }
-  }
-
-  $("loadProductsBtn").addEventListener("click", loadProducts);
-  $("loadOrdersBtn").addEventListener("click", loadOrders);
-
-  // LOGOUT
-  $("logoutBtn").addEventListener("click", async () => {
-    try {
-      await apiRequest("/admin/logout", { method: "POST" });
-    } catch {
-      // Clear local login state even if the server has no logout endpoint.
-    }
-
-    adminToken = "";
-    setLoggedIn(false);
-    resetProductForm();
-    $("productsList").replaceChildren();
-    $("ordersList").replaceChildren();
-    showMessage("Logged out.");
-  });
-
-  checkExistingLogin();
-})();
-</script>
-</body>
-  </html>
-  
+(()=>{
+"use strict";
+const API="/api";
+let token="",products=[],orders=[];
+const $=id=>document.getElementById(id);
+const statuses=["pending","confirmed","processing","shipped","delivered","cancelled","rejected"];
+function node(tag,text,cls){const n=document.createElement(tag);n.textContent=text==null?"":String(text);if(cls)n.className=cls;return n}
+function money(v){return "₹"+Number(v||0).toLocaleString("en-IN",{maximumFractionDigits:2})}
+function msg(text,error=false,login=false){const n=$(login?"loginMessage":"message");n.textContent=text;n.className="notice "+(error?"error":"ok")}
+function clearMsg(){$("message").textContent="";$("message").className=""}
+function arr(d,key){if(Array.isArray(d))return d;return d&&Array.isArray(d[key])?d[key]:[]}
+async function api(path,options={}){
+ const headers={...(options.headers||{})};
+ if(options.body)headers["Content-Type"]="application/json";
+ if(token)headers.Authorization="Bearer "+token;
+ const c=new AbortController(),timer=setTimeout(()=>c.abort(),18000);
+ try{
+  const r=await fetch(API+path,{...options,headers,signal:c.signal});
+  const raw=await r.text();let d={};
+  if(raw){try{d=JSON.parse(raw)}catch{d={message:raw}}}
+  if(!r.ok)throw Error(d.error||d.message||"HTTP "+r.status);
+  return d;
+ }catch(e){if(e.name==="AbortError")throw Error("Request timed out. Render server check karein.");throw e}
+ finally{clearTimeout(timer)}
+}
+function showLogin(on){$("loginArea").classList.toggle("hidden",on);$("app").classList.toggle("hidden",!on);$("logoutBtn").classList.toggle("hidden",!on)}
+function go(page){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id==="page-"+page));document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.page===page));if(page==="customers")renderCustomers();if(page==="payments")renderPayments();if(page==="reports")renderReports()}
+document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
+document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.goto)));
+
+$("loginForm").addEventListener("submit",async e=>{
+ e.preventDefault();const b=$("loginBtn");b.disabled=true;b.textContent="Logging in...";
+ try{const d=await api("/admin/login",{method:"POST",body:JSON.stringify({password:$("password").value})});if(!d.token)throw Error("Login token missing from server response.");token=d.token;$("password").value="";showLogin(true);msg("Login successful.");await refreshAll()}
+ catch(e){msg("Login failed: "+e.message,true,true)}
+ finally{b.disabled=false;b.textContent="Login"}
+});
+$("logoutBtn").addEventListener("click",()=>{token="";products=[];orders=[];showLogin(false);clearMsg();$("loginMessage").textContent="You have logged out."});
+$("refreshAll").addEventListener("click",refreshAll);
+$("refreshOrders").addEventListener("click",loadOrders);
+$("orderSearch").addEventListener("input",renderOrders);
+$("orderFilter").addEventListener("change",renderOrders);
+$("productSearch").addEventListener("input",renderProducts);
+$("customerSearch").addEventListener("input",renderCustomers);
+$("paymentSearch").addEventListener("input",renderPayments);
+$("globalSearch").addEventListener("input",()=>{
+ const q=$("globalSearch").value.trim();
+ if(!q)return;
+ $("orderSearch").value=q;$("productSearch").value=q;$("customerSearch").value=q;$("paymentSearch").value=q;
+});
+async function refreshAll(){clearMsg();await Promise.all([loadProducts(),loadOrders()]);updateStats();drawCharts()}
+async function loadProducts(){
+ $("productsList").textContent="Loading products...";
+ try{products=arr(await api("/products"),"products");renderProducts();updateStats();renderTopProducts()}
+ catch(e){$("productsList").textContent="Products load failed: "+e.message}
+}
+async function loadOrders(){
+ $("ordersList").textContent="Loading orders...";
+ try{orders=arr(await api("/orders"),"orders");renderOrders();renderRecent();updateStats();drawCharts();renderTopProducts();if($("page-customers").classList.contains("active"))renderCustomers();if($("page-payments").classList.contains("active"))renderPayments();if($("page-reports").classList.contains("active"))renderReports()}
+ catch(e){$("ordersList").textContent="Orders load failed: "+e.message}
+}
+function updateStats(){
+ $("statProducts").textContent=products.length;
+ $("statOrders").textContent=orders.length;
+ $("statCustomers").textContent=new Set(orders.map(o=>o.customer_email||o.phone||o.customer_name).filter(Boolean)).size;
+ $("statSales").textContent=money(orders.reduce((s,o)=>s+Number(o.total||0),0));
+ $("statPending").textContent=orders.filter(o=>String(o.status).toLowerCase()==="pending").length;
+ $("statPayments").textContent=orders.filter(o=>String(o.payment_status||"pending").toLowerCase()==="pending").length;
+ $("statPaid").textContent=orders.filter(o=>String(o.payment_status).toLowerCase()==="approved").length;
+ $("statRejected").textContent=orders.filter(o=>String(o.status).toLowerCase()==="rejected").length;
+}
+function renderProducts(){
+ const box=$("productsList");box.replaceChildren();
+ const q=$("productSearch").value.toLowerCase();
+ const list=products.filter(p=>String(p.name||"").toLowerCase().includes(q));
+ if(!list.length){box.append(node("p","No matching products."));return}
+ list.forEach(p=>{
+  const c=node("article","","item");
+  if(p.image){const im=node("img");im.src=p.image;im.alt=p.name||"Product";im.loading="lazy";im.onerror=()=>im.remove();c.append(im)}
+  c.append(node("h3",p.name||"Unnamed product"),node("p",money(p.price)));
+  const a=node("div","","actions"),edit=node("button","Edit"),del=node("button","Delete","danger");
+  edit.type=del.type="button";edit.addEventListener("click",()=>editProduct(p));del.addEventListener("click",()=>deleteProduct(p));a.append(edit,del);c.append(a);box.append(c)
+ })
+}
+function editProduct(p){$("productId").value=p.id||"";$("productName").value=p.name||"";$("productPrice").value=p.price??"";$("productImage").value=p.image||"";$("productTitle").textContent="Edit Product";$("saveProductBtn").textContent="Update Product";$("cancelEdit").classList.remove("hidden");$("productForm").scrollIntoView({behavior:"smooth"})}
+function resetProduct(){$("productForm").reset();$("productId").value="";$("productTitle").textContent="Add New Product";$("saveProductBtn").textContent="Save Product";$("cancelEdit").classList.add("hidden")}
+$("cancelEdit").addEventListener("click",resetProduct);
+$("productForm").addEventListener("submit",async e=>{
+ e.preventDefault();const id=$("productId").value,name=$("productName").value.trim(),price=Number($("productPrice").value),image=$("productImage").value.trim(),b=$("saveProductBtn");
+ if(!name||!image.startsWith("https://")||!Number.isFinite(price)||price<0){msg("Valid product name, price and HTTPS image URL enter karein.",true);return}
+ b.disabled=true;
+ try{await api(id?"/products/"+encodeURIComponent(id):"/products",{method:id?"PUT":"POST",body:JSON.stringify({name,price,image})});msg(id?"Product updated.":"Product added.");resetProduct();await loadProducts()}
+ catch(e){msg("Product save failed: "+e.message,true)}finally{b.disabled=false}
+});
+async function deleteProduct(p){if(!confirm("Delete 
