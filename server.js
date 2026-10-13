@@ -17,13 +17,23 @@ if (fs.existsSync(PUBLIC_DIR)) {
   app.use(express.static(PUBLIC_DIR));
 }
 
-// Serve the root index.html explicitly, without exposing other root files.
-app.get("/", (req, res, next) => {
+
+app.get("/", (req, res) => {
+  const publicIndex = path.join(PUBLIC_DIR, "index.html");
+
+  if (fs.existsSync(publicIndex)) {
+    return res.sendFile(publicIndex);
+  }
+
   if (fs.existsSync(ROOT_INDEX)) {
     return res.sendFile(ROOT_INDEX);
   }
-  next();
+
+  return res.status(404).send(
+    "index.html nahi mila. GitHub mein file location check karo."
+  );
 });
+
 
 // Serve the website homepage from public/index.html.
 app.get("/", (req, res, next) => {
