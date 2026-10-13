@@ -1,143 +1,307 @@
 
+"use strict";
+
 const express = require("express");
 const path = require("path");
-const fs = require("fs");
 const crypto = require("crypto");
+const { Pool } = require("pg");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+if (!process.env.DATABASE_URL) {
+  console.error("DATABASE_URL is missing");
+  process.exit(1);
+}
+if (!process.env.ADMIN_PASSWORD) {
+  console.error("ADMIN_PASSWORD is missing");
+  process.exit(1);
+}
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL.includes("localhost")
+    ? false
+    : { rejectUnauthorized: false }
+});
+
 app.use(express.json({ limit: "1mb" }));
+app.use(express.static(__dirname));
 
-// Website files
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+const sessions = new Map();
+const SESSION_TTL = 8 * 60 * 60 * 1000;
 
-app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "admin.html"));
-});
+const STATUSES = [
+  "pending", "confirmed", "processing",
+  "shipped", "delivered", "cancelled", "rejected"
+];
 
-// Product data storage
-const dataDir = path.join(__dirname, "data");
-const dataFile = path.join(dataDir, "products.json");
+const PAYMENT_STATUSES = ["pending", "approved", "rejected"];
 
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+async function initDatabase() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS products (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      price NUMERIC(12,2) NOT NULL,
+      image TEXT NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS orders (
+      id TEXT PRIMARY KEY,
+      customer_name TEXT NOT NULL DEFAULT '',
+      customer_email TEXT NOT NULL DEFAULT '',
+      phone TEXT NOT NULL DEFAULT '',
+      address TEXT NOT NULL DEFAULT '',
+      items JSONB NOT NULL DEFAULT '[]'::jsonb,
+      total NUMERIC(12,2) NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'pending',
+      payment_method TEXT NOT NULL DEFAULT '',
+      payment_status TEXT NOT NULL DEFAULT 'pending',
+      payment_reference TEXT NOT NULL DEFAULT '',
+      feedback TEXT NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
 }
 
-if (!fs.existsSync(dataFile)) {
-  fs.writeFileSync(dataFile, "[]", "utf8");
+function sendError(res, error, status = 500) {
+  console.error(error);
+  res.status(status).json({
+    error: status === 500 ? "Server error. Render Logs check karein." : error
+  });
 }
 
-function readProducts() {
-  return JSON.parse(fs.readFileSync(dataFile, "utf8"));
+function getToken(req) {
+  const header = req.headers.authorization || "";
+  if (!header.startsWith("Bearer ")) return "";
+  return header.slice(7);
 }
 
-function saveProducts(products) {
-  fs.writeFileSync(dataFile, JSON.stringify(products, null, 2));
+function requireAdmin(req, res, next) {
+  const token = getToken(req);
+  const expires = sessions.get(token);
+
+  if (!token || !expires || expires < Date.now()) {
+    sessions.delete(token);
+    return res.status(401).json({ error: "Login dobara karein." });
+  }
+
+  sessions.set(token, Date.now() + SESSION_TTL);
+  next();
 }
 
-// Check product data
 function validProduct(body) {
-  return (
-    body &&
+  return body &&
     typeof body.name === "string" &&
     body.name.trim().length > 0 &&
+    body.name.trim().length <= 200 &&
     Number.isFinite(Number(body.price)) &&
-    Number(body.price) >= 0
-  );
+    Number(body.price) >= 0 &&
+    Number(body.price) <= 100000000 &&
+    typeof body.image === "string" &&
+    body.image.length <= 2000;
 }
 
-// Get all products
-app.get("/products", (req, res) => {
+function validImageUrl(value) {
   try {
-    res.json(readProducts());
+    const url = new URL(value);
+    return url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+// Admin login
+app.post("/api/admin/login", (req, res) => {
+  const password = typeof req.body.password === "string"
+    ? req.body.password
+    : "";
+
+  const expected = process.env.ADMIN_PASSWORD;
+
+  const a = Buffer.from(password);
+  const b = Buffer.from(expected);
+
+  const matches =
+    a.length === b.length && crypto.timingSafeEqual(a, b);
+
+  if (!matches) {
+    return res.status(401).json({ error: "Password galat hai." });
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+  sessions.set(token, Date.now() + SESSION_TTL);
+
+  res.json({ token });
+});
+
+// Check current login
+app.get("/api/admin/check", requireAdmin, (req, res) => {
+  res.json({ authenticated: true });
+});
+
+// Logout
+app.post("/api/admin/logout", (req, res) => {
+  sessions.delete(getToken(req));
+  res.json({ message: "Logout ho gaya." });
+});
+
+// List products
+app.get("/api/products", requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, name, price, image FROM products ORDER BY created_at DESC"
+    );
+    res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: "Products load nahi ho paye." });
+    sendError(res, error);
   }
 });
 
 // Add product
-app.post("/products", (req, res) => {
+app.post("/api/products", requireAdmin, async (req, res) => {
   try {
-    if (!validProduct(req.body)) {
+    if (!validProduct(req.body) || !validImageUrl(req.body.image)) {
       return res.status(400).json({
-        error: "Product name aur valid price zaroori hai."
+        error: "Valid name, price aur HTTPS image URL zaroori hai."
       });
     }
-
-    const products = readProducts();
 
     const product = {
       id: crypto.randomUUID(),
       name: req.body.name.trim(),
       price: Number(req.body.price),
-      image: typeof req.body.image === "string" ? req.body.image.trim() : ""
+      image: req.body.image.trim()
     };
 
-    products.push(product);
-    saveProducts(products);
+    await pool.query(
+      `INSERT INTO products (id, name, price, image)
+       VALUES ($1, $2, $3, $4)`,
+      [product.id, product.name, product.price, product.image]
+    );
 
-    res.status(201).json({
-      message: "Product save ho gaya.",
-      product
-    });
+    res.status(201).json({ message: "Product save ho gaya.", ...product });
   } catch (error) {
-    res.status(500).json({ error: "Product save nahi hua." });
+    sendError(res, error);
   }
 });
 
 // Update product
-app.put("/products/:id", (req, res) => {
+app.put("/api/products/:id", requireAdmin, async (req, res) => {
   try {
-    if (!validProduct(req.body)) {
+    if (!validProduct(req.body) || !validImageUrl(req.body.image)) {
       return res.status(400).json({
-        error: "Product name aur valid price zaroori hai."
+        error: "Valid name, price aur HTTPS image URL zaroori hai."
       });
     }
 
-    const products = readProducts();
-    const index = products.findIndex(
-      product => product.id === req.params.id
+    const result = await pool.query(
+      `UPDATE products SET name=$1, price=$2, image=$3
+       WHERE id=$4 RETURNING id, name, price, image`,
+      [
+        req.body.name.trim(),
+        Number(req.body.price),
+        req.body.image.trim(),
+        req.params.id
+      ]
     );
 
-    if (index === -1) {
+    if (!result.rowCount) {
       return res.status(404).json({ error: "Product nahi mila." });
     }
 
-    products[index] = {
-      ...products[index],
-      name: req.body.name.trim(),
-      price: Number(req.body.price),
-      image: typeof req.body.image === "string"
-        ? req.body.image.trim()
-        : products[index].image
-    };
-
-    saveProducts(products);
-    res.json({ message: "Product update ho gaya.", product: products[index] });
+    res.json({ message: "Product update ho gaya.", ...result.rows[0] });
   } catch (error) {
-    res.status(500).json({ error: "Product update nahi hua." });
+    sendError(res, error);
   }
 });
 
 // Delete product
-app.delete("/products/:id", (req, res) => {
+app.delete("/api/products/:id", requireAdmin, async (req, res) => {
   try {
-    const products = readProducts();
-    const remaining = products.filter(
-      product => product.id !== req.params.id
+    const result = await pool.query(
+      "DELETE FROM products WHERE id=$1",
+      [req.params.id]
     );
 
-    if (remaining.length === products.length) {
+    if (!result.rowCount) {
       return res.status(404).json({ error: "Product nahi mila." });
     }
 
-    saveProducts(remaining);
     res.json({ message: "Product delete ho gaya." });
   } catch (error) {
-    res.status(500).json({ error: "Product delete nahi hua." });
+    sendError(res, error);
+  }
+});
+
+// List orders
+app.get("/api/orders", requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM orders ORDER BY created_at DESC"
+    );
+    res.json(result.rows);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// Change order status
+app.patch("/api/orders/:id/status", requireAdmin, async (req, res) => {
+  try {
+    const status = req.body.status;
+
+    if (!STATUSES.includes(status)) {
+      return res.status(400).json({ error: "Invalid order status." });
+    }
+
+    const result = await pool.query(
+      `UPDATE orders SET status=$1
+       WHERE id=$2 RETURNING *`,
+      [status, req.params.id]
+    );
+
+    if (!result.rowCount) {
+      return res.status(404).json({ error: "Order nahi mila." });
+    }
+
+    res.json({ message: "Order status update ho gaya.", order: result.rows[0] });
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// Update payment status
+app.patch("/api/orders/:id/payment", requireAdmin, async (req, res) => {
+  try {
+    const paymentStatus = req.body.payment_status;
+    const reference = typeof req.body.payment_reference === "string"
+      ? req.body.payment_reference.trim().slice(0, 200)
+      : "";
+
+    if (!PAYMENT_STATUSES.includes(paymentStatus)) {
+      return res.status(400).json({ error: "Invalid payment status." });
+    }
+
+    const result = await pool.query(
+      `UPDATE orders
+       SET payment_status=$1, payment_reference=$2
+       WHERE id=$3 RETURNING *`,
+      [paymentStatus, reference, req.params.id]
+    );
+
+    if (!result.rowCount) {
+      return res.status(404).json({ error: "Order nahi mila." });
+    }
+
+    res.json({
+      message: "Payment status update ho gaya.",
+      order: result.rows[0]
+    });
+  } catch (error) {
+    sendError(res, error);
   }
 });
 
@@ -146,7 +310,22 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK" });
 });
 
-// Start server
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Jewellery Store server running on port ${PORT}`);
+// Serve admin page
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "admin.html"));
 });
+
+app.get("/admin.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "admin.html"));
+});
+
+initDatabase()
+  .then(() => {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log("Jewellery Store server running on port " + PORT);
+    });
+  })
+  .catch(error => {
+    console.error("Database startup failed:", error);
+    process.exit(1);
+  });
