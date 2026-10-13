@@ -44,7 +44,9 @@ function requireAdmin(req, res, next) {
   const token = req.get("x-admin-token");
 
   if (!token || !sessions.has(token)) {
-    return res.status(401).json({ error: "Please login first" });
+    return res.status(401).json({
+      error: "Please login first"
+    });
   }
 
   next();
@@ -80,13 +82,18 @@ async function initializeDatabase() {
 app.get("/api/health", async (req, res) => {
   try {
     await pool.query("SELECT 1");
+
     res.json({
       status: "Jewellery Store Server is running",
       database: "connected"
     });
   } catch (error) {
     console.error("Health check failed:", error.message);
-    res.status(503).json({ error: "Database unavailable" });
+
+    res.status(503).json({
+      status: "Jewellery Store Server is running",
+      database: "disconnected"
+    });
   }
 });
 
@@ -107,11 +114,14 @@ app.post("/api/login", (req, res) => {
       Buffer.from(ADMIN_PASSWORD)
     )
   ) {
-    return res.status(401).json({ error: "Wrong password" });
+    return res.status(401).json({
+      error: "Wrong password"
+    });
   }
 
   const token = crypto.randomBytes(32).toString("hex");
   sessions.set(token, true);
+
   res.json({ token });
 });
 
@@ -125,10 +135,14 @@ app.get("/api/settings", async (req, res) => {
     const result = await pool.query(
       "SELECT data FROM store_settings WHERE id = 1"
     );
+
     res.json(result.rows[0]?.data || defaultSettings);
   } catch (error) {
     console.error("Read settings failed:", error.message);
-    res.status(500).json({ error: "Could not load settings" });
+
+    res.status(500).json({
+      error: "Could not load settings"
+    });
   }
 });
 
@@ -167,10 +181,16 @@ app.put("/api/settings", requireAdmin, async (req, res) => {
       [JSON.stringify(settings)]
     );
 
-    res.json({ message: "Settings saved", settings });
+    res.json({
+      message: "Settings saved",
+      settings
+    });
   } catch (error) {
     console.error("Save settings failed:", error.message);
-    res.status(500).json({ error: "Could not save settings" });
+
+    res.status(500).json({
+      error: "Could not save settings"
+    });
   }
 });
 
@@ -179,10 +199,14 @@ app.get("/api/products", async (req, res) => {
     const result = await pool.query(
       "SELECT id, name, price, image FROM products ORDER BY id DESC"
     );
+
     res.json(result.rows);
   } catch (error) {
     console.error("Read products failed:", error.message);
-    res.status(500).json({ error: "Could not load products" });
+
+    res.status(500).json({
+      error: "Could not load products"
+    });
   }
 });
 
@@ -190,8 +214,13 @@ app.post("/api/products", requireAdmin, async (req, res) => {
   const { name, price, image } = req.body || {};
 
   if (
-    typeof name !== "string" || !name.trim() ||
-    !Number.isFinite(Number(price)) || Number(price) < 0 ||
+    typeof name !== "string" ||
+    !name.trim() ||
+    price === "" ||
+    price === null ||
+    price === undefined ||
+    !Number.isFinite(Number(price)) ||
+    Number(price) < 0 ||
     typeof image !== "string" ||
     !/^https:\/\/\S+$/i.test(image.trim())
   ) {
@@ -211,22 +240,33 @@ app.post("/api/products", requireAdmin, async (req, res) => {
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error("Add product failed:", error.message);
-    res.status(500).json({ error: "Could not add product" });
+
+    res.status(500).json({
+      error: "Could not add product"
+    });
   }
 });
 
 app.put("/api/products/:id", requireAdmin, async (req, res) => {
   const { name, price, image } = req.body || {};
+  const id = Number(req.params.id);
 
   if (
-    !Number.isInteger(Number(req.params.id)) ||
-    Number(req.params.id) < 1 ||
-    typeof name !== "string" || !name.trim() ||
-    !Number.isFinite(Number(price)) || Number(price) < 0 ||
+    !Number.isInteger(id) ||
+    id < 1 ||
+    typeof name !== "string" ||
+    !name.trim() ||
+    price === "" ||
+    price === null ||
+    price === undefined ||
+    !Number.isFinite(Number(price)) ||
+    Number(price) < 0 ||
     typeof image !== "string" ||
     !/^https:\/\/\S+$/i.test(image.trim())
   ) {
-    return res.status(400).json({ error: "Invalid product details" });
+    return res.status(400).json({
+      error: "Invalid product details"
+    });
   }
 
   try {
@@ -235,53 +275,68 @@ app.put("/api/products/:id", requireAdmin, async (req, res) => {
        SET name = $1, price = $2, image = $3
        WHERE id = $4
        RETURNING id, name, price, image`,
-      [name.trim(), Number(price), image.trim(), Number(req.params.id)]
+      [name.trim(), Number(price), image.trim(), id]
     );
 
     if (!result.rowCount) {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({
+        error: "Product not found"
+      });
     }
 
     res.json(result.rows[0]);
   } catch (error) {
     console.error("Update product failed:", error.message);
-    res.status(500).json({ error: "Could not update product" });
+
+    res.status(500).json({
+      error: "Could not update product"
+    });
   }
 });
 
 app.delete("/api/products/:id", requireAdmin, async (req, res) => {
-  if (
-    !Number.isInteger(Number(req.params.id)) ||
-    Number(req.params.id) < 1
-  ) {
-    return res.status(400).json({ error: "Invalid product ID" });
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id < 1) {
+    return res.status(400).json({
+      error: "Invalid product ID"
+    });
   }
 
   try {
     const result = await pool.query(
       "DELETE FROM products WHERE id = $1",
-      [Number(req.params.id)]
+      [id]
     );
 
     if (!result.rowCount) {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({
+        error: "Product not found"
+      });
     }
 
     res.json({ message: "Product deleted" });
   } catch (error) {
     console.error("Delete product failed:", error.message);
-    res.status(500).json({ error: "Could not delete product" });
+
+    res.status(500).json({
+      error: "Could not delete product"
+    });
   }
 });
 
 initializeDatabase()
   .then(() => {
     app.listen(PORT, () => {
-      console.log("Jewellery Store server running on port " + PORT);
+      console.log(
+        "Jewellery Store server running on port " + PORT
+      );
     });
   })
   .catch(error => {
-    console.error("Database initialization failed:", error.message);
+    console.error(
+      "Database initialization failed:",
+      error.message
+    );
     process.exit(1);
   });
-           
