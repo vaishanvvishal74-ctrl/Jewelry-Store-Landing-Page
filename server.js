@@ -1,3 +1,4 @@
+
 const express = require("express");
 const { Pool } = require("pg");
 const crypto = require("crypto");
@@ -14,6 +15,10 @@ const pool = new Pool({
     process.env.NODE_ENV === "production"
       ? { rejectUnauthorized: false }
       : undefined,
+});
+
+pool.on("error", (error) => {
+  console.error("Unexpected database error:", error.message);
 });
 
 const sessions = new Map();
@@ -55,7 +60,6 @@ function validText(value, max = 200) {
 
 function validHttpsUrl(value) {
   if (value === "" || value == null) return true;
-
   if (typeof value !== "string" || value.length > 2048) {
     return false;
   }
@@ -65,6 +69,11 @@ function validHttpsUrl(value) {
   } catch {
     return false;
   }
+}
+
+function positiveInteger(value) {
+  const n = Number(value);
+  return Number.isSafeInteger(n) && n > 0 ? n : null;
 }
 
 function getToken(req) {
@@ -105,12 +114,6 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-function positiveInteger(value) {
-  const n = Number(value);
-
-  return Number.isSafeInteger(n) && n > 0 ? n : null;
-}
-
 function validProductInput(body) {
   const name = String(body.name || "").trim();
   const price = Number(body.price);
@@ -128,15 +131,10 @@ function validProductInput(body) {
     return { error: "Product image must use an HTTPS URL." };
   }
 
-  return {
-    value: {
-      name,
-      price,
-      image,
-    },
-  };
+  return { value: { name, price, image } };
 }
 
+// Database initialization and safe schema migration
 async function initializeDatabase() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS products (
@@ -152,6 +150,12 @@ async function initializeDatabase() {
       id INTEGER PRIMARY KEY,
       settings JSONB NOT NULL DEFAULT '{}'::jsonb
     )
+  `);
+
+  // Fix existing store_settings tables missing the settings column.
+  await pool.query(`
+    ALTER TABLE store_settings
+    ADD COLUMN IF NOT EXISTS settings JSONB NOT NULL DEFAULT '{}'::jsonb
   `);
 
   await pool.query(`
@@ -214,19 +218,16 @@ app.get("/api/settings", async (req, res) => {
       "SELECT settings FROM store_settings WHERE id = 1"
     );
 
-    const settings = result.rows[0]?.settings || DEFAULT_SETTINGS;
-
-    res.json(settings);
+    res.json(result.rows[0]?.settings || DEFAULT_SETTINGS);
   } catch (error) {
     console.error("Settings fetch failed:", error.message);
     res.status(500).json({ error: "Unable to load settings." });
   }
 });
 
-// Update store settings (admin only)
+// Update settings (admin only)
 app.put("/api/settings", requireAdmin, async (req, res) => {
   try {
-    const allowed = Object.keys(DEFAULT_SETTINGS);
     const incoming = req.body;
 
     if (!incoming || typeof incoming !== "object" || Array.isArray(incoming)) {
@@ -235,7 +236,7 @@ app.put("/api/settings", requireAdmin, async (req, res) => {
 
     const settings = {};
 
-    for (const key of allowed) {
+    for (const key of Object.keys(DEFAULT_SETTINGS)) {
       const value = incoming[key];
 
       if (value === undefined) continue;
@@ -286,7 +287,7 @@ app.put("/api/settings", requireAdmin, async (req, res) => {
   }
 });
 
-// Public product list
+// Public products
 app.get("/api/products", async (req, res) => {
   try {
     const result = await pool.query(
@@ -300,7 +301,7 @@ app.get("/api/products", async (req, res) => {
   }
 });
 
-// Add product (admin only)
+// Add product
 app.post("/api/products", requireAdmin, async (req, res) => {
   const parsed = validProductInput(req.body || {});
 
@@ -328,7 +329,7 @@ app.post("/api/products", requireAdmin, async (req, res) => {
   }
 });
 
-// Edit product (admin only)
+// Edit product
 app.put("/api/products/:id", requireAdmin, async (req, res) => {
   const id = positiveInteger(req.params.id);
 
@@ -357,17 +358,14 @@ app.put("/api/products/:id", requireAdmin, async (req, res) => {
       return res.status(404).json({ error: "Product not found." });
     }
 
-    res.json({
-      success: true,
-      product: result.rows[0],
-    });
+    res.json({ success: true, product: result.rows[0] });
   } catch (error) {
     console.error("Product update failed:", error.message);
     res.status(500).json({ error: "Unable to update product." });
   }
 });
 
-// Delete product (admin only)
+// Delete product
 app.delete("/api/products/:id", requireAdmin, async (req, res) => {
   const id = positiveInteger(req.params.id);
 
@@ -426,8 +424,6 @@ async function adminLogin(req, res) {
   }
 
   const token = crypto.randomBytes(32).toString("hex");
-
-  // 12-hour admin session
   sessions.set(token, Date.now() + 12 * 60 * 60 * 1000);
 
   res.setHeader(
@@ -445,12 +441,12 @@ async function adminLogin(req, res) {
 app.post("/api/admin/login", adminLogin);
 app.post("/api/login", adminLogin);
 
-// Check whether admin session is valid
+// Check admin session
 app.get("/api/admin/check", requireAdmin, (req, res) => {
   res.json({ success: true, authenticated: true });
 });
 
-// Admin logout
+// Logout
 function adminLogout(req, res) {
   const token = getToken(req);
 
@@ -467,8 +463,7 @@ function adminLogout(req, res) {
 app.post("/api/admin/logout", adminLogout);
 app.post("/api/logout", adminLogout);
 
-// Customer places an order.
-// Body: customerName, phone, address, items: [{ productId, quantity }]
+// Customer creates COD order
 app.post("/api/orders", async (req, res) => {
   const body = req.body || {};
 
@@ -493,7 +488,11 @@ app.post("/api/orders", async (req, res) => {
     return res.status(400).json({ error: "Enter your delivery address." });
   }
 
-  if (email && (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) {
+  if (
+    email &&
+    (email.length > 254 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+  ) {
     return res.status(400).json({ error: "Enter a valid email address." });
   }
 
@@ -509,11 +508,12 @@ app.post("/api/orders", async (req, res) => {
     });
   }
 
-  const items = [];
   const quantities = new Map();
 
   for (const item of rawItems) {
-    const productId = positiveInteger(item?.productId ?? item?.product_id ?? item?.id);
+    const productId = positiveInteger(
+      item?.productId ?? item?.product_id ?? item?.id
+    );
     const quantity = positiveInteger(item?.quantity ?? item?.qty);
 
     if (!productId || !quantity || quantity > 100) {
@@ -522,7 +522,10 @@ app.post("/api/orders", async (req, res) => {
       });
     }
 
-    quantities.set(productId, (quantities.get(productId) || 0) + quantity);
+    quantities.set(
+      productId,
+      (quantities.get(productId) || 0) + quantity
+    );
   }
 
   if ([...quantities.values()].some((quantity) => quantity > 100)) {
@@ -531,11 +534,13 @@ app.post("/api/orders", async (req, res) => {
     });
   }
 
-  const client = await pool.connect();
+  let client;
 
   try {
+    client = await pool.connect();
     await client.query("BEGIN");
 
+    const items = [];
     let total = 0;
 
     for (const [productId, quantity] of quantities.entries()) {
@@ -545,11 +550,9 @@ app.post("/api/orders", async (req, res) => {
       );
 
       if (!result.rowCount) {
-        await client.query("ROLLBACK");
-
-        return res.status(400).json({
-          error: `Product ${productId} is no longer available.`,
-        });
+        const error = new Error(`Product ${productId} is no longer available.`);
+        error.statusCode = 400;
+        throw error;
       }
 
       const product = result.rows[0];
@@ -567,9 +570,9 @@ app.post("/api/orders", async (req, res) => {
     }
 
     if (!Number.isFinite(total) || total > 1000000000) {
-      await client.query("ROLLBACK");
-
-      return res.status(400).json({ error: "Order total is invalid." });
+      const error = new Error("Order total is invalid.");
+      error.statusCode = 400;
+      throw error;
     }
 
     const result = await client.query(
@@ -599,7 +602,17 @@ app.post("/api/orders", async (req, res) => {
       order: result.rows[0],
     });
   } catch (error) {
-    await client.query("ROLLBACK");
+    if (client) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (rollbackError) {
+        console.error("Order rollback failed:", rollbackError.message);
+      }
+    }
+
+    if (error.statusCode === 400) {
+      return res.status(400).json({ error: error.message });
+    }
 
     console.error("Order creation failed:", error.message);
 
@@ -607,11 +620,11 @@ app.post("/api/orders", async (req, res) => {
       error: "Unable to place order. Please try again.",
     });
   } finally {
-    client.release();
+    if (client) client.release();
   }
 });
 
-// Admin views all orders
+// Admin views orders
 app.get("/api/orders", requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(
@@ -630,7 +643,7 @@ app.get("/api/orders", requireAdmin, async (req, res) => {
   }
 });
 
-// Admin updates order status and optional tracking number
+// Admin updates order status
 app.patch("/api/orders/:id", requireAdmin, async (req, res) => {
   const id = positiveInteger(req.params.id);
 
@@ -669,10 +682,7 @@ app.patch("/api/orders/:id", requireAdmin, async (req, res) => {
       return res.status(404).json({ error: "Order not found." });
     }
 
-    res.json({
-      success: true,
-      order: result.rows[0],
-    });
+    res.json({ success: true, order: result.rows[0] });
   } catch (error) {
     console.error("Order update failed:", error.message);
     res.status(500).json({ error: "Unable to update order." });
@@ -719,4 +729,4 @@ async function startServer() {
 }
 
 startServer();
-        
+  
