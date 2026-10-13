@@ -1,391 +1,330 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#b83280">
+<title>My Jewellery Store</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+<style>
+:root {
+  --gold:#b83280;
+  --dark:#281431;
+  --cream:#fff1f8;
+  --white:#fff;
+  --pink:#ec4899;
+  --purple:#7c3aed;
+  --text:#35263c;
+  --muted:#817187;
+  --border:#f0dce9;
+  --shadow:0 10px 35px #4b17420c;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:100px}
+body{margin:0;font-family:Poppins,sans-serif;color:var(--text);background:#fff}
+body.no-scroll{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+img{max-width:100%}
+.container{width:min(1160px,92%);margin:auto}
+.topbar{background:var(--dark);color:#fff;padding:9px 4%;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px}
+.topbar i{color:#f9a8d4;margin-right:6px}
+header{position:sticky;top:0;z-index:20;background:#ffffffed;backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.navbar{min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{width:48px;height:48px;object-fit:contain;display:none}
+.brand h1{font:700 23px "Playfair Display",serif;margin:0;overflow-wrap:anywhere}
+.brand p{font-size:10px;color:var(--muted);margin:3px 0 0;letter-spacing:1px}
+nav{display:flex;align-items:center;gap:23px}
+nav a{font-size:13px;font-weight:500}
+nav a:hover{color:var(--pink)}
+.nav-actions{display:flex;align-items:center;gap:8px}
+.icon-btn,.nav-toggle{position:relative;width:40px;height:40px;border:1px solid var(--border);border-radius:50%;background:white;color:var(--dark);display:grid;place-items:center}
+.nav-toggle{display:none;font-size:18px}
+.count{position:absolute;right:-4px;top:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:20px;background:var(--pink);color:white;font-size:10px;display:grid;place-items:center}
+.hero{position:relative;overflow:hidden;color:white;padding:85px 0;background:linear-gradient(115deg,#291039f5,#8d246ac9),var(--purple);background-position:center;background-size:cover;min-height:430px;display:flex;align-items:center}
+.hero:after{content:"";position:absolute;width:330px;height:330px;border:1px solid #ffffff30;border-radius:50%;right:7%;top:10%;box-shadow:0 0 0 35px #ffffff09,0 0 0 70px #ffffff08}
+.hero .container{position:relative;z-index:1}
+.eyebrow{text-transform:uppercase;letter-spacing:4px;color:#fbcfe8;font-size:11px}
+.hero h2{font:700 clamp(38px,6vw,67px) "Playfair Display",serif;max-width:720px;line-height:1.13;margin:18px 0}
+.hero p{max-width:520px;line-height:1.9;color:#fce7f3;font-size:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(100deg,var(--pink),var(--purple));border:0;border-radius:8px;color:#fff;padding:13px 21px;margin-top:12px;font-weight:600;font-size:13px;box-shadow:0 7px 18px #7c3aed25}
+.btn:hover{filter:brightness(.95)}
+.btn-light{background:white;color:var(--purple);box-shadow:none}
+section{padding:65px 0}
+.section-heading{text-align:center;margin-bottom:30px}
+.section-heading span{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--pink)}
+.section-heading h2{font:600 clamp(28px,4vw,40px) "Playfair Display",serif;margin:9px 0}
+.section-heading p{font-size:13px;color:var(--muted)}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.feature{padding:26px 16px;border:1px solid var(--border);border-radius:13px;text-align:center;background:#fff;box-shadow:var(--shadow)}
+.feature i{font-size:27px;color:var(--pink)}
+.feature h3{font:600 19px "Playfair Display",serif;margin:13px 0 7px}
+.feature p{font-size:12px;color:var(--muted);margin:0}
+.collection{background:var(--cream)}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:23px}
+.searchbox{display:flex;align-items:center;gap:9px;flex:1;min-width:190px;background:white;border:1px solid var(--border);border-radius:9px;padding:0 13px}
+.searchbox i{color:var(--muted)}
+.searchbox input{width:100%;border:0;outline:none;padding:12px 0;background:transparent}
+.toolbar select{max-width:100%;border:1px solid var(--border);border-radius:9px;background:white;padding:12px;color:var(--text);outline:none}
+.products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.product{position:relative;background:white;border:1px solid var(--border);border-radius:13px;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.product:hover{transform:translateY(-4px);box-shadow:0 14px 32px #4b174215}
+.product-image{height:230px;background:#fce7f3;position:relative;overflow:hidden;display:grid;place-items:center}
+.product-image img{width:100%;height:100%;object-fit:cover}
+.product-image .placeholder{font-size:40px;color:#c084b3}
+.wish-btn{position:absolute;top:10px;right:10px;width:35px;height:35px;border:0;border-radius:50%;background:#fff;color:#8b7188;box-shadow:0 3px 10px #0001}
+.wish-btn.active{color:#e11d74}
+.product-info{padding:14px}
+.product h3{font-size:13px;line-height:1.6;margin:0 0 8px;min-height:40px}
+.price{font-weight:700;color:var(--gold);font-size:16px}
+.product-actions{display:flex;gap:7px;margin-top:12px}
+.small-btn{flex:1;border:0;border-radius:7px;padding:10px 5px;font-size:11px;font-weight:600;background:#fce7f3;color:#9d236f}
+.small-btn.primary{background:linear-gradient(100deg,var(--pink),var(--purple));color:white}
+.empty{grid-column:1/-1;text-align:center;padding:35px 10px;color:var(--muted);font-size:13px}
+.status{text-align:center;font-size:12px;color:var(--muted);margin-top:15px}
+.story{text-align:center;background:#fff}
+.story p{max-width:730px;margin:12px auto;line-height:1.9;font-size:14px;color:var(--muted)}
+.contact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.contact-card{padding:23px 12px;border:1px solid var(--border);border-radius:12px;text-align:center;overflow-wrap:anywhere}
+.contact-card i{font-size:25px;color:var(--pink)}
+.contact-card h3{font:600 18px "Playfair Display",serif}
+.contact-card p,.contact-card a{font-size:12px;line-height:1.7}
+.socials{display:flex;justify-content:center;gap:16px;margin-top:15px}
+.socials a{font-size:22px;color:var(--purple)}
+footer{background:var(--dark);color:white;padding:40px 0 18px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr;gap:30px}
+footer h2{font:600 25px "Playfair Display",serif}
+footer h3{font-size:15px}
+footer p{font-size:12px;line-height:1.8;color:#e4d6e8}
+.copyright{text-align:center;border-top:1px solid #ffffff25;margin-top:25px;padding-top:17px;font-size:11px;color:#e4d6e8}
+.floating{position:fixed;right:15px;bottom:18px;z-index:15;display:flex;flex-direction:column;gap:9px}
+.floating a{width:45px;height:45px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(120deg,var(--pink),var(--purple));color:white;box-shadow:0 4px 14px #0002;font-size:19px}
+.overlay{position:fixed;inset:0;background:#190b20a8;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;z-index:51;right:0;top:0;height:100dvh;width:min(440px,100%);background:white;transform:translateX(105%);transition:transform .25s;display:flex;flex-direction:column;box-shadow:-10px 0 35px #0002}
+.drawer.open{transform:translateX(0)}
+.drawer-head{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.drawer-head h2{font:600 23px "Playfair Display",serif;margin:0}
+.close-btn{width:38px;height:38px;border:1px solid var(--border);border-radius:50%;background:white}
+.drawer-body{padding:18px;overflow:auto;flex:1}
+.drawer-foot{padding:18px;border-top:1px solid var(--border)}
+.cart-item{display:grid;grid-template-columns:65px 1fr auto;gap:12px;align-items:center;border-bottom:1px solid var(--border);padding:12px 0}
+.cart-item img{width:65px;height:65px;object-fit:cover;border-radius:8px;background:var(--cream)}
+.cart-item h4{font-size:12px;margin:0 0 5px}
+.cart-item p{font-size:12px;color:var(--gold);font-weight:600;margin:0}
+.qty{display:flex;align-items:center;gap:9px;margin-top:8px}
+.qty button{width:25px;height:25px;border:1px solid var(--border);border-radius:6px;background:white}
+.remove-btn{border:0;background:none;color:#b42355;padding:5px}
+.total-row{display:flex;justify-content:space-between;font-weight:700;margin-bottom:10px}
+.full-btn{width:100%;margin:5px 0 0}
+.modal{position:fixed;z-index:60;inset:0;display:none;align-items:center;justify-content:center;padding:15px;background:#190b20a8}
+.modal.open{display:flex}
+.modal-card{width:min(520px,100%);max-height:92dvh;overflow:auto;background:white;border-radius:15px;padding:22px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.modal-head h2{font:600 25px "Playfair Display",serif;margin:0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-size:12px;font-weight:600}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--border);border-radius:8px;padding:11px;outline-color:var(--pink);background:white}
+.field textarea{min-height:75px;resize:vertical}
+.note{font-size:11px;line-height:1.6;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:100;background:var(--dark);color:white;border-radius:9px;padding:12px 18px;font-size:12px;transition:.2s;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:850px){
+  nav{gap:13px}
+  nav a{font-size:12px}
+  .products{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .product-image{height:210px}
+}
+@media(max-width:650px){
+  .navbar{min-height:70px}
+  .brand h1{font-size:19px}
+  .brand p{font-size:9px}
+  .logo{width:39px;height:39px}
+  .nav-toggle{display:grid}
+  nav{display:none;position:absolute;top:100%;left:0;right:0;background:white;padding:20px 4%;border-bottom:1px solid var(--border);align-items:flex-start;flex-direction:column;gap:18px}
+  nav.open{display:flex}
+  .nav-actions{gap:5px}
+  .icon-btn,.nav-toggle{width:35px;height:35px}
+  .hero{min-height:370px;padding:55px 0}
+  .hero:after{right:-180px}
+  .hero p{font-size:13px}
+  section{padding:48px 0}
+  .features{grid-template-columns:1fr;gap:12px}
+  .products{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+  .product-image{height:175px}
+  .product-info{padding:11px}
+  .product h3{font-size:12px}
+  .small-btn{font-size:10px}
+  .toolbar{align-items:stretch}
+  .searchbox{flex-basis:100%}
+  .toolbar select{flex:1;min-width:0;font-size:12px}
+  .contact-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr;gap:10px}
+  .form-grid{grid-template-columns:1fr}
+  .field.full{grid-column:auto}
+}
+</style>
+</head>
+
+<body>
+<div class="topbar">
+  <span><i class="fa-regular fa-gem"></i> Jewellery for every occasion</span>
+  <a id="topPhone" href="tel:"><i class="fa-solid fa-phone"></i><span id="topPhoneText">Contact our store</span></a>
+</div>
+
+<header>
+  <div class="container navbar">
+    <a class="brand" href="#">
+      <img id="storeLogo" class="logo" alt="Store logo">
+      <div>
+        <h1 id="storeName">My Jewellery Store</h1>
+        <p>ELEGANCE IN EVERY DETAIL</p>
+      </div>
+    </a>
+    <nav id="mainNav">
+      <a href="#">Home</a>
+      <a href="#products">Collections</a>
+      <a href="#about">Our Story</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="wishlistNav" aria-label="Show wishlist"><i class="fa-regular fa-heart"></i><span class="count" id="wishCount">0</span></button>
+      <button class="icon-btn" id="cartNav" aria-label="Open cart"><i class="fa-solid fa-bag-shopping"></i><span class="count" id="cartCount">0</span></button>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="hero">
+    <div class="container">
+      <span class="eyebrow">Timeless elegance · Modern beauty</span>
+      <h2 id="heroTitle">Jewellery that tells your story</h2>
+      <p id="heroText">Discover beautiful designs for life's most memorable moments. Find something special for every celebration.</p>
+      <a class="btn" href="#products">Explore Collection <i class="fa-solid fa-arrow-right"></i></a>
+      <a class="btn btn-light" href="#contact">Contact Us</a>
+    </div>
+  </section>
+
+  <section>
+    <div class="container features">
+      <div class="feature"><i class="fa-solid fa-gem"></i><h3>Beautiful Designs</h3><p>Discover jewellery for every occasion.</p></div>
+      <div class="feature"><i class="fa-solid fa-award"></i><h3>Quality First</h3><p>Find your next treasured piece.</p></div>
+      <div class="feature"><i class="fa-solid fa-heart"></i><h3>Made for You</h3><p>Celebrate moments that matter.</p></div>
+    </div>
+  </section>
+
+  <section id="products" class="collection">
+    <div class="container">
+      <div class="section-heading">
+        <span>Our collection</span>
+        <h2>Discover Your Sparkle</h2>
+        <p>Explore our latest jewellery collection.</p>
+      </div>
+      <div class="toolbar">
+        <label class="searchbox"><i class="fa-solid fa-search"></i><input id="searchInput" type="search" placeholder="Search jewellery..." aria-label="Search products"></label>
+        <select id="sortSelect" aria-label="Sort products">
+          <option value="newest">Newest first</option>
+          <option value="low">Price: Low to High</option>
+          <option value="high">Price: High to Low</option>
+          <option value="name">Name: A to Z</option>
+        </select>
+        <select id="priceFilter" aria-label="Filter by price">
+          <option value="all">All prices</option>
+          <option value="1000">Under ₹1,000</option>
+          <option value="3000">Under ₹3,000</option>
+          <option value="5000">Under ₹5,000</option>
+        </select>
+      </div>
+      <div class="products" id="productGrid"><div class="empty">Loading products...</div></div>
+      <p class="status" id="productStatus" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="story" id="about">
+    <div class="container">
+      <div class="section-heading"><span>Our story</span><h2 id="aboutTitle">A Little Sparkle, A Lot of Meaning</h2></div>
+      <p id="aboutText">Discover jewellery for celebrations, thoughtful gifts and everyday elegance. We are here to help you find a piece that feels special.</p>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <div class="section-heading"><span>We are here to help</span><h2>Contact Our Store</h2><p>Reach out to us for product details and assistance.</p></div>
+      <div class="contact-grid">
+        <div class="contact-card"><i class="fa-solid fa-phone"></i><h3>Phone</h3><a id="contactPhone" href="tel:">Add phone in Store Settings</a></div>
+        <div class="contact-card"><i class="fa-brands fa-whatsapp"></i><h3>WhatsApp</h3><a id="contactWhatsApp" href="#contact">Contact us</a></div>
+        <div class="contact-card"><i class="fa-solid fa-envelope"></i><h3>Email</h3><a id="contactEmail" href="mailto:">Add email in Store Settings</a></div>
+        <div class="contact-card" style="grid-column:1/-1"><i class="fa-solid fa-location-dot"></i><h3>Shop Address</h3><p id="storeAddress">Add your shop address in Store Settings.</p><a id="mapLink" href="#contact" target="_blank" rel="noopener" hidden>Open Google Maps</a><p id="storeCity"></p></div>
+      </div>
+      <div class="section-heading" style="margin:35px 0 0"><h2>Follow Us</h2><div class="socials" id="socialLinks"></div></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container footer-grid">
+    <div><h2 id="footerStoreName">My Jewellery Store</h2><p id="footerAddress">Discover jewellery for every special moment.</p></div>
+    <div><h3>Quick Links</h3><p><a href="#products">Our Products</a></p><p><a href="#about">About Us</a></p><p><a href="#contact">Contact</a></p><p id="footerUPI"></p></div>
+  </div>
+  <div class="container copyright" id="footerText">Thank you for visiting our store.</div>
+</footer>
+
+<div class="floating">
+  <a id="floatingWhatsApp" href="#contact" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+  <a id="floatingPhone" href="tel:" aria-label="Call store"><i class="fa-solid fa-phone"></i></a>
+  <a href="#" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></a>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="cartDrawer" aria-label="Shopping cart">
+  <div class="drawer-head"><h2>Your Shopping Bag</h2><button class="close-btn" id="closeCart" aria-label="Close cart"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="drawer-body" id="cartItems"></div>
+  <div class="drawer-foot">
+    <div class="total-row"><span>Total</span><span id="cartTotal">₹0</span></div>
+    <button class="btn full-btn" id="checkoutBtn">Continue to Checkout <i class="fa-solid fa-arrow-right"></i></button>
+    <p class="note">Checkout is a preview until order-saving backend is connected.</p>
+  </div>
+</aside>
+
+<div class="modal" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+  <div class="modal-card">
+    <div class="modal-head"><h2 id="checkoutTitle">Checkout Details</h2><button class="close-btn" id="closeCheckout" aria-label="Close"><i class="fa-solid fa-xmark"></i></button></div>
+    <p class="note">This form is not connected to order storage yet. Do not enter sensitive payment information.</p>
+    <form id="checkoutForm">
+      <div class="form-grid">
+        <div class="field full"><label for="customerName">Full name *</label><input id="customerName" name="name" required maxlength="100" autocomplete="name"></div>
+        <div class="field"><label for="customerPhone">Mobile number *</label><input id="customerPhone" name="phone" type="tel" required pattern="[0-9 +()-]{10,16}" autocomplete="tel"></div>
+        <div class="field"><label for="customerEmail">Email (optional)</label><input id="customerEmail" name="email" type="email" autocomplete="email"></div>
+        <div class="field full"><label for="customerAddress">Full delivery address *</label><textarea id="customerAddress" name="address" required maxlength="500" autocomplete="street-address"></textarea></div>
+        <div class="field"><label for="customerCity">City *</label><input id="customerCity" name="city" required maxlength="100" autocomplete="address-level2"></div>
+        <div class="field"><label for="paymentMethod">Payment method</label><select id="paymentMethod" name="payment"><option value="COD">Cash on Delivery</option><option value="ONLINE" disabled>Online payment (not configured yet)</option></select></div>
+        <div class="field full"><button class="btn full-btn" type="submit">Review Order</button></div>
+      </div>
+    </form>
+    <p id="checkoutMessage" class="note" aria-live="polite"></p>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status"></div>
 
 <script>
 const $ = id => document.getElementById(id);
-
+const money = value => "₹" + Number(value || 0).toLocaleString("en-IN");
 let products = [];
-let cart = JSON.parse(localStorage.getItem("jewelleryCart") || "[]");
-let wishlist = JSON.parse(localStorage.getItem("jewelleryWishlist") || "[]");
+let cart = {};
+let wishlist = new Set();
+let showingWishlist = false;
+let toastTimer;
 
-function money(value) {
-  return "₹" + Number(value || 0).toLocaleString("en-IN");
-}
-
-function toast(message) {
-  $("toast").textContent = message;
-  $("toast").classList.add("show");
-  setTimeout(() => $("toast").classList.remove("show"), 2500);
-}
-
-function saveData() {
-  localStorage.setItem("jewelleryCart", JSON.stringify(cart));
-  localStorage.setItem("jewelleryWishlist", JSON.stringify(wishlist));
-  updateCounts();
-}
-
-function updateCounts() {
-  $("cartCount").textContent =
-    cart.reduce((sum, item) => sum + item.qty, 0);
-  $("wishCount").textContent = wishlist.length;
-}
-
-function renderProducts() {
-  const query = $("searchInput").value.trim().toLowerCase();
-  const sort = $("sortSelect").value;
-  const maxPrice = $("priceFilter").value;
-
-  let list = products.filter(p => {
-    const name = String(p.name || p.title || "").toLowerCase();
-    const price = Number(p.price || 0);
-    return name.includes(query) &&
-      (maxPrice === "all" || price < Number(maxPrice));
-  });
-
-  if (sort === "low") list.sort((a,b) => a.price - b.price);
-  if (sort === "high") list.sort((a,b) => b.price - a.price);
-  if (sort === "name") {
-    list.sort((a,b) =>
-      String(a.name || a.title || "").localeCompare(
-        String(b.name || b.title || "")
-      )
-    );
-  }
-
-  $("productStatus").textContent =
-    list.length + " product(s) found";
-
-  if (!list.length) {
-    $("productGrid").innerHTML =
-      '<div class="empty">No products found. Please check again.</div>';
-    return;
-  }
-
-  $("productGrid").innerHTML = list.map(p => {
-    const id = String(p.id);
-    const name = p.name || p.title || "Jewellery";
-    const image = p.image || p.image_url || "";
-    const price = Number(p.price || 0);
-    const liked = wishlist.includes(id);
-
-    return `
-      <article class="product">
-        <div class="product-image">
-          ${image
-            ? `<img src="${escapeHTML(image)}"
-                 alt="${escapeHTML(name)}"
-                 onerror="this.style.display='none'">`
-            : '<span class="placeholder"><i class="fa-solid fa-gem"></i></span>'}
-          <button class="wish-btn ${liked ? "active" : ""}"
-            onclick="toggleWish('${escapeJS(id)}')"
-            aria-label="Add to wishlist">
-            <i class="fa-${liked ? "solid" : "regular"} fa-heart"></i>
-          </button>
-        </div>
-        <div class="product-info">
-          <h3>${escapeHTML(name)}</h3>
-          <div class="price">${money(price)}</div>
-          <div class="product-actions">
-            <button class="small-btn primary"
-              onclick="addToCart('${escapeJS(id)}')">
-              <i class="fa-solid fa-bag-shopping"></i> Add to Bag
-            </button>
-          </div>
-        </div>
-      </article>`;
-  }).join("");
-}
-
-function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, ch => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;",
-    '"':"&quot;", "'":"&#39;"
-  })[ch]);
-}
-
-function escapeJS(value) {
-  return String(value).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-}
-
-async function loadProducts() {
-  try {
-    const response = await fetch("/api/products");
-    if (!response.ok) throw new Error("Products API unavailable");
-
-    const data = await response.json();
-    products = Array.isArray(data)
-      ? data
-      : (data.products || []);
-
-    products = products.filter(p => p && p.id != null);
-    renderProducts();
-  } catch (error) {
-    $("productGrid").innerHTML =
-      '<div class="empty">Products could not be loaded. Please check the server API.</div>';
-    $("productStatus").textContent =
-      "Product API connection needs to be checked.";
-  }
-}
-
-function addToCart(id) {
-  const product = products.find(p => String(p.id) === String(id));
-  if (!product) return;
-
-  const existing = cart.find(item => String(item.id) === String(id));
-  if (existing) {
-    existing.qty++;
-  } else {
-    cart.push({
-      id: product.id,
-      name: product.name || product.title || "Jewellery",
-      price: Number(product.price || 0),
-      image: product.image || product.image_url || "",
-      qty: 1
-    });
-  }
-
-  saveData();
-  renderCart();
-  toast("Added to your shopping bag!");
-}
-
-function toggleWish(id) {
-  id = String(id);
-  wishlist = wishlist.includes(id)
-    ? wishlist.filter(item => item !== id)
-    : [...wishlist, id];
-
-  saveData();
-  renderProducts();
-  toast(wishlist.includes(id)
-    ? "Added to wishlist"
-    : "Removed from wishlist");
-}
-
-function renderCart() {
-  if (!cart.length) {
-    $("cartItems").innerHTML =
-      '<div class="empty">Your shopping bag is empty.</div>';
-  } else {
-    $("cartItems").innerHTML = cart.map(item => `
-      <div class="cart-item">
-        <img src="${escapeHTML(item.image || "")}"
-          alt="${escapeHTML(item.name)}"
-          onerror="this.style.visibility='hidden'">
-        <div>
-          <h4>${escapeHTML(item.name)}</h4>
-          <p>${money(item.price)}</p>
-          <div class="qty">
-            <button onclick="changeQty('${escapeJS(item.id)}',-1)">−</button>
-            <span>${item.qty}</span>
-            <button onclick="changeQty('${escapeJS(item.id)}',1)">+</button>
-          </div>
-        </div>
-        <button class="remove-btn"
-          onclick="removeCartItem('${escapeJS(item.id)}')"
-          aria-label="Remove item">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </div>
-    `).join("");
-  }
-
-  const total = cart.reduce(
-    (sum, item) => sum + item.price * item.qty, 0
-  );
-  $("cartTotal").textContent = money(total);
-  updateCounts();
-}
-
-function changeQty(id, amount) {
-  const item = cart.find(p => String(p.id) === String(id));
-  if (!item) return;
-
-  item.qty += amount;
-  if (item.qty <= 0) {
-    cart = cart.filter(p => String(p.id) !== String(id));
-  }
-
-  saveData();
-  renderCart();
-}
-
-function removeCartItem(id) {
-  cart = cart.filter(p => String(p.id) !== String(id));
-  saveData();
-  renderCart();
-}
-
-function openCart() {
-  $("cartDrawer").classList.add("open");
-  $("overlay").classList.add("open");
-  document.body.classList.add("no-scroll");
-}
-
-function closeCart() {
-  $("cartDrawer").classList.remove("open");
-  $("overlay").classList.remove("open");
-  document.body.classList.remove("no-scroll");
-}
-
-function openCheckout() {
-  if (!cart.length) {
-    toast("Your shopping bag is empty.");
-    return;
-  }
-
-  closeCart();
-  $("checkoutModal").classList.add("open");
-}
-
-function closeCheckout() {
-  $("checkoutModal").classList.remove("open");
-}
-
-$("cartNav").addEventListener("click", openCart);
-$("closeCart").addEventListener("click", closeCart);
-$("overlay").addEventListener("click", closeCart);
-$("checkoutBtn").addEventListener("click", openCheckout);
-$("closeCheckout").addEventListener("click", closeCheckout);
-
-$("navToggle").addEventListener("click", () => {
-  $("mainNav").classList.toggle("open");
-});
-
-$("mainNav").querySelectorAll("a").forEach(link => {
-  link.addEventListener("click", () =>
-    $("mainNav").classList.remove("open")
-  );
-});
-
-$("searchInput").addEventListener("input", renderProducts);
-$("sortSelect").addEventListener("change", renderProducts);
-$("priceFilter").addEventListener("change", renderProducts);
-
-$("wishlistNav").addEventListener("click", () => {
-  const saved = products.filter(p => wishlist.includes(String(p.id)));
-  if (!saved.length) {
-    toast("Your wishlist is empty.");
-    return;
-  }
-
-  $("searchInput").value = "";
-  $("priceFilter").value = "all";
-  $("productGrid").scrollIntoView({behavior:"smooth"});
-  toast("Your wishlist has " + saved.length + " product(s).");
-});
-
-$("checkoutForm").addEventListener("submit", async event => {
-  event.preventDefault();
-
-  if (!cart.length) {
-    toast("Your shopping bag is empty.");
-    return;
-  }
-
-  const form = new FormData(event.target);
-  const order = {
-    name: form.get("name"),
-    phone: form.get("phone"),
-    email: form.get("email"),
-    address: form.get("address"),
-    city: form.get("city"),
-    payment: form.get("payment"),
-    items: cart.map(item => ({
-      product_id: item.id,
-      name: item.name,
-      quantity: item.qty,
-      price: item.price
-    })),
-    total: cart.reduce(
-      (sum, item) => sum + item.price * item.qty, 0
-    )
-  };
-
-  $("checkoutMessage").textContent =
-    "Checking order connection...";
-
-  try {
-    const response = await fetch("/api/orders", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(order)
-    });
-
-    const result = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      throw new Error(result.error || "Order could not be saved.");
-    }
-
-    $("checkoutMessage").textContent =
-      "Order submitted successfully! Order ID: " +
-      (result.orderId || result.id || "Received");
-
-    cart = [];
-    saveData();
-    renderCart();
-    event.target.reset();
-    toast("Order submitted successfully!");
-  } catch (error) {
-    $("checkoutMessage").textContent =
-      "Order submit nahi hua. Server ka /api/orders route aur request fields check karo.";
-  }
-});
-
-async function loadSettings() {
-  try {
-    const response = await fetch("/api/settings");
-    if (!response.ok) return;
-
-    const data = await response.json();
-    const s = data.settings || data;
-
-    if (s.store_name) {
-      $("storeName").textContent = s.store_name;
-      $("footerStoreName").textContent = s.store_name;
-    }
-    if (s.hero_title) $("heroTitle").textContent = s.hero_title;
-    if (s.hero_text) $("heroText").textContent = s.hero_text;
-    if (s.about_title) $("aboutTitle").textContent = s.about_title;
-    if (s.about_text) $("aboutText").textContent = s.about_text;
-    if (s.address) $("storeAddress").textContent = s.address;
-    if (s.city) $("storeCity").textContent = s.city;
-    if (s.footer_text) $("footerText").textContent = s.footer_text;
-
-    if (s.phone) {
-      const phone = String(s.phone).replace(/[^\d+]/g, "");
-      $("topPhone").href = "tel:" + phone;
-      $("topPhoneText").textContent = s.phone;
-      $("contactPhone").href = "tel:" + phone;
-      $("contactPhone").textContent = s.phone;
-      $("floatingPhone").href = "tel:" + phone;
-    }
-
-    if (s.email) {
-      $("contactEmail").href = "mailto:" + s.email;
-      $("contactEmail").textContent = s.email;
-    }
-
-    if (s.whatsapp) {
-      const number = String(s.whatsapp).replace(/\D/g, "");
-      const link = "https://wa.me/" + number;
-      $("contactWhatsApp").href = link;
-      $("floatingWhatsApp").href = link;
-    }
-
-    if (s.logo) {
-      $("storeLogo").src = s.logo;
-      $("storeLogo").style.display = "block";
-    }
-  } catch (error) {
-    console.warn("Store settings could not be loaded.", error);
-  }
-}
-
-updateCounts();
-renderCart();
-loadSettings();
-loadProducts();
-</script>
-</body>
-</html>
+function validHttps(value) {
+  if (typeof value !== "string" || !value.trim()) 
