@@ -1,19 +1,28 @@
 
 const express = require("express");
 const crypto = require("crypto");
+const { Pool } = require("pg");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
+if (!process.env.DATABASE_URL) {
+  console.error("DATABASE_URL is missing in Render Environment");
+  process.exit(1);
+}
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
 app.use(express.json({ limit: "20kb" }));
 app.use(express.static("."));
 
 const sessions = new Map();
-let products = [];
-let nextId = 1;
 
-let settings = {
+const defaultSettings = {
   storeName: "My Jewellery Store",
   logo: "",
   phone: "",
@@ -41,8 +50,44 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-app.get("/api/health", (req, res) => {
-  res.json({ status: "Jewellery Store Server is running" });
+async function initializeDatabase() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS products (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      price NUMERIC(12,2) NOT NULL CHECK (price >= 0),
+      image TEXT NOT NULL
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS store_settings (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      data JSONB NOT NULL
+    )
+  `);
+
+  await pool.query(
+    `INSERT INTO store_settings (id, data)
+     VALUES (1, $1::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [JSON.stringify(defaultSettings)]
+  );
+
+  console.log("Database tables are ready");
+}
+
+app.get("/api/health", async (req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    res.json({
+      status: "Jewellery Store Server is running",
+      database: "connected"
+    });
+  } catch (error) {
+    console.error("Health check failed:", error.message);
+    res.status(503).json({ error: "Database unavailable" });
+  }
 });
 
 app.post("/api/login", (req, res) => {
@@ -75,47 +120,78 @@ app.post("/api/logout", requireAdmin, (req, res) => {
   res.json({ message: "Logged out" });
 });
 
-app.get("/api/settings", (req, res) => {
-  res.json(settings);
-});
-
-app.put("/api/settings", requireAdmin, (req, res) => {
-  const allowed = Object.keys(settings);
-  const updates = req.body || {};
-
-  for (const key of Object.keys(updates)) {
-    if (!allowed.includes(key)) {
-      return res.status(400).json({
-        error: "Unknown setting: " + key
-      });
-    }
-
-    if (
-      typeof updates[key] !== "string" ||
-      updates[key].length > 2000
-    ) {
-      return res.status(400).json({
-        error: "Each setting must be text under 2000 characters"
-      });
-    }
+app.get("/api/settings", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT data FROM store_settings WHERE id = 1"
+    );
+    res.json(result.rows[0]?.data || defaultSettings);
+  } catch (error) {
+    console.error("Read settings failed:", error.message);
+    res.status(500).json({ error: "Could not load settings" });
   }
-
-  settings = { ...settings, ...updates };
-  res.json({ message: "Settings updated", settings });
 });
 
-app.get("/api/products", (req, res) => {
-  res.json(products);
+app.put("/api/settings", requireAdmin, async (req, res) => {
+  try {
+    const updates = req.body || {};
+    const allowed = Object.keys(defaultSettings);
+
+    for (const key of Object.keys(updates)) {
+      if (
+        !allowed.includes(key) ||
+        typeof updates[key] !== "string" ||
+        updates[key].length > 2000
+      ) {
+        return res.status(400).json({
+          error: "Invalid setting: " + key
+        });
+      }
+    }
+
+    const current = await pool.query(
+      "SELECT data FROM store_settings WHERE id = 1"
+    );
+
+    const settings = {
+      ...defaultSettings,
+      ...(current.rows[0]?.data || {}),
+      ...updates
+    };
+
+    await pool.query(
+      `INSERT INTO store_settings (id, data)
+       VALUES (1, $1::jsonb)
+       ON CONFLICT (id)
+       DO UPDATE SET data = EXCLUDED.data`,
+      [JSON.stringify(settings)]
+    );
+
+    res.json({ message: "Settings saved", settings });
+  } catch (error) {
+    console.error("Save settings failed:", error.message);
+    res.status(500).json({ error: "Could not save settings" });
+  }
 });
 
-app.post("/api/products", requireAdmin, (req, res) => {
+app.get("/api/products", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, name, price, image FROM products ORDER BY id DESC"
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Read products failed:", error.message);
+    res.status(500).json({ error: "Could not load products" });
+  }
+});
+
+app.post("/api/products", requireAdmin, async (req, res) => {
   const { name, price, image } = req.body || {};
 
   if (
-    typeof name !== "string" ||
-    !name.trim() ||
-    !Number.isFinite(Number(price)) ||
-    Number(price) < 0 ||
+    typeof name !== "string" || !name.trim() ||
+    !Number.isFinite(Number(price)) || Number(price) < 0 ||
     typeof image !== "string" ||
     !/^https:\/\/\S+$/i.test(image.trim())
   ) {
@@ -124,59 +200,88 @@ app.post("/api/products", requireAdmin, (req, res) => {
     });
   }
 
-  const product = {
-    id: nextId++,
-    name: name.trim(),
-    price: Number(price),
-    image: image.trim()
-  };
+  try {
+    const result = await pool.query(
+      `INSERT INTO products (name, price, image)
+       VALUES ($1, $2, $3)
+       RETURNING id, name, price, image`,
+      [name.trim(), Number(price), image.trim()]
+    );
 
-  products.push(product);
-  res.status(201).json(product);
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("Add product failed:", error.message);
+    res.status(500).json({ error: "Could not add product" });
+  }
 });
 
-app.put("/api/products/:id", requireAdmin, (req, res) => {
-  const id = Number(req.params.id);
-  const product = products.find(item => item.id === id);
-
-  if (!product) {
-    return res.status(404).json({ error: "Product not found" });
-  }
-
+app.put("/api/products/:id", requireAdmin, async (req, res) => {
   const { name, price, image } = req.body || {};
 
   if (
-    typeof name !== "string" ||
-    !name.trim() ||
-    !Number.isFinite(Number(price)) ||
-    Number(price) < 0 ||
+    !Number.isInteger(Number(req.params.id)) ||
+    Number(req.params.id) < 1 ||
+    typeof name !== "string" || !name.trim() ||
+    !Number.isFinite(Number(price)) || Number(price) < 0 ||
     typeof image !== "string" ||
     !/^https:\/\/\S+$/i.test(image.trim())
   ) {
     return res.status(400).json({ error: "Invalid product details" });
   }
 
-  Object.assign(product, {
-    name: name.trim(),
-    price: Number(price),
-    image: image.trim()
-  });
+  try {
+    const result = await pool.query(
+      `UPDATE products
+       SET name = $1, price = $2, image = $3
+       WHERE id = $4
+       RETURNING id, name, price, image`,
+      [name.trim(), Number(price), image.trim(), Number(req.params.id)]
+    );
 
-  res.json(product);
+    if (!result.rowCount) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Update product failed:", error.message);
+    res.status(500).json({ error: "Could not update product" });
+  }
 });
 
-app.delete("/api/products/:id", requireAdmin, (req, res) => {
-  const id = Number(req.params.id);
-  const before = products.length;
-  products = products.filter(item => item.id !== id);
-
-  if (products.length === before) {
-    return res.status(404).json({ error: "Product not found" });
+app.delete("/api/products/:id", requireAdmin, async (req, res) => {
+  if (
+    !Number.isInteger(Number(req.params.id)) ||
+    Number(req.params.id) < 1
+  ) {
+    return res.status(400).json({ error: "Invalid product ID" });
   }
 
-  res.json({ message: "Product deleted" });
+  try {
+    const result = await pool.query(
+      "DELETE FROM products WHERE id = $1",
+      [Number(req.params.id)]
+    );
+
+    if (!result.rowCount) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.json({ message: "Product deleted" });
+  } catch (error) {
+    console.error("Delete product failed:", error.message);
+    res.status(500).json({ error: "Could not delete product" });
+  }
 });
 
-app.listen(PORT, () => {
-  console.log("Jewellery Store server running on port " + PORT);
-});
+initializeDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log("Jewellery Store server running on port " + PORT);
+    });
+  })
+  .catch(error => {
+    console.error("Database initialization failed:", error.message);
+    process.exit(1);
+  });
+           
