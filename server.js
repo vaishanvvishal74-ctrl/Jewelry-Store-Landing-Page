@@ -13,6 +13,24 @@ const sessions = new Map();
 let products = [];
 let nextId = 1;
 
+let settings = {
+  storeName: "My Jewellery Store",
+  logo: "",
+  phone: "",
+  whatsapp: "",
+  email: "",
+  address: "",
+  city: "",
+  mapLink: "",
+  instagram: "",
+  facebook: "",
+  otherSocial: "",
+  upiId: "",
+  banner: "",
+  primaryColor: "#9b6b43",
+  footerText: "Thank you for visiting our store"
+};
+
 function requireAdmin(req, res, next) {
   const token = req.get("x-admin-token");
 
@@ -29,10 +47,12 @@ app.get("/api/health", (req, res) => {
 
 app.post("/api/login", (req, res) => {
   if (!ADMIN_PASSWORD) {
-    return res.status(500).json({ error: "Admin password is not configured" });
+    return res.status(500).json({
+      error: "ADMIN_PASSWORD is not configured in Render"
+    });
   }
 
-  const password = req.body && req.body.password;
+  const password = req.body?.password;
 
   if (
     typeof password !== "string" ||
@@ -47,13 +67,41 @@ app.post("/api/login", (req, res) => {
 
   const token = crypto.randomBytes(32).toString("hex");
   sessions.set(token, true);
-
   res.json({ token });
 });
 
 app.post("/api/logout", requireAdmin, (req, res) => {
   sessions.delete(req.get("x-admin-token"));
   res.json({ message: "Logged out" });
+});
+
+app.get("/api/settings", (req, res) => {
+  res.json(settings);
+});
+
+app.put("/api/settings", requireAdmin, (req, res) => {
+  const allowed = Object.keys(settings);
+  const updates = req.body || {};
+
+  for (const key of Object.keys(updates)) {
+    if (!allowed.includes(key)) {
+      return res.status(400).json({
+        error: "Unknown setting: " + key
+      });
+    }
+
+    if (
+      typeof updates[key] !== "string" ||
+      updates[key].length > 2000
+    ) {
+      return res.status(400).json({
+        error: "Each setting must be text under 2000 characters"
+      });
+    }
+  }
+
+  settings = { ...settings, ...updates };
+  res.json({ message: "Settings updated", settings });
 });
 
 app.get("/api/products", (req, res) => {
@@ -64,8 +112,10 @@ app.post("/api/products", requireAdmin, (req, res) => {
   const { name, price, image } = req.body || {};
 
   if (
-    typeof name !== "string" || !name.trim() ||
-    !Number.isFinite(Number(price)) || Number(price) < 0 ||
+    typeof name !== "string" ||
+    !name.trim() ||
+    !Number.isFinite(Number(price)) ||
+    Number(price) < 0 ||
     typeof image !== "string" ||
     !/^https:\/\/\S+$/i.test(image.trim())
   ) {
@@ -85,6 +135,48 @@ app.post("/api/products", requireAdmin, (req, res) => {
   res.status(201).json(product);
 });
 
+app.put("/api/products/:id", requireAdmin, (req, res) => {
+  const id = Number(req.params.id);
+  const product = products.find(item => item.id === id);
+
+  if (!product) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+
+  const { name, price, image } = req.body || {};
+
+  if (
+    typeof name !== "string" ||
+    !name.trim() ||
+    !Number.isFinite(Number(price)) ||
+    Number(price) < 0 ||
+    typeof image !== "string" ||
+    !/^https:\/\/\S+$/i.test(image.trim())
+  ) {
+    return res.status(400).json({ error: "Invalid product details" });
+  }
+
+  Object.assign(product, {
+    name: name.trim(),
+    price: Number(price),
+    image: image.trim()
+  });
+
+  res.json(product);
+});
+
+app.delete("/api/products/:id", requireAdmin, (req, res) => {
+  const id = Number(req.params.id);
+  const before = products.length;
+  products = products.filter(item => item.id !== id);
+
+  if (products.length === before) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+
+  res.json({ message: "Product deleted" });
+});
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log("Jewellery Store server running on port " + PORT);
 });
