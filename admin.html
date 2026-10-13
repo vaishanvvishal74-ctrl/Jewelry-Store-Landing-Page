@@ -1,154 +1,239 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jewellery Admin Login</title>
-  <style>
-    body{font-family:Arial,sans-serif;background:#f7f2eb;color:#33251c;margin:0}
-    header{background:#5b3825;color:white;text-align:center;padding:18px}
-    main{max-width:650px;margin:25px auto;padding:16px}
-    section{background:white;padding:20px;margin-bottom:18px;border-radius:12px}
-    input,button{box-sizing:border-box;width:100%;padding:12px;margin:7px 0;font-size:16px}
-    button{background:#8b5e3c;color:white;border:0;border-radius:6px;cursor:pointer}
-    img{max-width:100px;display:block;margin-top:6px}
-    li{margin:12px 0;overflow-wrap:anywhere}
-    [hidden]{display:none!important}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jewellery Store Admin</title>
+<style>
+:root{--gold:#9b6b43;--bg:#f7f4f0}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#30251d}
+header{background:#30251d;color:white;padding:18px}
+header h2{margin:0}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+button{border:0;border-radius:8px;padding:11px 14px;background:var(--gold);color:white;cursor:pointer}
+nav button{background:#594333}
+main{max-width:1000px;margin:auto;padding:16px}
+.card{background:white;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 2px 10px #0000000c}
+input,textarea{width:100%;padding:12px;margin:6px 0 14px;border:1px solid #d8cfc6;border-radius:8px;font:inherit}
+label{font-weight:bold;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+h3{margin-top:0}
+.hidden{display:none!important}
+.product{border-top:1px solid #eee;padding:12px 0}
+.product img{width:75px;height:75px;object-fit:cover;border-radius:8px;float:left;margin-right:12px}
+.danger{background:#a83232}
+#status{padding:10px;border-radius:8px;white-space:pre-wrap}
+</style>
 </head>
 <body>
-  <header><h1>Jewellery Store</h1><p>Admin Panel</p></header>
-  <main>
-    <section id="loginBox">
-      <h2>Admin Login</h2>
-      <form id="loginForm">
-        <input id="password" type="password" placeholder="Admin password" autocomplete="current-password" required>
-        <button type="submit">Login</button>
-      </form>
-      <p id="loginStatus" role="status"></p>
-    </section>
+<header>
+<h2 id="heading">Jewellery Store Admin</h2>
+<nav id="menu" class="hidden">
+<button onclick="show('dashboard')">Dashboard</button>
+<button onclick="show('products')">Products</button>
+<button onclick="show('settings')">Store Settings</button>
+<button onclick="logout()">Logout</button>
+</nav>
+</header>
 
-    <section id="adminBox" hidden>
-      <h2>Add Product</h2>
-      <form id="productForm">
-        <input id="name" placeholder="Product name" required>
-        <input id="price" type="number" min="0" step="0.01" placeholder="Price in ₹" required>
-        <input id="image" type="url" placeholder="HTTPS image URL" required>
-        <button type="submit">Add Product</button>
-      </form>
-      <button id="logoutButton" type="button">Logout</button>
-      <p id="status" role="status"></p>
-      <h2>Products</h2>
-      <ul id="products"></ul>
-    </section>
-  </main>
+<main>
+<div id="status" role="status"></div>
 
-  <script>
-    let token = null;
-    const loginBox = document.getElementById("loginBox");
-    const adminBox = document.getElementById("adminBox");
-    const loginStatus = document.getElementById("loginStatus");
-    const statusText = document.getElementById("status");
-    const list = document.getElementById("products");
+<section id="login" class="card">
+<h3>Admin Login</h3>
+<label>Admin Password</label>
+<input id="password" type="password" autocomplete="current-password" placeholder="Enter admin password">
+<button onclick="login()">Login</button>
+</section>
 
-    async function api(path, options = {}) {
-      const headers = {
-        "Content-Type": "application/json",
-        ...(options.headers || {})
-      };
-      if (token) headers["x-admin-token"] = token;
+<section id="dashboard" class="card hidden">
+<h3>Dashboard</h3>
+<p>Welcome to your jewellery store admin panel.</p>
+<p>Total products: <strong id="count">0</strong></p>
+<button onclick="show('products')">Manage Products</button>
+<button onclick="show('settings')">Edit Store Settings</button>
+</section>
 
-      const response = await fetch(path, { ...options, headers });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Request failed");
-      return data;
-    }
+<section id="products" class="card hidden">
+<h3>Product Management</h3>
+<form id="productForm">
+<input id="editId" type="hidden">
+<label>Product Name</label>
+<input id="pName" required maxlength="120" placeholder="Gold Necklace">
+<label>Price (INR)</label>
+<input id="pPrice" type="number" min="0" step="0.01" required placeholder="1500">
+<label>HTTPS Image URL</label>
+<input id="pImage" type="url" required placeholder="https://example.com/image.jpg">
+<button type="submit">Save Product</button>
+<button type="button" onclick="resetProduct()">Clear</button>
+</form>
+<h3>Existing Products</h3>
+<div id="productList"></div>
+</section>
 
-    async function loadProducts() {
-      const products = await api("/api/products");
-      list.replaceChildren();
+<section id="settings" class="card hidden">
+<h3>Store Settings</h3>
+<p>Fill in the details and tap Save Settings.</p>
+<form id="settingsForm">
+<div class="grid">
+<div><label>Store Name</label><input name="storeName" maxlength="200"></div>
+<div><label>Logo Image URL</label><input name="logo" type="url" placeholder="https://..."></div>
+<div><label>Contact Phone</label><input name="phone" type="tel"></div>
+<div><label>WhatsApp Number / Link</label><input name="whatsapp" placeholder="+91... or https://wa.me/..."></div>
+<div><label>Email</label><input name="email" type="email"></div>
+<div><label>City</label><input name="city"></div>
+<div><label>Shop Address</label><textarea name="address" rows="2"></textarea></div>
+<div><label>Google Maps Link</label><input name="mapLink" type="url" placeholder="https://maps.google.com/..."></div>
+<div><label>Instagram URL</label><input name="instagram" type="url" placeholder="https://instagram.com/..."></div>
+<div><label>Facebook URL</label><input name="facebook" type="url" placeholder="https://facebook.com/..."></div>
+<div><label>Other Social Media URL</label><input name="otherSocial" type="url" placeholder="https://..."></div>
+<div><label>UPI ID</label><input name="upiId" placeholder="yourname@bank"></div>
+<div><label>Website Banner Image URL</label><input name="banner" type="url" placeholder="https://..."></div>
+<div><label>Website Main Color</label><input name="primaryColor" type="text" placeholder="#9b6b43" maxlength="7"></div>
+</div>
+<label>Footer Text</label>
+<textarea name="footerText" rows="2"></textarea>
+<button type="submit">Save Settings</button>
+</form>
+</section>
+</main>
 
-      if (products.length === 0) {
-        list.textContent = "No products yet.";
-        return;
-      }
+<script>
+let token = "";
+let products = [];
 
-      products.forEach(product => {
-        const item = document.createElement("li");
-        item.append(document.createTextNode(
-          product.name + " — ₹" + product.price
-        ));
-        if (product.image) {
-          const img = document.createElement("img");
-          img.src = product.image;
-          img.alt = product.name;
-          img.onerror = () => img.remove();
-          item.appendChild(img);
-        }
-        list.appendChild(item);
-      });
-    }
-
-    document.getElementById("loginForm").addEventListener("submit", async event => {
-      event.preventDefault();
-      loginStatus.textContent = "Checking password...";
-
+const $ = id => document.getElementById(id);
+function message(text, error=false) {
+  $("status").textContent = text;
+  $("status").style.color = error ? "#a83232" : "#245b35";
+}
+async function api(path, options={}) {
+  const headers = {...(options.headers || {})};
+  if (options.body) headers["Content-Type"] = "application/json";
+  if (token) headers["x-admin-token"] = token;
+  const response = await fetch(path, {...options, headers});
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || "Request failed");
+  return data;
+}
+async function login() {
+  try {
+    const data = await api("/api/login", {
+      method:"POST",
+      body:JSON.stringify({password:$("password").value})
+    });
+    token = data.token;
+    $("login").classList.add("hidden");
+    $("menu").classList.remove("hidden");
+    show("dashboard");
+    await Promise.all([loadProducts(), loadSettings()]);
+    message("Login successful");
+  } catch (e) { message(e.message, true); }
+}
+function show(id) {
+  ["dashboard","products","settings"].forEach(section =>
+    $(section).classList.toggle("hidden", section !== id)
+  );
+}
+async function logout() {
+  try { await api("/api/logout",{method:"POST"}); } catch(e) {}
+  token = "";
+  $("menu").classList.add("hidden");
+  ["dashboard","products","settings"].forEach(id => $(id).classList.add("hidden"));
+  $("login").classList.remove("hidden");
+  $("password").value = "";
+  message("Logged out");
+}
+function resetProduct() {
+  $("productForm").reset();
+  $("editId").value = "";
+}
+async function loadProducts() {
+  products = await api("/api/products");
+  $("count").textContent = products.length;
+  $("productList").replaceChildren();
+  products.forEach(p => {
+    const item = document.createElement("div");
+    item.className = "product";
+    const img = document.createElement("img");
+    img.src = p.image;
+    img.alt = p.name;
+    img.onerror = () => img.remove();
+    const title = document.createElement("strong");
+    title.textContent = p.name;
+    const price = document.createElement("p");
+    price.textContent = "₹" + p.price;
+    const edit = document.createElement("button");
+    edit.textContent = "Edit";
+    edit.onclick = () => {
+      $("editId").value = p.id;
+      $("pName").value = p.name;
+      $("pPrice").value = p.price;
+      $("pImage").value = p.image;
+      window.scrollTo(0,0);
+    };
+    const del = document.createElement("button");
+    del.textContent = "Delete";
+    del.className = "danger";
+    del.style.marginLeft = "8px";
+    del.onclick = async () => {
+      if (!confirm("Delete this product?")) return;
       try {
-        const result = await api("/api/login", {
-          method: "POST",
-          body: JSON.stringify({
-            password: document.getElementById("password").value
-          })
-        });
-
-        token = result.token;
-        document.getElementById("password").value = "";
-        loginBox.hidden = true;
-        adminBox.hidden = false;
+        await api("/api/products/" + p.id, {method:"DELETE"});
         await loadProducts();
-        loginStatus.textContent = "";
-      } catch (error) {
-        token = null;
-        loginStatus.textContent = error.message;
-      }
+        message("Product deleted");
+      } catch(e) { message(e.message,true); }
+    };
+    item.append(img,title,price,edit,del);
+    $("productList").append(item);
+  });
+}
+$("productForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const id = $("editId").value;
+  const body = JSON.stringify({
+    name:$("pName").value,
+    price:$("pPrice").value,
+    image:$("pImage").value
+  });
+  try {
+    await api(id ? "/api/products/" + id : "/api/products", {
+      method:id ? "PUT" : "POST", body
     });
-
-    document.getElementById("productForm").addEventListener("submit", async event => {
-      event.preventDefault();
-      statusText.textContent = "Saving...";
-
-      try {
-        await api("/api/products", {
-          method: "POST",
-          body: JSON.stringify({
-            name: document.getElementById("name").value.trim(),
-            price: document.getElementById("price").value,
-            image: document.getElementById("image").value.trim()
-          })
-        });
-
-        event.target.reset();
-        statusText.textContent = "Product added!";
-        await loadProducts();
-      } catch (error) {
-        statusText.textContent = error.message;
-      }
-    });
-
-    document.getElementById("logoutButton").addEventListener("click", async () => {
-      try {
-        await api("/api/logout", { method: "POST" });
-      } catch (error) {
-        // Clear the local session even if the server request fails.
-      }
-      token = null;
-      adminBox.hidden = true;
-      loginBox.hidden = false;
-      list.replaceChildren();
-      statusText.textContent = "";
-      loginStatus.textContent = "Logged out.";
-    });
-  </script>
+    resetProduct();
+    await loadProducts();
+    message("Product saved successfully");
+  } catch(e) { message(e.message,true); }
+});
+async function loadSettings() {
+  const data = await api("/api/settings");
+  const form = $("settingsForm");
+  Object.keys(data).forEach(key => {
+    if (form.elements[key]) form.elements[key].value = data[key] || "";
+  });
+  if (/^#[0-9a-f]{6}$/i.test(data.primaryColor || "")) {
+    document.documentElement.style.setProperty("--gold",data.primaryColor);
+  }
+  $("heading").textContent = data.storeName || "Jewellery Store Admin";
+}
+$("settingsForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const form = $("settingsForm");
+  const data = {};
+  for (const [key,value] of new FormData(form).entries()) {
+    data[key] = value;
+  }
+  if (data.primaryColor && !/^#[0-9a-f]{6}$/i.test(data.primaryColor)) {
+    message("Color must be in format #9b6b43",true);
+    return;
+  }
+  try {
+    await api("/api/settings", {method:"PUT",body:JSON.stringify(data)});
+    await loadSettings();
+    message("Settings saved successfully");
+  } catch(e) { message(e.message,true); }
+});
+</script>
 </body>
 </html>
