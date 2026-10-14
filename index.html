@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -7,7 +8,6 @@
 <title>My Jewellery Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-
 <style>
 :root {
   --pink:#d633a6;
@@ -363,7 +363,6 @@ dialog::backdrop { background:#28112c99; }
       <h2>Contact Our Store</h2>
       <p>Contact details can be configured from your Store Settings.</p>
     </div>
-
     <div class="contact-grid">
       <div class="contact-card">
         <i class="fa-solid fa-phone"></i>
@@ -431,32 +430,25 @@ dialog::backdrop { background:#28112c99; }
     <button type="button" class="close" id="closeOrder" aria-label="Close">✕</button>
   </div>
   <p id="selectedProduct" class="notice"></p>
-
   <form id="orderForm" class="form-grid">
     <input id="orderName" type="text" placeholder="Full name" maxlength="100" required>
     <input id="orderEmail" type="email" placeholder="Email address (optional)" maxlength="150">
     <input id="orderPhone" type="tel" placeholder="Mobile number" maxlength="40" required>
     <textarea id="orderAddress" placeholder="Full delivery address" maxlength="2000" required></textarea>
-
     <label for="orderQuantity">Quantity</label>
     <input id="orderQuantity" type="number" min="1" max="100" value="1" required>
-
     <label for="paymentMethod">Payment method</label>
     <select id="paymentMethod">
       <option value="cod">Cash on Delivery</option>
       <option value="upi">UPI (payment must be verified separately)</option>
     </select>
-
     <button class="btn" type="submit">Submit Order</button>
     <p id="orderStatus" class="status" role="status"></p>
-    <p class="notice">Order submit hone ke baad store admin se confirmation ka wait karein. This form does not process an online payment.</p>
+    <p class="notice">This form does not process an online payment. Store confirmation is required.</p>
   </form>
 </dialog>
 
-<!-- PART 2 yahan se continue hoga -->
-</body>
-  </html>
-                                   
+
 <script>
 "use strict";
 
@@ -467,9 +459,7 @@ let selectedProduct = null;
 let storeSettings = {};
 
 function safeText(value, fallback = "") {
-  if (typeof value !== "string" && typeof value !== "number") {
-    return fallback;
-  }
+  if (value === null || value === undefined) return fallback;
   const text = String(value).trim();
   return text || fallback;
 }
@@ -477,15 +467,18 @@ function safeText(value, fallback = "") {
 function showStatus(id, message, isError = false) {
   const element = $(id);
   if (!element) return;
+
   element.textContent = message || "";
   element.style.color = isError ? "#b42318" : "#237547";
 }
 
 function formatPrice(value) {
   const price = Number(value);
+
   if (!Number.isFinite(price) || price < 0) {
     return "Price on request";
   }
+
   return "₹" + price.toLocaleString("en-IN");
 }
 
@@ -495,10 +488,16 @@ function getImageUrl(value) {
 
   try {
     const url = new URL(image, window.location.origin);
-    if (url.protocol === "https:" || url.origin === window.location.origin) {
+
+    if (
+      url.protocol === "https:" ||
+      url.origin === window.location.origin
+    ) {
       return url.href;
     }
-  } catch (_) {}
+  } catch (error) {
+    console.warn("Invalid product image URL");
+  }
 
   return "";
 }
@@ -508,6 +507,7 @@ function setContactLink(id, value, type) {
   if (!element) return;
 
   const text = safeText(value);
+
   if (!text) {
     element.textContent = "Add contact in settings";
     element.href = "#contact";
@@ -522,10 +522,9 @@ function setContactLink(id, value, type) {
     element.href = "tel:" + text.replace(/[^\d+]/g, "");
   } else if (type === "whatsapp") {
     const digits = text.replace(/\D/g, "");
-    element.textContent = "Chat on WhatsApp";
-    element.href = digits
-      ? "https://wa.me/" + digits
-      : "#contact";
+    element.textContent = digits ? "Chat on WhatsApp" : text;
+    element.href = digits ? "https://wa.me/" + digits : "#contact";
+
     if (digits) {
       element.target = "_blank";
       element.rel = "noopener noreferrer";
@@ -540,17 +539,19 @@ async function loadSettings() {
     });
 
     if (!response.ok) {
-      throw new Error("Store settings could not be loaded.");
+      throw new Error("Could not load store settings.");
     }
 
     const data = await response.json();
-    storeSettings = data && typeof data === "object" ? data : {};
 
-    // Support common settings response shapes.
-    const settings = storeSettings.settings &&
+    storeSettings =
+      data && typeof data === "object" ? data : {};
+
+    const settings =
+      storeSettings.settings &&
       typeof storeSettings.settings === "object"
-      ? storeSettings.settings
-      : storeSettings;
+        ? storeSettings.settings
+        : storeSettings;
 
     const storeName = safeText(
       settings.store_name || settings.storeName,
@@ -559,6 +560,7 @@ async function loadSettings() {
 
     $("footerStoreName").textContent = storeName;
     document.title = storeName;
+
     $("footerText").textContent = safeText(
       settings.footer_text || settings.footerText,
       "Thank you for visiting our store."
@@ -585,6 +587,7 @@ async function loadSettings() {
     const phone = safeText(
       settings.phone || settings.contact_phone
     );
+
     const whatsapp = safeText(
       settings.whatsapp || settings.whatsapp_number
     );
@@ -594,13 +597,13 @@ async function loadSettings() {
       : "#contact";
 
     const digits = whatsapp.replace(/\D/g, "");
+
     $("floatingWhatsApp").href = digits
       ? "https://wa.me/" + digits
       : "#contact";
 
   } catch (error) {
     console.error("Settings error:", error);
-    // The shop can still display products if settings are unavailable.
   }
 }
 
@@ -609,8 +612,10 @@ function renderProducts() {
   grid.replaceChildren();
 
   if (!products.length) {
-    grid.innerHTML =
-      '<div class="empty">Abhi products available nahi hain.</div>';
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "Abhi products available nahi hain.";
+    grid.appendChild(empty);
     return;
   }
 
@@ -621,13 +626,20 @@ function renderProducts() {
     const image = document.createElement("img");
     image.loading = "lazy";
     image.alt = safeText(product.name, "Jewellery product");
-    image.src = getImageUrl(
-      product.image_url || product.image || product.imageUrl
+
+    const imageUrl = getImageUrl(
+      product.image_url ||
+      product.image ||
+      product.imageUrl
     );
 
+    if (imageUrl) {
+      image.src = imageUrl;
+    } else {
+      image.style.display = "none";
+    }
+
     image.addEventListener("error", () => {
-      image.removeAttribute("src");
-      image.alt = "Product image unavailable";
       image.style.display = "none";
     }, { once: true });
 
@@ -651,19 +663,18 @@ function renderProducts() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "btn";
-    button.innerHTML =
-      'Order Now <i class="fa-solid fa-bag-shopping"></i>';
+    button.textContent = "Order Now";
     button.addEventListener("click", () => openOrder(index));
 
     info.append(name, description, price, button);
     card.append(image, info);
-    grid.append(card);
+    grid.appendChild(card);
   });
 }
 
 async function loadProducts() {
   const grid = $("productGrid");
-  grid.innerHTML = '<div class="empty">Loading products...</div>';
+  grid.textContent = "Loading products...";
 
   try {
     const response = await fetch("/api/products", {
@@ -676,7 +687,6 @@ async function loadProducts() {
 
     const data = await response.json();
 
-    // Support either an array or { products: [...] } response.
     products = Array.isArray(data)
       ? data
       : Array.isArray(data.products)
@@ -684,21 +694,22 @@ async function loadProducts() {
         : [];
 
     renderProducts();
+
   } catch (error) {
     console.error("Products error:", error);
-    grid.innerHTML =
-      '<div class="empty">Products load nahi hue. Server/API check karein.</div>';
+    grid.textContent =
+      "Products load nahi hue. Server/API check karein.";
   }
 }
 
 function openOrder(index) {
   selectedProduct = products[index];
+
   if (!selectedProduct) return;
 
-  const amount = Number(selectedProduct.price);
   $("selectedProduct").textContent =
     safeText(selectedProduct.name, "Jewellery") +
-    " — " + formatPrice(amount);
+    " — " + formatPrice(selectedProduct.price);
 
   $("orderQuantity").value = "1";
   showStatus("orderStatus", "");
@@ -711,6 +722,7 @@ function openOrder(index) {
 $("menuButton").addEventListener("click", () => {
   const nav = $("mainNav");
   nav.classList.toggle("open");
+
   $("menuButton").setAttribute(
     "aria-expanded",
     nav.classList.contains("open") ? "true" : "false"
@@ -730,21 +742,24 @@ $("closeOrder").addEventListener("click", () => {
 
 $("orderQuantity").addEventListener("change", () => {
   const quantity = Number($("orderQuantity").value);
-  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+
+  if (
+    !Number.isInteger(quantity) ||
+    quantity < 1 ||
+    quantity > 100
+  ) {
     $("orderQuantity").value = "1";
   }
 });
 
 $("year").textContent = String(new Date().getFullYear());
 
-// PART 3 continues with the order submit handler and feedback form.
-</script>
-/* Submit order: matches server.js POST /api/orders */
+/* Order submit: matches server.js POST /api/orders */
 $("orderForm").addEventListener("submit", async (event) => {
   event.preventDefault();
 
   if (!selectedProduct) {
-    showStatus("orderStatus", "Please select a product first.", true);
+    showStatus("orderStatus", "Pehle product select karein.", true);
     return;
   }
 
@@ -771,21 +786,19 @@ $("orderForm").addEventListener("submit", async (event) => {
   if (!Number.isFinite(price) || price < 0) {
     showStatus(
       "orderStatus",
-      "Is product ki valid price available nahi hai. Store se contact karein.",
+      "Product ki price valid nahi hai.",
       true
     );
     return;
   }
 
-  const total = price * quantity;
   const submitButton = $("orderForm").querySelector(
     'button[type="submit"]'
   );
 
   submitButton.disabled = true;
-  showStatus("orderStatus", "Submitting your order...");
+  showStatus("orderStatus", "Order submit ho raha hai...");
 
-  // These field names match server.js exactly.
   const order = {
     customer_name: customerName,
     phone: phone,
@@ -796,7 +809,7 @@ $("orderForm").addEventListener("submit", async (event) => {
       price: price,
       quantity: quantity
     }],
-    total: total
+    total: price * quantity
   };
 
   try {
@@ -811,19 +824,15 @@ $("orderForm").addEventListener("submit", async (event) => {
 
     const result = await response.json().catch(() => ({}));
 
-    if (!response.ok || result.success !== true) {
+    if (!response.ok) {
       throw new Error(
-        result.message ||
-        "Order submit nahi hua. Please try again."
+        result.message || "Order submit nahi hua. Dobara try karein."
       );
     }
 
     showStatus(
       "orderStatus",
-      "Order successfully submit ho gaya! Order ID: " +
-      (result.order && result.order.id != null
-        ? result.order.id
-        : "Confirmed")
+      "Order submit ho gaya! Admin se confirmation ka wait karein."
     );
 
     $("orderForm").reset();
@@ -844,7 +853,7 @@ $("orderForm").addEventListener("submit", async (event) => {
   }
 });
 
-/* Feedback: opens the user's email app; it does not save to the database. */
+/* Feedback form: opens the store email app; it does not save to the database. */
 $("feedbackForm").addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -862,9 +871,9 @@ $("feedbackForm").addEventListener("submit", (event) => {
     return;
   }
 
-  const contactLink = $("contactEmail").getAttribute("href");
+  const emailLink = $("contactEmail").getAttribute("href");
 
-  if (!contactLink || !contactLink.startsWith("mailto:")) {
+  if (!emailLink || !emailLink.startsWith("mailto:")) {
     showStatus(
       "feedbackStatus",
       "Store email settings mein add karein.",
@@ -882,17 +891,24 @@ $("feedbackForm").addEventListener("submit", (event) => {
   );
 
   window.location.href =
-    contactLink + "?subject=" + subject + "&body=" + body;
+    emailLink + "?subject=" + subject + "&body=" + body;
 
   showStatus(
     "feedbackStatus",
-    "Email app open ho sakti hai. Feedback bhejne ke liye email send karein."
+    "Email app open karein aur feedback send karein."
   );
 });
 
-/* Start page */
+/* Start the page */
 loadSettings();
 loadProducts();
-    </script>
+</script>
 </body>
-  </html>
+</html>
+
+</script>
+</body>
+</html>
+
+
+  
