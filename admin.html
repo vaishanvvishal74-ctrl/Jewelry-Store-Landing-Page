@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jewellery Store Admin</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:15px Arial;background:#f6f3ef;color:#292522}
+button,input,textarea,select{font:inherit;padding:10px;border-radius:6px;border:1px solid #ddd}
+button{background:#8b5e3c;color:white;border:0;cursor:pointer;margin:3px}
+button:disabled{opacity:.5}
+input,textarea,select{width:100%;margin:5px 0}
+.hidden{display:none!important}
+.card{background:white;padding:16px;margin:12px 0;border-radius:10px}
+.login{max-width:380px;margin:12vh auto;padding:22px;background:white;border-radius:12px}
+.layout{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
+aside{background:#292522;color:white;padding:14px}
+aside button{width:100%;text-align:left}
+main{padding:15px;min-width:0}
+table{border-collapse:collapse;width:100%;min-width:600px}
+td,th{padding:9px;border-bottom:1px solid #ddd;text-align:left}
+.table{overflow:auto}
+.error{color:#b42318;white-space:pre-wrap}
+.success{color:#16803c;white-space:pre-wrap}
+label{display:block;margin-top:10px;font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:650px){
+.layout{grid-template-columns:1fr}
+aside{padding:8px}
+aside button{width:auto}
+main{padding:8px}
+.grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<section id="loginScreen" class="login">
+<h2>💎 Jewellery Store</h2>
+<p>Admin Panel Login</p>
+<form id="loginForm">
+<label for="password">Admin Password</label>
+<input id="password" type="password" required autocomplete="current-password" placeholder="Enter admin password">
+<button id="loginButton" type="submit">Login</button>
+<p id="loginError" class="error" role="alert"></p>
+</form>
+</section>
+
+<section id="appScreen" class="layout hidden">
+<aside>
+<h3>💎 Admin Panel</h3>
+<button data-page="dashboard">Dashboard</button>
+<button data-page="orders">Orders</button>
+<button data-page="payments">Payments</button>
+<button data-page="products">Products</button>
+<button data-page="gallery">Gallery Upload</button>
+<button data-page="settings">Store Settings</button>
+<button id="logoutButton">Logout</button>
+</aside>
+<main>
+<h2 id="pageTitle">Dashboard</h2>
+<button id="refreshButton">Refresh Data</button>
+<p id="globalMessage" role="status"></p>
+<!-- Dashboard Section -->
+<section id="dashboardSection" class="panel">
+  <div class="stats">
+    <div class="stat-card">
+      <h3>Total Orders</h3>
+      <p id="totalOrders">0</p>
+    </div>
+    <div class="stat-card">
+      <h3>Pending Orders</h3>
+      <p id="pendingOrders">0</p>
+    </div>
+    <div class="stat-card">
+      <h3>Total Products</h3>
+      <p id="totalProducts">0</p>
+    </div>
+  </div>
+  <h3>Recent Orders</h3>
+  <div id="recentOrders" class="table-wrap"></div>
+</section>
+
+<!-- Orders Section -->
+<section id="ordersSection" class="panel hidden">
+  <h3>Manage Orders</h3>
+  <div class="form-row">
+    <input id="orderSearch" placeholder="Search order or customer">
+    <select id="orderFilter">
+      <option value="">All Orders</option>
+      <option value="pending">Pending</option>
+      <option value="approved">Approved</option>
+      <option value="rejected">Rejected</option>
+      <option value="completed">Completed</option>
+    </select>
+    <button id="searchOrdersButton" type="button">Search</button>
+  </div>
+  <div id="ordersTable" class="table-wrap"></div>
+</section>
+
+<!-- Payments Section -->
+<section id="paymentsSection" class="panel hidden">
+  <h3>Payment Management</h3>
+  <p>Review payment status and update payment approval.</p>
+  <div id="paymentsTable" class="table-wrap"></div>
+</section>
+
+<!-- Products Section -->
+<section id="productsSection" class="panel hidden">
+  <h3>Add / Edit Product</h3>
+
+  <form id="productForm">
+    <input id="productId" type="hidden">
+
+    <label for="productName">Product Name</label>
+    <input id="productName" required placeholder="Enter product name">
+
+    <label for="productPrice">Price (₹)</label>
+    <input id="productPrice" type="number" min="0" step="0.01" required>
+
+    <label for="productImage">Product Image</label>
+    <input id="productImage" type="file" accept="image/*">
+
+    <label for="productImageUrl">Image URL (optional)</label>
+    <input id="productImageUrl" type="url" placeholder="https://example.com/image.jpg">
+
+    <div id="productPreview" class="hidden">
+      <img id="productPreviewImage" alt="Product preview">
+    </div>
+
+    <div class="form-row">
+      <button type="submit" id="saveProductButton">Save Product</button>
+      <button type="button" id="resetProductButton" class="secondary">Clear Form</button>
+    </div>
+    <p id="productMessage" role="status"></p>
+  </form>
+
+  <h3>All Products</h3>
+  <div id="productsTable" class="table-wrap"></div>
+</section>
+
+<!-- Settings Section -->
+<section id="settingsSection" class="panel hidden">
+  <h3>Store Settings</h3>
+
+  <form id="settingsForm">
+    <label for="settingStoreName">Store Name</label>
+    <input id="settingStoreName" placeholder="Jewellery Store">
+
+    <label for="settingLogoUrl">Logo URL</label>
+    <input id="settingLogoUrl" type="url" placeholder="https://example.com/logo.png">
+
+    <label for="settingWhatsapp">WhatsApp Number</label>
+    <input id="settingWhatsapp" placeholder="91XXXXXXXXXX">
+
+    <label for="settingInstagram">Instagram URL</label>
+    <input id="settingInstagram" type="url" placeholder="https://instagram.com/yourstore">
+
+    <label for="settingPhone">Phone Number</label>
+    <input id="settingPhone" placeholder="Store phone number">
+
+    <label for="settingEmail">Email</label>
+    <input id="settingEmail" type="email" placeholder="store@example.com">
+
+    <label for="settingAddress">Store Address</label>
+    <textarea id="settingAddress" rows="3"></textarea>
+
+    <label for="settingGoogleMaps">Google Maps URL</label>
+    <input id="settingGoogleMaps" type="url" placeholder="https://maps.google.com/...">
+
+    <label for="settingUpiId">UPI ID</label>
+    <input id="settingUpiId" placeholder="yourname@upi">
+
+    <label for="settingQrUrl">Payment QR Image URL</label>
+    <input id="settingQrUrl" type="url" placeholder="https://example.com/qr.png">
+
+    <button type="submit" id="saveSettingsButton">Save Settings</button>
+    <p id="settingsMessage" role="status"></p>
+  </form>
+</section>
+
+</main>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const API = "";
+const TOKEN_KEY = "jewellery_admin_token";
+
+let orders = [];
+let products = [];
+let settings = {};
+
+function token() {
+  return sessionStorage.getItem(TOKEN_KEY) || "";
+}
+
+async function request(path, options = {}) {
+  const headers = { ...(options.headers || {}) };
+
+  if (token()) {
+    headers.Authorization = `Bearer ${token()}`;
+  }
+
+  if (options.body && !(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  const response = await fetch(API + path, {
+    ...options,
+    headers
+  });
+
+  const text = await response.text();
+  let data = {};
+
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = { message: text };
+  }
+
+  if (!response.ok) {
+    throw new Error(data.message || data.error || `Request failed (${response.status})`);
+  }
+
+  return data;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function money(value) {
+  return "₹" + Number(value || 0).toLocaleString("en-IN");
+}
+
+function showMessage(id, message, isError = false) {
+  const element = $(id);
+  if (!element) return;
+
+  element.textContent = message;
+  element.style.color = isError ? "#dc2626" : "#15803d";
+}
+
+function showLogin() {
+  $("loginScreen").classList.remove("hidden");
+  $("adminScreen").classList.add("hidden");
+}
+
+function showAdmin() {
+  $("loginScreen").classList.add("hidden");
+  $("adminScreen").classList.remove("hidden");
+}
+
+async function login(event) {
+  event.preventDefault();
+
+  const username = $("username").value.trim();
+  const password = $("password").value;
+
+  showMessage("loginMessage", "Logging in...");
+
+  try {
+    const data = await request("/api/admin/login", {
+      method: "POST",
+      body: JSON.stringify({ username, password })
+    });
+
+    if (!data.token) {
+      throw new Error("Server did not return a login token.");
+    }
+
+    sessionStorage.setItem(TOKEN_KEY, data.token);
+    $("password").value = "";
+
+    showAdmin();
+    await loadDashboard();
+
+    showMessage("globalMessage", "Login successful.");
+  } catch (error) {
+    showMessage("loginMessage", error.message, true);
+  }
+}
+
+async function checkLogin() {
+  if (!token()) {
+    showLogin();
+    return;
+  }
+
+  try {
+    await request("/api/admin/check");
+    showAdmin();
+    await loadDashboard();
+  } catch {
+    sessionStorage.removeItem(TOKEN_KEY);
+    showLogin();
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem(TOKEN_KEY);
+  showLogin();
+  showMessage("loginMessage", "You have been logged out.");
+}
+
+function showSection(sectionName) {
+  const sections = [
+    "dashboard",
+    "orders",
+    "payments",
+    "products",
+    "settings"
+  ];
+
+  sections.forEach((name) => {
+    const section = $(name + "Section");
+    if (section) {
+      section.classList.toggle("hidden", name !== sectionName);
+    }
+  });
+
+  $("pageTitle").textContent =
+    sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
+
+  document.querySelectorAll("[data-section]").forEach((button) => {
+    button.classList.toggle(
+      "active",
+      button.dataset.section === sectionName
+    );
+  });
+
+  if (sectionName === "orders" || sectionName === "payments") {
+    renderOrders();
+  }
+
+  if (sectionName === "products") {
+    renderProducts();
+  }
+
+  if (sectionName === "settings") {
+    loadSettings();
+  }
+}
+
+async function loadDashboard() {
+  try {
+    const [ordersData, productsData] = await Promise.all([
+      request("/api/orders"),
+      request("/api/products")
+    ]);
+
+    orders = Array.isArray(ordersData)
+      ? ordersData
+      : ordersData.orders || [];
+
+    products = Array.isArray(productsData)
+      ? productsData
+      : productsData.products || [];
+
+    $("totalOrders").textContent = orders.length;
+
+    $("pendingOrders").textContent = orders.filter((order) =>
+      String(order.status || "pending").toLowerCase() === "pending"
+    ).length;
+
+    $("totalProducts").textContent = products.length;
+
+    $("recentOrders").innerHTML = orders.length
+      ? orders.slice(0, 5).map((order) => `
+          <div class="list-item">
+            <strong>Order #${escapeHtml(order.id)}</strong>
+            <span>${escapeHtml(order.customer_name || order.name || "Customer")}</span>
+            <span>${money(order.total || order.amount || order.price)}</span>
+            <span>${escapeHtml(order.status || "pending")}</span>
+          </div>
+        `).join("")
+      : "<p>No orders found.</p>";
+
+    renderOrders();
+    renderProducts();
+  } catch (error) {
+    showMessage("globalMessage", error.message, true);
+  }
+}
+
+function renderOrders() {
+  const search = ($("orderSearch")?.value || "").toLowerCase();
+  const filter = ($("orderFilter")?.value || "").toLowerCase();
+
+  const filtered = orders.filter((order) => {
+    const status = String(order.status || "pending").toLowerCase();
+    const text = [
+      order.id,
+      order.customer_name,
+      order.name,
+      order.phone,
+      order.email
+    ].join(" ").toLowerCase();
+
+    return (!search || text.includes(search)) &&
+      (!filter || status === filter);
+  });
+
+  const html = filtered.length
+    ? `<table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Payment</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map((order) => `
+            <tr>
+              <td>${escapeHtml(order.id)}</td>
+              <td>
+                ${escapeHtml(order.customer_name || order.name || "Customer")}
+                <br>
+                ${escapeHtml(order.phone || order.email || "")}
+              </td>
+              <td>${money(order.total || order.amount || order.price)}</td>
+              <td>${escapeHtml(order.status || "pending")}</td>
+              <td>${escapeHtml(order.payment_status || order.paymentStatus || "pending")}</td>
+              <td>
+                <select id="status-${escapeHtml(order.id)}">
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="completed">Completed</option>
+                </select>
+                <button onclick="updateOrderStatus('${escapeHtml(order.id)}')">Save Status</button>
+                <select id="payment-${escapeHtml(order.id)}">
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+                <button onclick="updatePaymentStatus('${escapeHtml(order.id)}')">Save Payment</button>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>`
+    : "<p>No matching orders found.</p>";
+
+  $("ordersTable").innerHTML = html;
+  $("paymentsTable").innerHTML = html;
+
+  filtered.forEach((order) => {
+    const statusSelect = $("status-" + order.id);
+    const paymentSelect = $("payment-" + order.id);
+
+    if (statusSelect) {
+      statusSelect.value = order.status || "pending";
+    }
+
+    if (paymentSelect) {
+      paymentSelect.value =
+        order.payment_status || order.paymentStatus || "pending";
+    }
+  });
+}
+
+async function updateOrderStatus(id) {
+  const select = $("status-" + id);
+  if (!select) return;
+
+  try {
+    await request(`/api/orders/${encodeURIComponent(id)}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status: select.value })
+    });
+
+    showMessage("globalMessage", "Order status updated.");
+    await loadDashboard();
+  } catch (error) {
+    showMessage("globalMessage", error.message, true);
+  }
+}
+
+async function updatePaymentStatus(id) {
+  const select = $("payment-" + id);
+  if (!select) return;
+
+  try {
+    await request(`/api/orders/${encodeURIComponent(id)}/payment`, {
+      method: "PATCH",
+      body: JSON.stringify({ payment_status: select.value })
+    });
+
+    showMessage("globalMessage", "Payment status updated.");
+    await loadDashboard();
+  } catch (error) {
+    showMessage("globalMessage", error.message, true);
+  }
+}
+
+function renderProducts() {
+  $("productsTable").innerHTML = products.length
+    ? `<table>
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${products.map((product) => `
+            <tr>
+              <td>
+                ${product.image
+                  ? `<img src="${escapeHtml(product.image)}" alt="" width="55">`
+                  : "No image"}
+              </td>
+              <td>${escapeHtml(product.name)}</td>
+              <td>${money(product.price)}</td>
+              <td>
+                <button onclick="editProduct('${escapeHtml(product.id)}')">Edit</button>
+                <button class="danger" onclick="deleteProduct('${escapeHtml(product.id)}')">Delete</button>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>`
+    : "<p>No products found.</p>";
+}
+
+function editProduct(id) {
+  const product = products.find((item) => String(item.id) === String(id));
+  if (!product) return;
+
+  $("productId").value = product.id;
+  $("productName").value = product.name || "";
+  $("productPrice").value = product.price || "";
+  $("productImageUrl").value = product.image || "";
+
+  if (product.image) {
+    $("productPreviewImage").src = product.image;
+    $("productPreview").classList.remove("hidden");
+  } else {
+    $("productPreview").classList.add("hidden");
+  }
+
+  showSection("products");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function deleteProduct(id) {
+  if (!confirm("Delete this product?")) return;
+
+  try {
+    await request(`/api/products/${encodeURIComponent(id)}`, {
+      method: "DELETE"
+    });
+
+    showMessage("productMessage", "Product deleted.");
+    await loadDashboard();
+  } catch (error) {
+    showMessage("productMessage", error.message, true);
+  }
+}
+
+async function saveProduct(event) {
+  event.preventDefault();
+
+  const id = $("productId").value;
+  const name = $("productName").value.trim();
+  const price = Number($("productPrice").value);
+  let image = $("productImageUrl").value.trim();
+  const file = $("productImage").files[0];
+
+  if (!name || !Number.isFinite(price) || price < 0) {
+    showMessage("productMessage", "Enter a valid name and price.", true);
+    return;
+  }
+
+  try {
+    if (file) {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const uploaded = await request("/api/admin/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      image = uploaded.url || uploaded.image || uploaded.secure_url || image;
+
+      if (!image) {
+        throw new Error("Image upload did not return an image URL.");
+      }
+    }
+
+    const productData = { name, price, image };
+
+    await request(
+      id
+        ? `/api/products/${encodeURIComponent(id)}`
+        : "/api/products",
+      {
+        method: id ? "PUT" : "POST",
+        body: JSON.stringify(productData)
+      }
+    );
+
+    showMessage("productMessage", "Product saved successfully.");
+    $("productForm").reset();
+    $("productId").value = "";
+    $("productPreview").classList.add("hidden");
+
+    await loadDashboard();
+  } catch (error) {
+    showMessage("productMessage", error.message, true);
+  }
+}
+
+function resetProductForm() {
+  $("productForm").reset();
+  $("productId").value = "";
+  $("productPreview").classList.add("hidden");
+  showMessage("productMessage", "");
+}
+
+async function loadSettings() {
+  try {
+    const data = await request("/api/admin/settings");
+    settings = data.settings || data;
+
+    $("settingStoreName").value = settings.store_name || "";
+    $("settingLogoUrl").value = settings.logo_url || "";
+    $("settingWhatsapp").value = settings.whatsapp || "";
+    $("settingInstagram").value = settings.instagram || "";
+    $("settingPhone").value = settings.phone || "";
+    $("settingEmail").value = settings.email || "";
+    $("settingAddress").value = settings.address || "";
+    $("settingGoogleMaps").value = settings.google_maps || "";
+    $("settingUpiId").value = settings.upi_id || "";
+    $("settingQrUrl").value = settings.qr_url || "";
+  } catch (error) {
+    showMessage("settingsMessage", error.message, true);
+  }
+}
+
+async function saveSettings(event) {
+  event.preventDefault();
+
+  const data = {
+    store_name: $("settingStoreName").value.trim(),
+    logo_url: $("settingLogoUrl").value.trim(),
+    whatsapp: $("settingWhatsapp").value.trim(),
+    instagram: $("settingInstagram").value.trim(),
+    phone: $("settingPhone").value.trim(),
+    email: $("settingEmail").value.trim(),
+    address: $("settingAddress").value.trim(),
+    google_maps: $("settingGoogleMaps").value.trim(),
+    upi_id: $("settingUpiId").value.trim(),
+    qr_url: $("settingQrUrl").value.trim()
+  };
+
+  try {
+    await request("/api/admin/settings", {
+      method: "PUT",
+      body: JSON.stringify(data)
+    });
+
+    showMessage("settingsMessage", "Settings saved successfully.");
+  } catch (error) {
+    showMessage("settingsMessage", error.message, true);
+  }
+}
+
+$("loginForm").addEventListener("submit", login);
+$("logoutButton").addEventListener("click", logout);
+$("refreshButton").addEventListener("click", loadDashboard);
+$("productForm").addEventListener("submit", saveProduct);
+$("resetProductButton").addEventListener("click", resetProductForm);
+$("settingsForm").addEventListener("submit", saveSettings);
+$("searchOrdersButton").addEventListener("click", renderOrders);
+$("orderFilter").addEventListener("change", renderOrders);
+
+$("productImage").addEventListener("change", () => {
+  const file = $("productImage").files[0];
+
+  if (!file) {
+    $("productPreview").classList.add("hidden");
+    return;
+  }
+
+  $("productPreviewImage").src = URL.createObjectURL(file);
+  $("productPreview").classList.remove("hidden");
+});
+
+document.querySelectorAll("[data-section]").forEach((button) => {
+  button.addEventListener("click", () => {
+    showSection(button.dataset.section);
+  });
+});
+
+checkLogin();
+</script>
+</body>
+</html>
