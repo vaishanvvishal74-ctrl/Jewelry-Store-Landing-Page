@@ -13,6 +13,7 @@ if (!process.env.DATABASE_URL) {
   console.error("DATABASE_URL is missing");
   process.exit(1);
 }
+
 if (!process.env.ADMIN_PASSWORD) {
   console.error("ADMIN_PASSWORD is missing");
   process.exit(1);
@@ -38,6 +39,7 @@ const STATUSES = [
 
 const PAYMENT_STATUSES = ["pending", "approved", "rejected"];
 
+// Database tables
 async function initDatabase() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS products (
@@ -63,13 +65,36 @@ async function initDatabase() {
       feedback TEXT NOT NULL DEFAULT '',
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
+    CREATE TABLE IF NOT EXISTS store_settings (
+      id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+      store_name TEXT NOT NULL DEFAULT 'Jewellery Store',
+      logo_url TEXT NOT NULL DEFAULT '',
+      whatsapp TEXT NOT NULL DEFAULT '',
+      instagram TEXT NOT NULL DEFAULT '',
+      phone TEXT NOT NULL DEFAULT '',
+      email TEXT NOT NULL DEFAULT '',
+      address TEXT NOT NULL DEFAULT '',
+      google_maps TEXT NOT NULL DEFAULT '',
+      upi_id TEXT NOT NULL DEFAULT '',
+      qr_url TEXT NOT NULL DEFAULT '',
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
+
+  await pool.query(`
+    INSERT INTO store_settings (id)
+    VALUES (1)
+    ON CONFLICT (id) DO NOTHING
   `);
 }
 
 function sendError(res, error, status = 500) {
   console.error(error);
   res.status(status).json({
-    error: status === 500 ? "Server error. Render Logs check karein." : error
+    error: status === 500
+      ? "Server error. Render Logs check karein."
+      : error
   });
 }
 
@@ -85,7 +110,9 @@ function requireAdmin(req, res, next) {
 
   if (!token || !expires || expires < Date.now()) {
     sessions.delete(token);
-    return res.status(401).json({ error: "Login dobara karein." });
+    return res.status(401).json({
+      error: "Login dobara karein."
+    });
   }
 
   sessions.set(token, Date.now() + SESSION_TTL);
@@ -128,7 +155,9 @@ app.post("/api/admin/login", (req, res) => {
     a.length === b.length && crypto.timingSafeEqual(a, b);
 
   if (!matches) {
-    return res.status(401).json({ error: "Password galat hai." });
+    return res.status(401).json({
+      error: "Password galat hai."
+    });
   }
 
   const token = crypto.randomBytes(32).toString("hex");
@@ -137,7 +166,7 @@ app.post("/api/admin/login", (req, res) => {
   res.json({ token });
 });
 
-// Check current login
+// Check login
 app.get("/api/admin/check", requireAdmin, (req, res) => {
   res.json({ authenticated: true });
 });
@@ -146,6 +175,119 @@ app.get("/api/admin/check", requireAdmin, (req, res) => {
 app.post("/api/admin/logout", (req, res) => {
   sessions.delete(getToken(req));
   res.json({ message: "Logout ho gaya." });
+});
+
+// Get store settings (admin only)
+app.get("/api/admin/settings", requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM store_settings WHERE id = 1"
+    );
+
+    res.json(result.rows[0] || {});
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// Save store settings (admin only)
+app.put("/api/admin/settings", requireAdmin, async (req, res) => {
+  try {
+    const fields = [
+      "store_name",
+      "logo_url",
+      "whatsapp",
+      "instagram",
+      "phone",
+      "email",
+      "address",
+      "google_maps",
+      "upi_id",
+      "qr_url"
+    ];
+
+    const values = {};
+
+    for (const field of fields) {
+      const value = req.body[field];
+
+      if (typeof value !== "string") {
+        return res.status(400).json({
+          error: "Invalid setting: " + field
+        });
+      }
+
+      values[field] = value.trim();
+    }
+
+    if (!values.store_name || values.store_name.length > 200) {
+      return res.status(400).json({
+        error: "Store name zaroori hai (maximum 200 characters)."
+      });
+    }
+
+    for (const field of ["logo_url", "qr_url"]) {
+      if (
+        values[field] &&
+        (!validImageUrl(values[field]) || values[field].length > 2000)
+      ) {
+        return res.status(400).json({
+          error: field + " ke liye valid HTTPS image URL dein."
+        });
+      }
+    }
+
+    if (
+      values.instagram &&
+      (!validImageUrl(values.instagram) || values.instagram.length > 2000)
+    ) {
+      return res.status(400).json({
+        error: "Instagram ke liye valid HTTPS URL dein."
+      });
+    }
+
+    if (
+      values.google_maps &&
+      (!validImageUrl(values.google_maps) || values.google_maps.length > 2000)
+    ) {
+      return res.status(400).json({
+        error: "Google Maps ke liye valid HTTPS URL dein."
+      });
+    }
+
+    for (const field of fields) {
+      if (values[field].length > 2000) {
+        return res.status(400).json({
+          error: field + " bahut lamba hai."
+        });
+      }
+    }
+
+    const result = await pool.query(
+      `UPDATE store_settings SET
+        store_name = $1,
+        logo_url = $2,
+        whatsapp = $3,
+        instagram = $4,
+        phone = $5,
+        email = $6,
+        address = $7,
+        google_maps = $8,
+        upi_id = $9,
+        qr_url = $10,
+        updated_at = NOW()
+       WHERE id = 1
+       RETURNING *`,
+      fields.map(field => values[field])
+    );
+
+    res.json({
+      message: "Store settings save ho gayi.",
+      settings: result.rows[0]
+    });
+  } catch (error) {
+    sendError(res, error);
+  }
 });
 
 // List products
@@ -182,7 +324,10 @@ app.post("/api/products", requireAdmin, async (req, res) => {
       [product.id, product.name, product.price, product.image]
     );
 
-    res.status(201).json({ message: "Product save ho gaya.", ...product });
+    res.status(201).json({
+      message: "Product save ho gaya.",
+      ...product
+    });
   } catch (error) {
     sendError(res, error);
   }
@@ -209,10 +354,15 @@ app.put("/api/products/:id", requireAdmin, async (req, res) => {
     );
 
     if (!result.rowCount) {
-      return res.status(404).json({ error: "Product nahi mila." });
+      return res.status(404).json({
+        error: "Product nahi mila."
+      });
     }
 
-    res.json({ message: "Product update ho gaya.", ...result.rows[0] });
+    res.json({
+      message: "Product update ho gaya.",
+      ...result.rows[0]
+    });
   } catch (error) {
     sendError(res, error);
   }
@@ -227,7 +377,9 @@ app.delete("/api/products/:id", requireAdmin, async (req, res) => {
     );
 
     if (!result.rowCount) {
-      return res.status(404).json({ error: "Product nahi mila." });
+      return res.status(404).json({
+        error: "Product nahi mila."
+      });
     }
 
     res.json({ message: "Product delete ho gaya." });
@@ -254,7 +406,9 @@ app.patch("/api/orders/:id/status", requireAdmin, async (req, res) => {
     const status = req.body.status;
 
     if (!STATUSES.includes(status)) {
-      return res.status(400).json({ error: "Invalid order status." });
+      return res.status(400).json({
+        error: "Invalid order status."
+      });
     }
 
     const result = await pool.query(
@@ -264,10 +418,15 @@ app.patch("/api/orders/:id/status", requireAdmin, async (req, res) => {
     );
 
     if (!result.rowCount) {
-      return res.status(404).json({ error: "Order nahi mila." });
+      return res.status(404).json({
+        error: "Order nahi mila."
+      });
     }
 
-    res.json({ message: "Order status update ho gaya.", order: result.rows[0] });
+    res.json({
+      message: "Order status update ho gaya.",
+      order: result.rows[0]
+    });
   } catch (error) {
     sendError(res, error);
   }
@@ -282,7 +441,9 @@ app.patch("/api/orders/:id/payment", requireAdmin, async (req, res) => {
       : "";
 
     if (!PAYMENT_STATUSES.includes(paymentStatus)) {
-      return res.status(400).json({ error: "Invalid payment status." });
+      return res.status(400).json({
+        error: "Invalid payment status."
+      });
     }
 
     const result = await pool.query(
@@ -293,7 +454,9 @@ app.patch("/api/orders/:id/payment", requireAdmin, async (req, res) => {
     );
 
     if (!result.rowCount) {
-      return res.status(404).json({ error: "Order nahi mila." });
+      return res.status(404).json({
+        error: "Order nahi mila."
+      });
     }
 
     res.json({
@@ -329,3 +492,4 @@ initDatabase()
     console.error("Database startup failed:", error);
     process.exit(1);
   });
+    
