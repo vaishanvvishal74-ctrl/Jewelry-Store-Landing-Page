@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jewellery Store Admin</title>
 <style>
 *{box-sizing:border-box}
@@ -297,8 +296,7 @@ async function login(event) {
     button.disabled = false;
   }
 }
-            </script>
-  
+         
 async function checkLogin() {
   if (!token()) {
     showLogin();
@@ -326,7 +324,7 @@ function showSection(sectionName) {
     "dashboard", "orders", "payments", "products", "settings"
   ];
 
-  sections.forEach((name) => {
+  sections.forEach(name => {
     $(name + "Section").classList.toggle(
       "hidden", name !== sectionName
     );
@@ -335,7 +333,7 @@ function showSection(sectionName) {
   $("pageTitle").textContent =
     sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
 
-  document.querySelectorAll("[data-section]").forEach((button) => {
+  document.querySelectorAll("[data-section]").forEach(button => {
     button.classList.toggle(
       "active", button.dataset.section === sectionName
     );
@@ -363,23 +361,29 @@ async function loadDashboard() {
       ? productsData : (productsData.products || []);
 
     $("totalOrders").textContent = orders.length;
-    $("pendingOrders").textContent = orders.filter(
-      order => String(order.status || "pending").toLowerCase() === "pending"
+
+    $("pendingOrders").textContent = orders.filter(order =>
+      String(order.status || "pending").toLowerCase() === "pending"
     ).length;
+
     $("totalProducts").textContent = products.length;
 
     $("recentOrders").innerHTML = orders.length
-      ? `<table><thead><tr>
-          <th>Order</th><th>Customer</th><th>Amount</th><th>Status</th>
-        </tr></thead><tbody>
-        ${orders.slice(0, 5).map(order => `
-          <tr>
-            <td>${escapeHtml(order.id)}</td>
-            <td>${escapeHtml(order.customer_name || order.name || "Customer")}</td>
-            <td>${money(order.total || order.amount || order.price)}</td>
-            <td>${escapeHtml(order.status || "pending")}</td>
-          </tr>`).join("")}
-        </tbody></table>`
+      ? `<table>
+          <thead><tr>
+            <th>Order</th><th>Customer</th><th>Amount</th><th>Status</th>
+          </tr></thead>
+          <tbody>
+          ${orders.slice(0, 5).map(order => `
+            <tr>
+              <td>${escapeHtml(order.id)}</td>
+              <td>${escapeHtml(order.customer_name || order.name || "Customer")}</td>
+              <td>${money(order.total || order.amount || order.price)}</td>
+              <td>${escapeHtml(order.status || "pending")}</td>
+            </tr>
+          `).join("")}
+          </tbody>
+        </table>`
       : "<p>No orders found.</p>";
 
     renderOrders();
@@ -404,36 +408,46 @@ function renderOrders() {
   });
 
   const html = filtered.length
-    ? `<table><thead><tr>
-        <th>ID</th><th>Customer</th><th>Amount</th>
-        <th>Status</th><th>Payment</th><th>Actions</th>
-      </tr></thead><tbody>
-      ${filtered.map(order => `
-        <tr>
-          <td>${escapeHtml(order.id)}</td>
-          <td>
-            ${escapeHtml(order.customer_name || order.name || "Customer")}<br>
-            ${escapeHtml(order.phone || order.email || "")}
-          </td>
-          <td>${money(order.total || order.amount || order.price)}</td>
-          <td>${escapeHtml(order.status || "pending")}</td>
-          <td>${escapeHtml(order.payment_status || order.paymentStatus || "pending")}</td>
-          <td>
-            <select id="status-${escapeHtml(order.id)}">
-              ${["pending","confirmed","processing","shipped","delivered","cancelled","rejected"].map(s =>
-                `<option value="${s}">${s.charAt(0).toUpperCase()+s.slice(1)}</option>`
-              ).join("")}
-            </select>
-            <button type="button" onclick="updateOrderStatus('${escapeHtml(order.id)}')">Save Status</button>
-            <select id="payment-${escapeHtml(order.id)}">
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
-            </select>
-            <button type="button" onclick="updatePaymentStatus('${escapeHtml(order.id)}')">Save Payment</button>
-          </td>
-        </tr>`).join("")}
-      </tbody></table>`
+    ? `<table>
+        <thead><tr>
+          <th>ID</th><th>Customer</th><th>Amount</th>
+          <th>Status</th><th>Payment</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+        ${filtered.map(order => `
+          <tr>
+            <td>${escapeHtml(order.id)}</td>
+            <td>
+              ${escapeHtml(order.customer_name || order.name || "Customer")}<br>
+              ${escapeHtml(order.phone || order.email || "")}
+            </td>
+            <td>${money(order.total || order.amount || order.price)}</td>
+            <td>${escapeHtml(order.status || "pending")}</td>
+            <td>${escapeHtml(order.payment_status || order.paymentStatus || "pending")}</td>
+            <td>
+              <select id="status-${escapeHtml(order.id)}">
+                ${["pending","confirmed","processing","shipped","delivered","cancelled","rejected"].map(s =>
+                  `<option value="${s}">${s.charAt(0).toUpperCase() + s.slice(1)}</option>`
+                ).join("")}
+              </select>
+              <button type="button"
+                onclick="updateOrderStatus('${escapeHtml(order.id)}')">
+                Save Status
+              </button>
+              <select id="payment-${escapeHtml(order.id)}">
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <button type="button"
+                onclick="updatePaymentStatus('${escapeHtml(order.id)}')">
+                Save Payment
+              </button>
+            </td>
+          </tr>
+        `).join("")}
+        </tbody>
+      </table>`
     : "<p>No matching orders found.</p>";
 
   $("ordersTable").innerHTML = html;
@@ -444,8 +458,10 @@ function renderOrders() {
     const payment = $("payment-" + order.id);
 
     if (status) status.value = order.status || "pending";
+
     if (payment) {
-      payment.value = order.payment_status || order.paymentStatus || "pending";
+      payment.value =
+        order.payment_status || order.paymentStatus || "pending";
     }
   });
 }
@@ -486,27 +502,35 @@ async function updatePaymentStatus(id) {
 
 function renderProducts() {
   $("productsTable").innerHTML = products.length
-    ? `<table><thead><tr>
-        <th>Image</th><th>Name</th><th>Price</th><th>Actions</th>
-      </tr></thead><tbody>
-      ${products.map(product => `
-        <tr>
-          <td>${product.image
-            ? `<img src="${escapeHtml(product.image)}" alt="" width="55">`
-            : "No image"}</td>
-          <td>${escapeHtml(product.name)}</td>
-          <td>${money(product.price)}</td>
-          <td>
-            <button type="button" onclick="editProduct('${escapeHtml(product.id)}')">Edit</button>
-            <button type="button" onclick="deleteProduct('${escapeHtml(product.id)}')">Delete</button>
-          </td>
-        </tr>`).join("")}
-      </tbody></table>`
+    ? `<table>
+        <thead><tr>
+          <th>Image</th><th>Name</th><th>Price</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+        ${products.map(product => `
+          <tr>
+            <td>${product.image
+              ? `<img src="${escapeHtml(product.image)}" alt="" width="55">`
+              : "No image"}</td>
+            <td>${escapeHtml(product.name)}</td>
+            <td>${money(product.price)}</td>
+            <td>
+              <button type="button"
+                onclick="editProduct('${escapeHtml(product.id)}')">Edit</button>
+              <button type="button"
+                onclick="deleteProduct('${escapeHtml(product.id)}')">Delete</button>
+            </td>
+          </tr>
+        `).join("")}
+        </tbody>
+      </table>`
     : "<p>No products found.</p>";
 }
 
 function editProduct(id) {
-  const product = products.find(item => String(item.id) === String(id));
+  const product = products.find(
+    item => String(item.id) === String(id)
+  );
   if (!product) return;
 
   $("productId").value = product.id;
@@ -564,7 +588,10 @@ async function saveProduct(event) {
       });
 
       image = uploaded.url || uploaded.image || uploaded.secure_url || image;
-      if (!image) throw new Error("Image upload did not return a URL.");
+
+      if (!image) {
+        throw new Error("Image upload did not return a URL.");
+      }
     }
 
     await request(
@@ -590,9 +617,8 @@ function resetProductForm() {
   $("productId").value = "";
   $("productPreview").classList.add("hidden");
   showMessage("productMessage", "");
-}
-    
-async function loadSettings() {
+ }
+ async function loadSettings() {
   try {
     const data = await request("/api/admin/settings");
     settings = data.settings || data;
@@ -635,7 +661,10 @@ async function saveSettings(event) {
     });
 
     settings = data;
-    showMessage("settingsMessage", "Settings saved successfully.");
+    showMessage(
+      "settingsMessage",
+      "Settings saved successfully."
+    );
   } catch (error) {
     showMessage("settingsMessage", error.message, true);
   }
@@ -672,5 +701,3 @@ checkLogin();
 </script>
 </body>
 </html>
-
-    
