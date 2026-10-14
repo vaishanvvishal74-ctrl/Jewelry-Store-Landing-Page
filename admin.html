@@ -4,11 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jewellery Store Admin</title>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f5f5fa;color:#25243a}
 button,input,select,textarea{font:inherit;padding:11px;border-radius:8px;border:1px solid #ddd}
 button{cursor:pointer;background:#eee}
+button:disabled{opacity:.6;cursor:wait}
 .primary{background:#8238bd;color:white;border:0}
 .danger{background:#ffe5e5;color:#b42332}
 .success{background:#dff8e9;color:#137448}
@@ -22,46 +24,59 @@ header h2{margin:0}
 .layout{display:flex;min-height:calc(100vh - 60px)}
 nav{width:210px;background:#30203e;padding:12px;flex-shrink:0}
 nav button{width:100%;margin:5px 0;text-align:left;background:transparent;color:white;border:0}
-nav button:hover{background:#ffffff20}
+nav button:hover,nav button.active{background:#ffffff20}
 main{padding:20px;flex:1;min-width:0}
-.page{display:none}.page.active{display:block}
+.page{display:none}
+.page.active{display:block}
 .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
-.card,.panel{background:white;padding:17px;border-radius:12px;margin-bottom:15px;box-shadow:0 3px 15px #00000008}
+.card,.panel,.settings-section{background:white;padding:17px;border-radius:12px;margin-bottom:15px;box-shadow:0 3px 15px #00000008}
 .card strong{display:block;font-size:25px;margin-top:10px;color:#8238bd}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .toolbar input{flex:1;min-width:150px}
-.table-wrap{overflow-x:auto;background:white}
+.table-wrap{overflow-x:auto;background:white;border-radius:8px}
 table{border-collapse:collapse;width:100%;min-width:650px}
 th,td{padding:11px;border-bottom:1px solid #eee;text-align:left;font-size:13px}
 th{background:#f7f4fa}
 td button{margin:2px}
 .status{display:inline-block;padding:4px 8px;border-radius:20px;background:#eee;font-size:12px}
-.notice{color:#b42332;margin:8px 0;white-space:pre-wrap}
+.notice{color:#b42332;margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .form-grid input,.form-grid textarea{width:100%}
 .full{grid-column:1/-1}
 #productForm{display:none}
+.settings-section h3{color:#8238bd;margin-top:0}
+.settings-section label{display:block;font-weight:bold;margin:12px 0 5px}
+.settings-section input:not([type=file]),.settings-section textarea{width:100%}
+.upload-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:10px 0}
+.upload-row input[type=file]{max-width:100%;min-width:0}
+.preview-image{max-width:180px;max-height:180px;object-fit:contain;display:block;margin:10px 0;border:1px solid #eee;border-radius:8px;padding:6px}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.gallery-item{border:1px solid #eee;border-radius:10px;padding:10px;min-width:0}
+.gallery-item img{width:100%;height:150px;object-fit:contain}
+.gallery-item a{display:block;overflow-wrap:anywhere;margin:8px 0}
+.muted{color:#777;font-size:13px}
 @media(max-width:750px){
-.layout{display:block}
-nav{width:100%;display:flex;overflow-x:auto}
-nav button{width:auto;white-space:nowrap}
-main{padding:12px}
-.cards{grid-template-columns:1fr 1fr}
-.form-grid{grid-template-columns:1fr}
-.full{grid-column:auto}
+ .layout{display:block}
+ nav{width:100%;display:flex;overflow-x:auto;gap:4px}
+ nav button{width:auto;white-space:nowrap}
+ main{padding:12px}
+ .cards{grid-template-columns:1fr 1fr}
+ .form-grid{grid-template-columns:1fr}
+ .full{grid-column:auto}
 }
 </style>
 </head>
+
 <body>
 
 <section id="login">
 <form class="login-card" id="loginForm">
 <h1>✦ Jewellery Store</h1>
 <h3>Admin Login</h3>
-<p>Admin password डालें</p>
-<input id="password" type="password" placeholder="Admin Password" required>
+<p>अपना Admin Password डालें</p>
+<input id="password" type="password" placeholder="Admin Password" autocomplete="current-password" required>
 <button class="primary" id="loginButton" type="submit">Login</button>
-<div id="loginError" class="notice"></div>
+<div id="loginError" class="notice" role="alert"></div>
 </form>
 </section>
 
@@ -69,17 +84,21 @@ main{padding:12px}
 <header>
 <h2>✦ Jewellery Store Admin</h2>
 </header>
+
 <div class="layout">
-<nav>
-<button onclick="showPage('dashboard')">🏠 Dashboard</button>
-<button onclick="showPage('orders')">📦 Orders</button>
-<button onclick="showPage('payments')">₹ Payment Approval</button>
-<button onclick="showPage('products')">💍 Products</button>
+<nav id="navigation">
+<button class="active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
+<button onclick="showPage('orders',this)">📦 Orders</button>
+<button onclick="showPage('payments',this)">₹ Payments</button>
+<button onclick="showPage('products',this)">💍 Products</button>
+<button onclick="showPage('gallery',this)">🖼️ Gallery</button>
+<button onclick="showPage('settings',this)">⚙️ Store Settings</button>
 <button onclick="refreshAll()">↻ Refresh</button>
 <button onclick="logout()">Logout</button>
 </nav>
 
 <main>
+
 <section id="dashboard" class="page active">
 <h2>Dashboard</h2>
 <div class="cards">
@@ -90,22 +109,22 @@ main{padding:12px}
 </div>
 <div class="panel">
 <h3>Latest Orders</h3>
-<div id="recent">Orders load हो रहे हैं…</div>
+<div id="recent">लोड हो रहा है…</div>
 </div>
+<div id="dashboardMessage" class="notice"></div>
 </section>
 
 <section id="orders" class="page">
 <h2>Orders Management</h2>
 <div class="toolbar">
-<input id="orderSearch" placeholder="Order ID या customer search">
-<button onclick="loadOrders()">Search / Refresh</button>
+<input id="orderSearch" placeholder="Order ID या Customer खोजें">
+<button onclick="loadOrders()">Refresh</button>
 </div>
 <div class="table-wrap">
 <table>
-<thead><tr>
-<th>Order ID</th><th>Customer</th><th>Total</th>
-<th>Payment</th><th>Status</th><th>Action</th>
-</tr></thead>
+<thead>
+<tr><th>Order ID</th><th>Customer</th><th>Total</th><th>Payment</th><th>Status</th><th>Action</th></tr>
+</thead>
 <tbody id="ordersTable"></tbody>
 </table>
 </div>
@@ -113,10 +132,16 @@ main{padding:12px}
 
 <section id="payments" class="page">
 <h2>Payment Approval</h2>
-<p>Payment status को approve या reject करें।</p>
+<p>Payment approve करने से पहले वास्तविक payment verify करें।</p>
+<div class="toolbar">
+<input id="paymentSearch" placeholder="Order ID या Customer खोजें">
+<button onclick="loadOrders()">Refresh</button>
+</div>
 <div class="table-wrap">
 <table>
-<thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Payment Status</th><th>Action</th></tr></thead>
+<thead>
+<tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Payment Status</th><th>Action</th></tr>
+</thead>
 <tbody id="paymentsTable"></tbody>
 </table>
 </div>
@@ -125,37 +150,123 @@ main{padding:12px}
 <section id="products" class="page">
 <h2>Products Management</h2>
 <div class="panel">
-<button class="primary" onclick="toggleProductForm()">+ Add Product</button>
+<button class="primary" onclick="toggleProductForm(true)">+ Add Product</button>
 <form id="productForm">
 <h3 id="formTitle">Add Product</h3>
 <input id="productId" type="hidden">
 <div class="form-grid">
 <input id="productName" placeholder="Product Name" required>
-<input id="productCategory" placeholder="Category">
-<input id="productPrice" type="number" min="0" placeholder="Price" required>
-<input id="productStock" type="number" min="0" placeholder="Stock" value="0">
-<input id="productImage" class="full" placeholder="Image URL">
-<textarea id="productDescription" class="full" placeholder="Description"></textarea>
+<input id="productPrice" type="number" min="0" step="0.01" placeholder="Price (₹)" required>
+<input id="productImage" class="full" type="url" placeholder="Image URL (https://...)" required>
 </div>
-<br>
-<button class="primary" type="submit">Save Product</button>
-<button type="button" onclick="toggleProductForm(false)">Cancel</button>
+<p class="muted">Product image upload करने के लिए पहले Gallery में फोटो Upload करें और उसका URL यहाँ डालें।</p>
 <div id="productError" class="notice"></div>
+<br>
+<button class="primary" id="productSaveButton" type="submit">Save Product</button>
+<button type="button" onclick="toggleProductForm(false)">Cancel</button>
 </form>
 </div>
 <div class="toolbar">
-<input id="productSearch" placeholder="Search product">
+<input id="productSearch" placeholder="Product खोजें">
 <button onclick="loadProducts()">Refresh</button>
 </div>
 <div class="table-wrap">
 <table>
-<thead><tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Action</th></tr></thead>
+<thead><tr><th>ID</th><th>Image</th><th>Name</th><th>Price</th><th>Action</th></tr></thead>
 <tbody id="productsTable"></tbody>
 </table>
 </div>
 </section>
 
-<div id="message" class="notice"></div>
+<section id="gallery" class="page">
+<h2>🖼️ Gallery Management</h2>
+
+<div class="settings-section">
+<h3>Photo Upload</h3>
+<p>एक बार में एक फोटो चुनें। अधिकतम आकार 5 MB रखा गया है।</p>
+<form id="galleryUploadForm">
+<div class="upload-row">
+<input id="galleryFile" type="file" accept="image/*" required>
+<button class="primary" id="galleryUploadButton" type="submit">Upload Photo</button>
+</div>
+</form>
+<div id="galleryMessage" class="notice" role="status"></div>
+</div>
+
+<div class="settings-section">
+<h3>Uploaded Images</h3>
+<p class="muted">अपलोड की गई फोटो का URL कॉपी करके Product Image, Logo या QR URL में इस्तेमाल कर सकते हैं।</p>
+<div id="galleryGrid" class="gallery-grid"></div>
+</div>
+</section>
+
+<section id="settings" class="page">
+<h2>⚙️ Store Settings</h2>
+<p class="muted">बदलाव करने के बाद Save Settings दबाएँ।</p>
+
+<form id="settingsForm">
+<div class="settings-section">
+<h3>🏪 Store Information</h3>
+
+<label for="settingStoreName">Store Name</label>
+<input id="settingStoreName" placeholder="Jewellery Store">
+
+<label for="settingLogo">Logo URL</label>
+<input id="settingLogo" type="url" placeholder="https://...">
+
+<div class="upload-row">
+<input id="logoFile" type="file" accept="image/*">
+<button type="button" onclick="uploadSettingImage('logo')">Upload Logo</button>
+</div>
+<img id="logoPreview" class="preview-image" alt="Logo Preview" hidden>
+
+<label for="settingAddress">Store Address</label>
+<textarea id="settingAddress" rows="3" placeholder="दुकान का पूरा पता"></textarea>
+
+<label for="settingMaps">Google Maps Link</label>
+<input id="settingMaps" type="url" placeholder="https://maps.google.com/...">
+</div>
+
+<div class="settings-section">
+<h3>📞 Contact Details</h3>
+
+<label for="settingWhatsApp">WhatsApp Number या Link</label>
+<input id="settingWhatsApp" placeholder="+91XXXXXXXXXX या https://wa.me/...">
+
+<label for="settingInstagram">Instagram Link</label>
+<input id="settingInstagram" type="url" placeholder="https://instagram.com/yourstore">
+
+<label for="settingEmail">Email</label>
+<input id="settingEmail" type="email" placeholder="store@example.com">
+
+<label for="settingPhone">Phone Number</label>
+<input id="settingPhone" type="tel" placeholder="+91XXXXXXXXXX">
+</div>
+
+<div class="settings-section">
+<h3>₹ Payment Details</h3>
+
+<label for="settingUpi">UPI ID</label>
+<input id="settingUpi" placeholder="yourname@upi">
+
+<label for="settingQr">Payment QR Code URL</label>
+<input id="settingQr" type="url" placeholder="https://...">
+
+<div class="upload-row">
+<input id="qrFile" type="file" accept="image/*">
+<button type="button" onclick="uploadSettingImage('qr')">Upload QR Code</button>
+</div>
+<img id="qrPreview" class="preview-image" alt="QR Code Preview" hidden>
+</div>
+
+<button class="primary" id="settingsSaveButton" type="submit">Save Settings</button>
+<button type="button" id="settingsReloadButton" onclick="loadSettings()">Reload Settings</button>
+<div id="settingsMessage" class="notice" role="status"></div>
+</form>
+</section>
+
+<div id="message" class="notice" role="status"></div>
+
 </main>
 </div>
 </div>
@@ -166,6 +277,7 @@ main{padding:12px}
 let token = sessionStorage.getItem("jewellery_admin_token") || "";
 let products = [];
 let orders = [];
+let galleryImages = [];
 
 const $ = id => document.getElementById(id);
 
@@ -209,32 +321,8 @@ function showMessage(message) {
   $("message").textContent = message;
 }
 
-async function api(url, options = {}) {
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {})
-  };
-
-  if (token) headers.Authorization = "Bearer " + token;
-
-  const response = await fetch(url, { ...options, headers });
-  const text = await response.text();
-  let data = {};
-
-  try {
-    data = text ? JSON.parse(text) : {};
-  } catch {
-    data = { message: text };
-  }
-
-  if (!response.ok) {
-    if (response.status === 401 || response.status === 403) {
-      if (url !== "/api/admin/login") logout(false);
-    }
-    throw new Error(data.error || data.message || "Request failed: " + response.status);
-  }
-
-  return data;
+function setText(id, message) {
+  $(id).textContent = message;
 }
 
 function unwrap(data, key) {
@@ -245,32 +333,67 @@ function unwrap(data, key) {
   return [];
 }
 
+async function api(url, options = {}) {
+  const headers = {...(options.headers || {})};
+
+  if (options.body && !(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+  if (token) headers.Authorization = "Bearer " + token;
+
+  const response = await fetch(url, {...options, headers});
+  const text = await response.text();
+  let data = {};
+
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = {message:text};
+  }
+
+  if (!response.ok) {
+    if ((response.status === 401 || response.status === 403) &&
+        url !== "/api/admin/login") {
+      logout(false);
+    }
+    throw new Error(data.error || data.message || "Request failed: " + response.status);
+  }
+
+  return data;
+}
+
+function showApp() {
+  $("login").style.display = "none";
+  $("app").style.display = "block";
+}
+
 $("loginForm").addEventListener("submit", async event => {
   event.preventDefault();
-  $("loginError").textContent = "";
-  $("loginButton").disabled = true;
-  $("loginButton").textContent = "Logging in…";
+
+  const button = $("loginButton");
+  button.disabled = true;
+  button.textContent = "Logging in…";
+  setText("loginError","");
 
   try {
     const data = await api("/api/admin/login", {
-      method: "POST",
-      body: JSON.stringify({ password: $("password").value })
+      method:"POST",
+      body:JSON.stringify({password:$("password").value})
     });
 
-    token = data.token || data.accessToken || data.access_token ||
-      (data.data && data.data.token);
+    token = data.token || data.accessToken ||
+      data.access_token || (data.data && data.data.token) || "";
 
-    if (!token) throw new Error("Server se login token nahi mila.");
+    if (!token) throw new Error("Login token नहीं मिला। Backend response जाँचें।");
 
     sessionStorage.setItem("jewellery_admin_token", token);
-    $("login").style.display = "none";
-    $("app").style.display = "block";
+    showApp();
     await refreshAll();
-  } catch (error) {
-    $("loginError").textContent = error.message || "Login failed";
+  } catch(error) {
+    setText("loginError", error.message || "Login failed");
   } finally {
-    $("loginButton").disabled = false;
-    $("loginButton").textContent = "Login";
+    button.disabled = false;
+    button.textContent = "Login";
   }
 });
 
@@ -280,30 +403,161 @@ function logout(show = true) {
   $("app").style.display = "none";
   $("login").style.display = "grid";
   $("password").value = "";
-  if (show) $("loginError").textContent = "Logout हो गया।";
+  if (show) setText("loginError","Logout हो गया।");
 }
 
-function showPage(id) {
+function showPage(id, button) {
   document.querySelectorAll(".page").forEach(page => {
     page.classList.toggle("active", page.id === id);
   });
+
+  document.querySelectorAll("#navigation button").forEach(b => b.classList.remove("active"));
+  if (button) button.classList.add("active");
+
   showMessage("");
+
+  if (id === "gallery") renderGallery();
+  if (id === "settings") loadSettings();
+  if (id === "orders") renderOrders();
+  if (id === "payments") renderPayments();
+  if (id === "products") renderProducts();
 }
 
 async function refreshAll() {
-  await Promise.allSettled([loadProducts(), loadOrders()]);
+  await Promise.allSettled([
+    loadProducts(),
+    loadOrders(),
+    loadSettings()
+  ]);
   renderDashboard();
 }
+
+/* PRODUCTS */
 
 async function loadProducts() {
   try {
     products = unwrap(await api("/api/products"), "products");
     renderProducts();
     renderDashboard();
-  } catch (error) {
+  } catch(error) {
     showMessage("Products load नहीं हुए: " + error.message);
   }
 }
+
+function renderProducts() {
+  const query = $("productSearch").value.toLowerCase().trim();
+
+  const filtered = products.filter(p =>
+    (productName(p) + " " + getId(p)).toLowerCase().includes(query)
+  );
+
+  $("productsTable").innerHTML = filtered.map(p => `
+    <tr>
+      <td>${escapeHTML(getId(p))}</td>
+      <td>${p.image ? `<img src="${escapeHTML(p.image)}" alt="" style="width:50px;height:50px;object-fit:contain">` : "—"}</td>
+      <td>${escapeHTML(productName(p))}</td>
+      <td>${money(p.price)}</td>
+      <td>
+        <button data-edit-product="${escapeHTML(getId(p))}">Edit</button>
+        <button class="danger" data-delete-product="${escapeHTML(getId(p))}">Delete</button>
+      </td>
+    </tr>
+  `).join("") || '<tr><td colspan="5">कोई product नहीं मिला।</td></tr>';
+}
+
+$("productSearch").addEventListener("input", renderProducts);
+
+function toggleProductForm(show) {
+  const form = $("productForm");
+  const visible = show === undefined
+    ? form.style.display === "none" || getComputedStyle(form).display === "none"
+    : show;
+
+  form.style.display = visible ? "block" : "none";
+
+  if (!visible) {
+    form.reset();
+    $("productId").value = "";
+    $("formTitle").textContent = "Add Product";
+    setText("productError","");
+  }
+}
+
+$("productsTable").addEventListener("click", async event => {
+  const edit = event.target.closest("[data-edit-product]");
+  const del = event.target.closest("[data-delete-product]");
+
+  if (edit) {
+    const p = products.find(item => String(getId(item)) === edit.dataset.editProduct);
+    if (!p) return;
+
+    $("productId").value = getId(p);
+    $("productName").value = p.name || "";
+    $("productPrice").value = p.price ?? "";
+    $("productImage").value = p.image || "";
+    $("formTitle").textContent = "Edit Product";
+    $("productForm").style.display = "block";
+    return;
+  }
+
+  if (del) {
+    const id = del.dataset.deleteProduct;
+    if (!id || !confirm("क्या यह product delete करना है?")) return;
+
+    try {
+      await api("/api/products/" + encodeURIComponent(id), {method:"DELETE"});
+      showMessage("Product delete हो गया।");
+      await loadProducts();
+    } catch(error) {
+      showMessage("Delete नहीं हुआ: " + error.message);
+    }
+  }
+});
+
+$("productForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const button = $("productSaveButton");
+  button.disabled = true;
+  button.textContent = "Saving…";
+  setText("productError","");
+
+  const id = $("productId").value;
+  const product = {
+    name:$("productName").value.trim(),
+    price:Number($("productPrice").value),
+    image:$("productImage").value.trim()
+  };
+
+  if (!product.name || !product.image ||
+      !Number.isFinite(product.price) || product.price < 0) {
+    setText("productError","Product name, valid price और image URL भरें।");
+    button.disabled = false;
+    button.textContent = "Save Product";
+    return;
+  }
+
+  try {
+    const result = await api(
+      id ? "/api/products/" + encodeURIComponent(id) : "/api/products",
+      {
+        method:id ? "PUT" : "POST",
+        body:JSON.stringify(product)
+      }
+    );
+
+    showMessage(result.message || "Product save हो गया।");
+    toggleProductForm(false);
+    await loadProducts();
+  } catch(error) {
+    setText("productError",error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Save Product";
+  }
+});
+
+/* ORDERS */
 
 async function loadOrders() {
   try {
@@ -311,7 +565,7 @@ async function loadOrders() {
     renderOrders();
     renderPayments();
     renderDashboard();
-  } catch (error) {
+  } catch(error) {
     showMessage("Orders load नहीं हुए: " + error.message);
   }
 }
@@ -323,12 +577,11 @@ function renderDashboard() {
     orders.filter(o => ["pending","processing"].includes(orderStatus(o))).length;
 
   $("totalSales").textContent = money(
-    orders.reduce((sum, o) => sum + (Number(amount(o)) || 0), 0)
+    orders.reduce((sum,o) => sum + (Number(amount(o)) || 0),0)
   );
 
-  $("recent").innerHTML = orders.slice(0, 5).map(o =>
-    `<p>Order #${escapeHTML(getId(o))} — ${escapeHTML(customer(o))}
-    — ${money(amount(o))} — ${escapeHTML(orderStatus(o))}</p>`
+  $("recent").innerHTML = orders.slice(0,5).map(o =>
+    `<p>Order #${escapeHTML(getId(o))} — ${escapeHTML(customer(o))} — ${money(amount(o))} — ${escapeHTML(orderStatus(o))}</p>`
   ).join("") || "अभी कोई order नहीं है।";
 }
 
@@ -339,12 +592,17 @@ function renderOrders() {
     (String(getId(o)) + " " + customer(o)).toLowerCase().includes(query)
   );
 
+  const statuses = [
+    "pending","processing","approved","shipped","delivered","rejected","cancelled"
+  ];
+
   $("ordersTable").innerHTML = filtered.map(o => {
     const id = getId(o);
     const status = orderStatus(o);
-    const options = ["pending","processing","approved","shipped","delivered","rejected","cancelled"]
-      .map(s => `<option value="${s}" ${s === status ? "selected" : ""}>${s}</option>`)
-      .join("");
+
+    const options = statuses.map(s =>
+      `<option value="${s}" ${s === status ? "selected" : ""}>${s}</option>`
+    ).join("");
 
     return `<tr>
       <td>#${escapeHTML(id)}</td>
@@ -367,189 +625,4 @@ $("ordersTable").addEventListener("click", async event => {
   if (!button) return;
 
   const id = button.dataset.saveOrder;
-  const select = [...document.querySelectorAll("[data-status]")]
-    .find(el => el.dataset.status === id);
-
-  if (!id || !select) return showMessage("Order ID नहीं मिला।");
-
-  button.disabled = true;
-  try {
-    await api("/api/orders/" + encodeURIComponent(id) + "/status", {
-      method: "PATCH",
-      body: JSON.stringify({ status: select.value })
-    });
-
-    showMessage("Order status update हो गया।");
-    await loadOrders();
-  } catch (error) {
-    showMessage("Order update नहीं हुआ: " + error.message);
-  } finally {
-    button.disabled = false;
-  }
-});
-
-function renderPayments() {
-  $("paymentsTable").innerHTML = orders.map(o => {
-    const id = getId(o);
-    const status = paymentStatus(o);
-
-    return `<tr>
-      <td>#${escapeHTML(id)}</td>
-      <td>${escapeHTML(customer(o))}</td>
-      <td>${money(amount(o))}</td>
-      <td>${escapeHTML(status)}</td>
-      <td>
-        <button class="success" data-payment="${escapeHTML(id)}" data-payment-status="approved">Approve</button>
-        <button class="danger" data-payment="${escapeHTML(id)}" data-payment-status="rejected">Reject</button>
-      </td>
-    </tr>`;
-  }).join("") || '<tr><td colspan="5">कोई order नहीं मिला।</td></tr>';
-}
-
-$("paymentsTable").addEventListener("click", async event => {
-  const button = event.target.closest("[data-payment]");
-  if (!button) return;
-
-  const id = button.dataset.payment;
-  const status = button.dataset.paymentStatus;
-
-  if (!id) return showMessage("Order ID नहीं मिला।");
-  button.disabled = true;
-
-  try {
-    await api("/api/orders/" + encodeURIComponent(id) + "/payment", {
-      method: "PATCH",
-      body: JSON.stringify({
-        payment_status: status,
-        status: status
-      })
-    });
-
-    showMessage("Payment status update हो गया।");
-    await loadOrders();
-  } catch (error) {
-    showMessage("Payment update नहीं हुआ: " + error.message);
-  } finally {
-    button.disabled = false;
-  }
-});
-
-function renderProducts() {
-  const query = $("productSearch").value.toLowerCase().trim();
-
-  const filtered = products.filter(p =>
-    (productName(p) + " " + (p.category || "")).toLowerCase().includes(query)
-  );
-
-  $("productsTable").innerHTML = filtered.map(p => `
-    <tr>
-      <td>${escapeHTML(getId(p))}</td>
-      <td>${escapeHTML(productName(p))}</td>
-      <td>${escapeHTML(p.category || "—")}</td>
-      <td>${money(p.price)}</td>
-      <td>${escapeHTML(p.stock ?? p.quantity ?? 0)}</td>
-      <td>
-        <button data-edit-product="${escapeHTML(getId(p))}">Edit</button>
-        <button class="danger" data-delete-product="${escapeHTML(getId(p))}">Delete</button>
-      </td>
-    </tr>
-  `).join("") || '<tr><td colspan="6">कोई product नहीं मिला।</td></tr>';
-}
-
-$("productSearch").addEventListener("input", renderProducts);
-
-function toggleProductForm(show) {
-  const form = $("productForm");
-  const visible = show === undefined ? form.style.display === "none" : show;
-  form.style.display = visible ? "block" : "none";
-
-  if (!visible) {
-    form.reset();
-    $("productId").value = "";
-    $("productStock").value = 0;
-    $("formTitle").textContent = "Add Product";
-    $("productError").textContent = "";
-  }
-}
-
-$("productsTable").addEventListener("click", event => {
-  const edit = event.target.closest("[data-edit-product]");
-  const del = event.target.closest("[data-delete-product]");
-
-  if (edit) {
-    const p = products.find(item => String(getId(item)) === edit.dataset.editProduct);
-    if (!p) return;
-
-    $("productId").value = getId(p);
-    $("productName").value = p.name ?? p.title ?? p.product_name ?? "";
-    $("productCategory").value = p.category ?? "";
-    $("productPrice").value = p.price ?? 0;
-    $("productStock").value = p.stock ?? p.quantity ?? 0;
-    $("productImage").value = p.image_url ?? p.image ?? "";
-    $("productDescription").value = p.description ?? "";
-    $("formTitle").textContent = "Edit Product";
-    $("productForm").style.display = "block";
-  }
-
-  if (del) deleteProduct(del.dataset.deleteProduct);
-});
-
-async function deleteProduct(id) {
-  if (!id || !confirm("क्या आप यह product delete करना चाहते हैं?")) return;
-
-  try {
-    await api("/api/products/" + encodeURIComponent(id), {
-      method: "DELETE"
-    });
-    showMessage("Product delete हो गया।");
-    await loadProducts();
-  } catch (error) {
-    showMessage("Delete नहीं हुआ: " + error.message);
-  }
-}
-
-$("productForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  $("productError").textContent = "";
-
-  const id = $("productId").value;
-  const product = {
-    name: $("productName").value.trim(),
-    category: $("productCategory").value.trim(),
-    price: Number($("productPrice").value),
-    stock: Number($("productStock").value || 0),
-    image_url: $("productImage").value.trim(),
-    description: $("productDescription").value.trim()
-  };
-
-  if (!product.name || !Number.isFinite(product.price) || product.price < 0) {
-    $("productError").textContent = "Product name और valid price डालें।";
-    return;
-  }
-
-  try {
-    const data = await api(
-      id ? "/api/products/" + encodeURIComponent(id) : "/api/products",
-      {
-        method: id ? "PUT" : "POST",
-        body: JSON.stringify(product)
-      }
-    );
-
-    showMessage(data.message || "Product save request सफल हुआ।");
-    toggleProductForm(false);
-    await loadProducts();
-  } catch (error) {
-    $("productError").textContent = error.message;
-  }
-});
-
-if (token) {
-  $("login").style.display = "none";
-  $("app").style.display = "block";
-  refreshAll();
-}
-</script>
-</body>
-  </html>
-  
+  const select = [...doc
