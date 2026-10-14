@@ -251,6 +251,7 @@ function showMessage(id, message, isError = false) {
 }
 
 
+
 function showLogin() {
   $("loginScreen").classList.remove("hidden");
   $("appScreen").classList.add("hidden");
@@ -260,9 +261,6 @@ function showAdmin() {
   $("loginScreen").classList.add("hidden");
   $("appScreen").classList.remove("hidden");
 }
-
-async function login(event) {
-  event.preventDefault();
 
   const password = $("password").value;
   const button = $("loginButton");
@@ -276,6 +274,31 @@ async function login(event) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password })
     });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Login failed");
+    }
+
+    if (!data.token) {
+      throw new Error("Server did not return a login token.");
+    }
+
+    sessionStorage.setItem(TOKEN_KEY, data.token);
+    $("password").value = "";
+
+    showAdmin();
+    await loadDashboard();
+
+    showMessage("globalMessage", "Login successful.");
+  } catch (error) {
+    showMessage("loginError", error.message, true);
+  } finally {
+    button.disabled = false;
+  }
+    }
+  
 
     const data = await response.json();
 
