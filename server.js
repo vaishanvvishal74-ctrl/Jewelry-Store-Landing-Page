@@ -4,18 +4,18 @@ require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
+const crypto = require("crypto");
 const { Pool } = require("pg");
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
-const bcrypt = require("bcryptjs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true }));
 
-// Serve the website's main pages from the project root.
+// Main website pages
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
@@ -24,8 +24,12 @@ app.get("/admin.html", (req, res) => {
   res.sendFile(path.join(__dirname, "admin.html"));
 });
 
-// Serve any other static files in the public folder.
 app.use(express.static(path.join(__dirname, "public")));
+
+// PostgreSQL
+if (!process.env.DATABASE_URL) {
+  console.error("DATABASE_URL is missing.");
+}
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -34,10 +38,11 @@ const pool = new Pool({
     : false
 });
 
-pool.on("error", (error) => {
-  console.error("Database connection error:", error.message);
+pool.on("error", (err) => {
+  console.error("Database error:", err.message);
 });
 
+// Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -46,92 +51,328 @@ cloudinary.config({
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 10 * 1024 * 1024,
-    files: 1
-  },
-  fileFilter: (req, file, callback) => {
-    if (!file.mimetype || !file.mimetype.startsWith("image/")) {
-      return callback(new Error("Only image files are allowed."));
-    }
-    callback(null, true);
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
+
+// In-memory login tokens: they expire after 8 hours.
+// Render restart will invalidate existing tokens.
+const adminTokens = new Map();
+const TOKEN_LIFETIME = 8 * 60 * 60 * 1000;
+
+function getBearerToken(req) {
+  const header = req.headers.authorization || "";
+  if (!header.startsWith("Bearer ")) return null;
+  return header.slice(7).trim();
+}
+
+function requireAdmin(req, res, next) {
+  const token = getBearerToken(req);
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: "Admin login required"
+    });
   }
+
+  const expiry = adminTokens.get(token);
+
+  if (!expiry || expiry < Date.now()) {
+    adminTokens.delete(token);
+    return res.status(401).json({
+      success: false,
+      message: "Session expired. Please log in again."
+    });
+  }
+
+  next();
+}
+
+// Login endpoint
+app.post("/api/admin/login", (req, res) => {
+  const configuredPassword = process.env.ADMIN_PASSWORD;
+  const suppliedPassword = String(req.body?.password || "");
+
+  if (!configuredPassword) {
+    return res.status(500).json({
+      success: false,
+      message: "ADMIN_PASSWORD is not configured in Render"
+    });
+  }
+
+  const expected = Buffer.from(configuredPassword);
+  const actual = Buffer.from(suppliedPassword);
+
+  const passwordMatches =
+    expected.length === actual.length &&
+    crypto.timingSafeEqual(expected, actual);
+
+  if (!passwordMatches) {
+    return res.status(401).json({
+      success: false,
+      message: "Incorrect admin password"
+    });
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+  adminTokens.set(token, Date.now() + TOKEN_LIFETIME);
+
+  res.json({
+    success: true,
+    token,
+    message: "Login successful"
+  });
+});
+
+// Check whether a session is valid
+app.get("/api/admin/me", requireAdmin, (req, res) => {
+  res.json({ success: true, authenticated: true });
+});
+
+// Logout
+app.post("/api/admin/logout", requireAdmin, (req, res) => {
+  const token = getBearerToken(req);
+  adminTokens.delete(token);
+  res.json({ success: true, message: "Logged out" });
 });
 
 // Health check
 app.get("/api/health", (req, res) => {
-  res.json({
-    success: true,
-    store: "Vishal Jewellers",
-    message: "Server is running"
-  });
+  res.json({ success: true, message: "Server is running" });
 });
+// Create database tables
+async function ensureTables() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS products (
+      id BIGSERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      price NUMERIC(12,2) NOT NULL DEFAULT 0,
+      image TEXT NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
 
-// Database check
-app.get("/api/db-status", async (req, res) => {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id BIGSERIAL PRIMARY KEY,
+      customer_name TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      address TEXT NOT NULL,
+      items JSONB NOT NULL DEFAULT '[]'::jsonb,
+      total NUMERIC(12,2) NOT NULL DEFAULT 0,
+      payment_method TEXT NOT NULL DEFAULT 'COD',
+      payment_status TEXT NOT NULL DEFAULT 'PENDING',
+      status TEXT NOT NULL DEFAULT 'Pending',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS store_settings (
+      key TEXT PRIMARY KEY,
+      value JSONB NOT NULL DEFAULT '{}'::jsonb
+    )
+  `);
+}
+
+// Public product list
+app.get("/api/products", async (req, res) => {
   try {
-    await pool.query("SELECT 1");
-    res.json({ success: true, database: "connected" });
-  } catch (error) {
-    console.error("Database check failed:", error.message);
+    await ensureTables();
+
+    const result = await pool.query(
+      "SELECT id, name, price, image FROM products ORDER BY id DESC"
+    );
+
+    res.json({ success: true, products: result.rows });
+  } catch (err) {
+    console.error("Products error:", err.message);
     res.status(500).json({
       success: false,
-      message: "Database connection failed"
+      message: "Could not load products"
     });
   }
 });
+
+// Admin: list orders
+app.get("/api/orders", requireAdmin, async (req, res) => {
+  try {
+    await ensureTables();
+
+    const result = await pool.query(
+      "SELECT * FROM orders ORDER BY id DESC LIMIT 500"
+    );
+
+    res.json({ success: true, orders: result.rows });
+  } catch (err) {
+    console.error("Orders error:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Could not load orders"
+    });
+  }
+});
+
+// Admin: create a product
+app.post("/api/products", requireAdmin, async (req, res) => {
+  try {
+    await ensureTables();
+
+    const name = String(req.body?.name || "").trim();
+    const price = Number(req.body?.price);
+    const image = String(req.body?.image || "").trim();
+
+    if (!name || !Number.isFinite(price) || price < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid product name and price are required"
+      });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO products (name, price, image)
+       VALUES ($1, $2, $3)
+       RETURNING id, name, price, image`,
+      [name, price, image]
+    );
+
+    res.status(201).json({
+      success: true,
+      product: result.rows[0]
+    });
+  } catch (err) {
+    console.error("Create product error:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Could not create product"
+    });
+  }
+});
+
+// Admin: update a product
+app.put("/api/products/:id", requireAdmin, async (req, res) => {
+  try {
+    await ensureTables();
+
+    const id = Number(req.params.id);
+    const name = String(req.body?.name || "").trim();
+    const price = Number(req.body?.price);
+    const image = String(req.body?.image || "").trim();
+
+    if (!Number.isSafeInteger(id) || id < 1 ||
+        !name || !Number.isFinite(price) || price < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product details"
+      });
+    }
+
+    const result = await pool.query(
+      `UPDATE products
+       SET name = $1, price = $2, image = $3
+       WHERE id = $4
+       RETURNING id, name, price, image`,
+      [name, price, image, id]
+    );
+
+    if (!result.rowCount) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found"
+      });
+    }
+
+    res.json({ success: true, product: result.rows[0] });
+  } catch (err) {
+    console.error("Update product error:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Could not update product"
+    });
+  }
+});
+
+// Admin: delete a product
+app.delete("/api/products/:id", requireAdmin, async (req, res) => {
+  try {
+    await ensureTables();
+
+    const id = Number(req.params.id);
+
+    if (!Number.isSafeInteger(id) || id < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID"
+      });
+    }
+
+    const result = await pool.query(
+      "DELETE FROM products WHERE id = $1 RETURNING id",
+      [id]
+    );
+
+    if (!result.rowCount) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found"
+      });
+    }
+
+    res.json({ success: true, message: "Product deleted" });
+  } catch (err) {
+    console.error("Delete product error:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Could not delete product"
+    });
+  }
+});
+
+// Read store settings
 app.get("/api/settings", async (req, res) => {
   try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS store_settings (
-        key TEXT PRIMARY KEY,
-        value JSONB NOT NULL DEFAULT '{}'::jsonb
-      )
-    `);
+    await ensureTables();
 
     const result = await pool.query(
       "SELECT value FROM store_settings WHERE key = $1",
       ["settings"]
     );
 
-    const settings = result.rows.length
-      ? result.rows[0].value
-      : {
-          store_name: "Vishal Jewellers",
-          upi_id: "",
-          qr_url: ""
-        };
-
-    res.json({ success: true, settings });
-  } catch (error) {
-    console.error("Settings read failed:", error.message);
+    res.json({
+      success: true,
+      settings: result.rows[0]?.value || {
+        store_name: "Vishal Jewellers",
+        phone: "",
+        whatsapp: "",
+        email: "",
+        address: "",
+        upi_id: "",
+        qr_url: ""
+      }
+    });
+  } catch (err) {
+    console.error("Read settings error:", err.message);
     res.status(500).json({
       success: false,
-      message: "Could not load store settings"
+      message: "Could not load settings"
     });
   }
 });
 
-// IMPORTANT: protect this route with admin authentication
-// before using store settings in production.
-app.put("/api/settings", async (req, res) => {
+// Admin: update settings
+app.put("/api/settings", requireAdmin, async (req, res) => {
   try {
-    const settings = req.body.settings;
+    await ensureTables();
+
+    const settings = req.body?.settings;
 
     if (!settings || typeof settings !== "object" ||
         Array.isArray(settings)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid settings data"
+        message: "Invalid settings"
       });
     }
-
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS store_settings (
-        key TEXT PRIMARY KEY,
-        value JSONB NOT NULL DEFAULT '{}'::jsonb
-      )
-    `);
 
     await pool.query(
       `INSERT INTO store_settings (key, value)
@@ -142,203 +383,85 @@ app.put("/api/settings", async (req, res) => {
     );
 
     res.json({ success: true, settings });
-  } catch (error) {
-    console.error("Settings save failed:", error.message);
+  } catch (err) {
+    console.error("Save settings error:", err.message);
     res.status(500).json({
       success: false,
       message: "Could not save settings"
     });
   }
 });
+// Admin: upload an image to Cloudinary
+app.post(
+  "/api/upload-image",
+  requireAdmin,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "Please select an image"
+        });
+      }
 
-// Image upload
-app.post("/api/upload-image", upload.single("image"), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({
+      if (
+        !process.env.CLOUDINARY_CLOUD_NAME ||
+        !process.env.CLOUDINARY_API_KEY ||
+        !process.env.CLOUDINARY_API_SECRET
+      ) {
+        return res.status(500).json({
+          success: false,
+          message: "Cloudinary environment variables are missing"
+        });
+      }
+
+      const imageUrl = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "vishal-jewellers",
+            resource_type: "image"
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result.secure_url);
+          }
+        );
+
+        stream.end(req.file.buffer);
+      });
+
+      res.json({ success: true, url: imageUrl });
+    } catch (err) {
+      console.error("Image upload error:", err.message);
+      res.status(500).json({
         success: false,
-        message: "Please select an image"
+        message: "Image upload failed"
       });
     }
-
-    if (
-      !process.env.CLOUDINARY_CLOUD_NAME ||
-      !process.env.CLOUDINARY_API_KEY ||
-      !process.env.CLOUDINARY_API_SECRET
-    ) {
-      return res.status(500).json({
-        success: false,
-        message: "Cloudinary environment variables are missing"
-      });
-    }
-
-    const imageUrl = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        {
-          folder: "vishal-jewellers",
-          resource_type: "image"
-        },
-        (error, result) => {
-          if (error) return reject(error);
-          resolve(result.secure_url);
-        }
-      );
-
-      stream.end(req.file.buffer);
-    });
-
-    res.json({ success: true, url: imageUrl });
-  } catch (error) {
-    console.error("Image upload failed:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Image upload failed"
-    });
   }
-});
+);
 
-// List products
-app.get("/api/products", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM products ORDER BY id DESC"
-    );
+// Handle unexpected errors
+app.use((err, req, res, next) => {
+  console.error("Request error:", err.message);
 
-    res.json({
-      success: true,
-      products: result.rows
-    });
-  } catch (error) {
-    console.error("Products read failed:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Could not load products"
-    });
-  }
-});
-app.post("/api/orders", async (req, res) => {
-  const {
-    customer_name,
-    phone,
-    address,
-    items,
-    total,
-    payment_method
-  } = req.body || {};
-
-  if (
-    !customer_name ||
-    !phone ||
-    !address ||
-    !Array.isArray(items) ||
-    items.length === 0
-  ) {
+  if (err instanceof multer.MulterError) {
     return res.status(400).json({
       success: false,
-      message: "Please provide customer details and order items"
+      message: "Upload failed. Maximum image size is 5 MB."
     });
   }
 
-  const method = String(payment_method || "COD").toUpperCase();
-
-  if (!["COD", "UPI"].includes(method)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid payment method"
-    });
-  }
-
-  const orderTotal = Number(total);
-
-  if (!Number.isFinite(orderTotal) || orderTotal < 0) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid order total"
-    });
-  }
-
-  const client = await pool.connect();
-
-  try {
-    await client.query("BEGIN");
-
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS orders (
-        id BIGSERIAL PRIMARY KEY,
-        customer_name TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        address TEXT NOT NULL,
-        items JSONB NOT NULL,
-        total NUMERIC(12,2) NOT NULL,
-        payment_method TEXT NOT NULL DEFAULT 'COD',
-        payment_status TEXT NOT NULL DEFAULT 'PENDING',
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `);
-
-    const result = await client.query(
-      `INSERT INTO orders
-       (customer_name, phone, address, items, total,
-        payment_method, payment_status)
-       VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7)
-       RETURNING id, payment_method, payment_status`,
-      [
-        String(customer_name).trim(),
-        String(phone).trim(),
-        String(address).trim(),
-        JSON.stringify(items),
-        orderTotal,
-        method,
-        "PENDING"
-      ]
-    );
-
-    await client.query("COMMIT");
-
-    res.status(201).json({
-      success: true,
-      message: "Order received",
-      order: result.rows[0]
-    });
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("Order creation failed:", error.message);
-
-    res.status(500).json({
-      success: false,
-      message: "Could not place order"
-    });
-  } finally {
-    client.release();
-  }
-});
-
-// Handle JSON and image-upload errors
-app.use((error, req, res, next) => {
-  console.error("Request error:", error.message);
-
-  if (error instanceof multer.MulterError) {
-    return res.status(400).json({
-      success: false,
-      message: "Image upload failed. Maximum size is 10 MB."
-    });
-  }
-
-  if (error.status === 413) {
-    return res.status(413).json({
-      success: false,
-      message: "Request is too large"
-    });
-  }
-
-  res.status(error.status || 500).json({
+  res.status(err.status || 500).json({
     success: false,
-    message: "Internal server error"
+    message: "Server error"
   });
 });
 
+// Start server
 const server = app.listen(PORT, () => {
-  console.log(`Vishal Jewellers server running on port ${PORT}`);
+  console.log(`Vishal Jewellers running on port ${PORT}`);
 });
 
 process.on("SIGTERM", () => {
