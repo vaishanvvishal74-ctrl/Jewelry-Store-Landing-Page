@@ -1,13 +1,14 @@
-
+Writing
 <!DOCTYPE html>
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#a83291">
-<title>My Jewellery Store</title>
+<meta name="theme-color" content="#7138b8">
+<title>Vishal Jewellers</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
 <style>
 :root {
   --pink:#d633a6;
@@ -24,10 +25,11 @@ body {
   color:var(--text);
   background:#fff;
 }
-a { color:inherit; text-decoration:none; }
+a { color:inherit;text-decoration:none; }
 button,input,textarea,select { font:inherit; }
 button { cursor:pointer; }
-.container { width:min(1150px,92%); margin:auto; }
+.container { width:min(1150px,92%);margin:auto; }
+
 .topbar {
   background:var(--purple);
   color:white;
@@ -39,11 +41,11 @@ header {
   position:sticky;
   top:0;
   z-index:10;
-  background:#fff;
+  background:white;
   box-shadow:0 3px 18px #47205a12;
 }
 .navbar {
-  min-height:76px;
+  min-height:72px;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -54,20 +56,20 @@ header {
   color:var(--purple);
 }
 .brand span { color:var(--pink); }
-nav { display:flex; align-items:center; gap:22px; }
-nav a { font-size:13px; font-weight:600; }
+nav { display:flex;align-items:center;gap:22px; }
+nav a { font-size:13px;font-weight:600; }
 nav a:hover { color:var(--pink); }
 .menu {
   display:none;
-  background:none;
   border:0;
+  background:none;
   color:var(--purple);
   font-size:24px;
 }
 .hero {
   color:white;
-  padding:95px 0;
-  min-height:410px;
+  padding:85px 0;
+  min-height:390px;
   background:
     radial-gradient(circle at 80% 25%,#ffffff32,transparent 25%),
     linear-gradient(120deg,#6327a0,#d633a6 70%,#f29bd7);
@@ -82,10 +84,10 @@ nav a:hover { color:var(--pink); }
 .hero h1 {
   max-width:720px;
   margin:18px 0;
-  font:700 clamp(42px,7vw,76px) "Playfair Display",serif;
+  font:700 clamp(40px,7vw,72px) "Playfair Display",serif;
   line-height:1.12;
 }
-.hero p { max-width:570px; line-height:1.9; }
+.hero p { max-width:570px;line-height:1.9; }
 .btn {
   display:inline-flex;
   align-items:center;
@@ -99,11 +101,10 @@ nav a:hover { color:var(--pink); }
   margin-top:12px;
   font-weight:600;
 }
-.hero .btn { background:white; color:var(--purple); }
-.btn:hover { opacity:.88; }
-.btn:disabled { opacity:.6; cursor:not-allowed; }
-section { padding:65px 0; }
-.heading { text-align:center; margin-bottom:32px; }
+.hero .btn { background:white;color:var(--purple); }
+.btn:disabled { opacity:.6;cursor:not-allowed; }
+section { padding:60px 0; }
+.heading { text-align:center;margin-bottom:30px; }
 .heading span {
   color:var(--pink);
   text-transform:uppercase;
@@ -115,25 +116,26 @@ section { padding:65px 0; }
   margin:8px 0;
   font:700 clamp(28px,4vw,42px) "Playfair Display",serif;
 }
-.heading p { color:var(--muted); font-size:13px; }
+.heading p { color:var(--muted);font-size:13px; }
 .features {
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:18px;
 }
 .feature {
-  padding:28px 15px;
+  padding:26px 15px;
   text-align:center;
   background:var(--light);
   border-radius:16px;
 }
-.feature i { font-size:30px; color:var(--pink); }
+.feature i { font-size:30px;color:var(--pink); }
 .feature h3 { font:700 20px "Playfair Display",serif; }
-.feature p { color:var(--muted); font-size:13px; }
+.feature p { color:var(--muted);font-size:13px; }
+
 .products {
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:20px;
+  gap:18px;
 }
 .product {
   background:white;
@@ -144,15 +146,15 @@ section { padding:65px 0; }
 }
 .product img {
   width:100%;
-  height:230px;
+  height:220px;
   display:block;
   object-fit:cover;
   background:var(--light);
 }
-.product-info { padding:15px; }
-.product h3 { font-size:14px; min-height:42px; }
-.price { color:var(--purple); font-weight:700; }
-.product .btn { width:100%; padding:10px; font-size:12px; }
+.product-info { padding:14px; }
+.product h3 { font-size:14px;min-height:38px; }
+.price { color:var(--purple);font-weight:700; }
+.product .btn { width:100%;padding:10px;font-size:12px; }
 .empty {
   text-align:center;
   color:var(--muted);
@@ -181,7 +183,7 @@ section { padding:65px 0; }
   text-align:center;
   overflow-wrap:anywhere;
 }
-.contact-card i { color:var(--pink); font-size:26px; }
+.contact-card i { color:var(--pink);font-size:26px; }
 .contact-card h3 { font:700 19px "Playfair Display",serif; }
 .feedback-box {
   max-width:650px;
@@ -190,7 +192,7 @@ section { padding:65px 0; }
   border-radius:18px;
   background:var(--light);
 }
-.form-grid { display:grid; gap:13px; }
+.form-grid { display:grid;gap:13px; }
 input,textarea,select {
   width:100%;
   padding:13px;
@@ -199,14 +201,14 @@ input,textarea,select {
   background:white;
   color:var(--text);
 }
-textarea { min-height:100px; resize:vertical; }
+textarea { min-height:90px;resize:vertical; }
 footer {
   padding:35px 0 18px;
   color:white;
   background:#3c2054;
   text-align:center;
 }
-footer p { color:#eadcf0; font-size:13px; }
+footer p { color:#eadcf0;font-size:13px; }
 .floating {
   position:fixed;
   right:14px;
@@ -231,7 +233,7 @@ dialog {
   overflow:auto;
   border:0;
   border-radius:18px;
-  padding:25px;
+  padding:24px;
   color:var(--text);
   box-shadow:0 10px 50px #0004;
 }
@@ -242,7 +244,7 @@ dialog::backdrop { background:#28112c99; }
   align-items:center;
   gap:10px;
 }
-.dialog-head h2 { font:700 25px "Playfair Display",serif; }
+.dialog-head h2 { font:700 24px "Playfair Display",serif; }
 .close {
   border:0;
   background:#f6e7f8;
@@ -250,19 +252,38 @@ dialog::backdrop { background:#28112c99; }
   width:38px;
   height:38px;
 }
-.notice { font-size:13px; color:var(--muted); line-height:1.7; }
-.status { font-size:13px; margin-top:12px; overflow-wrap:anywhere; }
-
+.notice { font-size:13px;color:var(--muted);line-height:1.7; }
+.status { font-size:13px;margin-top:12px;overflow-wrap:anywhere; }
+.qr-box {
+  display:none;
+  text-align:center;
+  padding:18px;
+  margin:8px 0;
+  border:1px solid #ead5ef;
+  border-radius:14px;
+  background:#fff8fe;
+}
+.qr-box img {
+  display:block;
+  width:min(240px,100%);
+  max-height:280px;
+  object-fit:contain;
+  margin:12px auto;
+  background:white;
+}
+.upi-id {
+  font-weight:700;
+  overflow-wrap:anywhere;
+  color:var(--purple);
+}
 @media(max-width:760px) {
-  .navbar { min-height:68px; }
+  .navbar { min-height:66px; }
   .brand { font-size:21px; }
   .menu { display:block; }
   nav {
     display:none;
     position:absolute;
-    left:0;
-    right:0;
-    top:100%;
+    left:0;right:0;top:100%;
     padding:20px 5%;
     background:white;
     flex-direction:column;
@@ -270,25 +291,25 @@ dialog::backdrop { background:#28112c99; }
     box-shadow:0 8px 15px #0001;
   }
   nav.open { display:flex; }
-  .hero { min-height:350px; padding:65px 0; }
+  .hero { min-height:330px;padding:60px 0; }
   .features { grid-template-columns:1fr; }
-  .products { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-  .product img { height:165px; }
-  .product-info { padding:11px; }
+  .products { grid-template-columns:repeat(2,minmax(0,1fr));gap:12px; }
+  .product img { height:160px; }
+  .product-info { padding:10px; }
   .product h3 { font-size:12px; }
   .contact-grid { grid-template-columns:1fr; }
-  section { padding:45px 0; }
-  .feedback-box { padding:17px; }
+  section { padding:42px 0; }
+  .feedback-box { padding:16px; }
 }
 </style>
 </head>
-<body>
 
-<div class="topbar">✨ खूबसूरती और भरोसा — Jewellery for Every Occasion ✨</div>
+<body>
+<div class="topbar">✨ Vishal Jewellers — खूबसूरती और भरोसा ✨</div>
 
 <header>
   <div class="container navbar">
-    <a href="#" class="brand">MY <span>JEWELLERY</span></a>
+    <a href="#" class="brand">VISHAL <span>JEWELLERS</span></a>
     <button class="menu" id="menuButton" aria-label="Open menu">
       <i class="fa-solid fa-bars"></i>
     </button>
@@ -306,8 +327,8 @@ dialog::backdrop { background:#28112c99; }
 <section class="hero">
   <div class="container">
     <span class="tag">NEW COLLECTION ✨</span>
-    <h1 id="heroTitle">JEWELLERY That Makes You Shine</h1>
-    <p>Discover beautiful jewellery for your special moments. Find a design that reflects your style.</p>
+    <h1>Jewellery That Makes You Shine</h1>
+    <p>अपने खास पलों के लिए खूबसूरत jewellery designs देखें और सीधे हमारे स्टोर पर ऑर्डर करें।</p>
     <a class="btn" href="#products">Shop Now <i class="fa-solid fa-arrow-right"></i></a>
   </div>
 </section>
@@ -317,17 +338,17 @@ dialog::backdrop { background:#28112c99; }
     <div class="feature">
       <i class="fa-solid fa-gem"></i>
       <h3>Beautiful Designs</h3>
-      <p>Explore jewellery for every occasion.</p>
+      <p>हर अवसर के लिए खूबसूरत designs।</p>
     </div>
     <div class="feature">
       <i class="fa-solid fa-heart"></i>
       <h3>Made With Care</h3>
-      <p>Find something special for yourself.</p>
+      <p>अपने लिए कुछ खास चुनें।</p>
     </div>
     <div class="feature">
       <i class="fa-solid fa-truck-fast"></i>
       <h3>Easy Ordering</h3>
-      <p>Send your order directly to our store.</p>
+      <p>आसानी से अपना ऑर्डर भेजें।</p>
     </div>
   </div>
 </section>
@@ -336,11 +357,11 @@ dialog::backdrop { background:#28112c99; }
   <div class="container">
     <div class="heading">
       <span>Our Collection</span>
-      <h2>New Products</h2>
-      <p>Explore our latest jewellery designs.</p>
+      <h2>Vishal Jewellers Collection</h2>
+      <p>हमारे latest jewellery designs देखें।</p>
     </div>
     <div class="products" id="productGrid">
-      <div class="empty">Loading products...</div>
+      <div class="empty">Products load हो रहे हैं...</div>
     </div>
     <p class="status" id="productStatus" role="status"></p>
   </div>
@@ -352,7 +373,7 @@ dialog::backdrop { background:#28112c99; }
       <span>Our Story</span>
       <h2>Every Piece Tells A Story</h2>
     </div>
-    <p>We believe jewellery makes special moments even more memorable. Discover your favourite design and contact us if you need help with your order.</p>
+    <p>Vishal Jewellers में अपने पसंदीदा designs चुनें। ऑर्डर से जुड़ी सहायता के लिए हमसे संपर्क करें।</p>
   </div>
 </section>
 
@@ -360,14 +381,14 @@ dialog::backdrop { background:#28112c99; }
   <div class="container">
     <div class="heading">
       <span>Get In Touch</span>
-      <h2>Contact Our Store</h2>
-      <p>Contact details can be configured from your Store Settings.</p>
+      <h2>Contact Vishal Jewellers</h2>
+      <p>Store contact details Settings से अपडेट किए जा सकते हैं।</p>
     </div>
     <div class="contact-grid">
       <div class="contact-card">
         <i class="fa-solid fa-phone"></i>
         <h3>Phone</h3>
-        <a id="contactPhone" href="#contact">Add phone in settings</a>
+        <a id="contactPhone" href="#contact">Settings में phone जोड़ें</a>
       </div>
       <div class="contact-card">
         <i class="fa-brands fa-whatsapp"></i>
@@ -377,31 +398,8 @@ dialog::backdrop { background:#28112c99; }
       <div class="contact-card">
         <i class="fa-solid fa-envelope"></i>
         <h3>Email</h3>
-        <a id="contactEmail" href="#contact">Add email in settings</a>
+        <a id="contactEmail" href="#contact">Settings में email जोड़ें</a>
       </div>
-    </div>
-
-    <div class="feedback-box">
-      <div class="heading">
-        <span>Your Opinion Matters</span>
-        <h2>Feedback Form</h2>
-        <p>Share your feedback with our store.</p>
-      </div>
-      <form id="feedbackForm" class="form-grid">
-        <input id="feedbackName" type="text" placeholder="Your name" maxlength="100" required>
-        <input id="feedbackEmail" type="email" placeholder="Your email (optional)" maxlength="150">
-        <select id="feedbackRating" required>
-          <option value="">Select your rating</option>
-          <option value="5">★★★★★ Excellent</option>
-          <option value="4">★★★★☆ Very Good</option>
-          <option value="3">★★★☆☆ Good</option>
-          <option value="2">★★☆☆☆ Fair</option>
-          <option value="1">★☆☆☆☆ Poor</option>
-        </select>
-        <textarea id="feedbackMessage" placeholder="Write your feedback..." maxlength="2000" required></textarea>
-        <button class="btn" type="submit">Send Feedback</button>
-        <p id="feedbackStatus" class="status" role="status"></p>
-      </form>
     </div>
   </div>
 </section>
@@ -409,9 +407,9 @@ dialog::backdrop { background:#28112c99; }
 
 <footer>
   <div class="container">
-    <h2 id="footerStoreName">MY JEWELLERY STORE</h2>
+    <h2 id="footerStoreName">VISHAL JEWELLERS</h2>
     <p id="footerText">Thank you for visiting our store.</p>
-    <p>© <span id="year"></span> My Jewellery Store</p>
+    <p>© <span id="year"></span> Vishal Jewellers</p>
   </div>
 </footer>
 
@@ -430,24 +428,36 @@ dialog::backdrop { background:#28112c99; }
     <button type="button" class="close" id="closeOrder" aria-label="Close">✕</button>
   </div>
   <p id="selectedProduct" class="notice"></p>
+
   <form id="orderForm" class="form-grid">
     <input id="orderName" type="text" placeholder="Full name" maxlength="100" required>
-    <input id="orderEmail" type="email" placeholder="Email address (optional)" maxlength="150">
+    <input id="orderEmail" type="email" placeholder="Email (optional)" maxlength="150">
     <input id="orderPhone" type="tel" placeholder="Mobile number" maxlength="40" required>
     <textarea id="orderAddress" placeholder="Full delivery address" maxlength="2000" required></textarea>
+
     <label for="orderQuantity">Quantity</label>
     <input id="orderQuantity" type="number" min="1" max="100" value="1" required>
+
     <label for="paymentMethod">Payment method</label>
     <select id="paymentMethod">
       <option value="cod">Cash on Delivery</option>
-      <option value="upi">UPI (payment must be verified separately)</option>
+      <option value="upi">UPI / QR Payment</option>
     </select>
+
+    <div id="upiQrBox" class="qr-box">
+      <h3>Pay with UPI</h3>
+      <p class="notice">नीचे दिए गए QR को अपने UPI app से scan करें।</p>
+      <img id="upiQrImage" alt="Store UPI QR code">
+      <p>UPI ID: <span id="upiIdText" class="upi-id"></span></p>
+      <p>Order amount: <strong id="upiAmount">₹0</strong></p>
+      <p class="notice">Payment करने के बाद भी ऑर्डर की पुष्टि स्टोर द्वारा की जाएगी।</p>
+    </div>
+
     <button class="btn" type="submit">Submit Order</button>
     <p id="orderStatus" class="status" role="status"></p>
-    <p class="notice">This form does not process an online payment. Store confirmation is required.</p>
+    <p class="notice">QR दिखना payment confirmation नहीं है। भुगतान की पुष्टि अलग से करें।</p>
   </form>
 </dialog>
-
 
 <script>
 "use strict";
@@ -467,28 +477,24 @@ function safeText(value, fallback = "") {
 function showStatus(id, message, isError = false) {
   const element = $(id);
   if (!element) return;
-
   element.textContent = message || "";
   element.style.color = isError ? "#b42318" : "#237547";
 }
 
 function formatPrice(value) {
   const price = Number(value);
-
   if (!Number.isFinite(price) || price < 0) {
     return "Price on request";
   }
-
   return "₹" + price.toLocaleString("en-IN");
 }
 
-function getImageUrl(value) {
+function safeImageUrl(value) {
   const image = safeText(value);
   if (!image) return "";
 
   try {
     const url = new URL(image, window.location.origin);
-
     if (
       url.protocol === "https:" ||
       url.origin === window.location.origin
@@ -496,42 +502,23 @@ function getImageUrl(value) {
       return url.href;
     }
   } catch (error) {
-    console.warn("Invalid product image URL");
+    console.warn("Invalid image URL");
   }
-
   return "";
 }
 
-function setContactLink(id, value, type) {
-  const element = $(id);
-  if (!element) return;
-
-  const text = safeText(value);
-
-  if (!text) {
-    element.textContent = "Add contact in settings";
-    element.href = "#contact";
-    return;
+function getSettingsObject(response) {
+  if (
+    response &&
+    response.settings &&
+    typeof response.settings === "object"
+  ) {
+    return response.settings;
   }
-
-  if (type === "email") {
-    element.textContent = text;
-    element.href = "mailto:" + text;
-  } else if (type === "phone") {
-    element.textContent = text;
-    element.href = "tel:" + text.replace(/[^\d+]/g, "");
-  } else if (type === "whatsapp") {
-    const digits = text.replace(/\D/g, "");
-    element.textContent = digits ? "Chat on WhatsApp" : text;
-    element.href = digits ? "https://wa.me/" + digits : "#contact";
-
-    if (digits) {
-      element.target = "_blank";
-      element.rel = "noopener noreferrer";
-    }
-  }
+  return response && typeof response === "object" ? response : {};
 }
 
+/* Load store settings, contact details, UPI ID and QR URL */
 async function loadSettings() {
   try {
     const response = await fetch("/api/settings", {
@@ -539,71 +526,101 @@ async function loadSettings() {
     });
 
     if (!response.ok) {
-      throw new Error("Could not load store settings.");
+      throw new Error("Store settings load nahi hui.");
     }
 
-    const data = await response.json();
+    storeSettings = getSettingsObject(await response.json());
 
-    storeSettings =
-      data && typeof data === "object" ? data : {};
-
-    const settings =
-      storeSettings.settings &&
-      typeof storeSettings.settings === "object"
-        ? storeSettings.settings
-        : storeSettings;
-
-    const storeName = safeText(
-      settings.store_name || settings.storeName,
-      "MY JEWELLERY STORE"
+    const name = safeText(
+      storeSettings.store_name || storeSettings.storeName,
+      "Vishal Jewellers"
     );
 
-    $("footerStoreName").textContent = storeName;
-    document.title = storeName;
+    $("footerStoreName").textContent = name;
+    document.title = name;
 
     $("footerText").textContent = safeText(
-      settings.footer_text || settings.footerText,
+      storeSettings.footer_text || storeSettings.footerText,
       "Thank you for visiting our store."
     );
 
-    setContactLink(
-      "contactPhone",
-      settings.phone || settings.contact_phone,
-      "phone"
-    );
-
-    setContactLink(
-      "contactWhatsApp",
-      settings.whatsapp || settings.whatsapp_number,
-      "whatsapp"
-    );
-
-    setContactLink(
-      "contactEmail",
-      settings.email || settings.contact_email,
-      "email"
-    );
-
     const phone = safeText(
-      settings.phone || settings.contact_phone
+      storeSettings.phone || storeSettings.contact_phone
     );
 
     const whatsapp = safeText(
-      settings.whatsapp || settings.whatsapp_number
+      storeSettings.whatsapp || storeSettings.whatsapp_number
     );
+
+    const email = safeText(
+      storeSettings.email || storeSettings.contact_email
+    );
+
+    const phoneLink = $("contactPhone");
+    phoneLink.textContent = phone || "Phone details not available";
+    phoneLink.href = phone
+      ? "tel:" + phone.replace(/[^\d+]/g, "")
+      : "#contact";
+
+    const emailLink = $("contactEmail");
+    emailLink.textContent = email || "Email details not available";
+    emailLink.href = email ? "mailto:" + email : "#contact";
+
+    const whatsappDigits = whatsapp.replace(/\D/g, "");
+    const whatsappLink = $("contactWhatsApp");
+    whatsappLink.textContent = whatsappDigits
+      ? "Chat on WhatsApp"
+      : "WhatsApp details not available";
+    whatsappLink.href = whatsappDigits
+      ? "https://wa.me/" + whatsappDigits
+      : "#contact";
+
+    if (whatsappDigits) {
+      whatsappLink.target = "_blank";
+      whatsappLink.rel = "noopener noreferrer";
+    }
 
     $("floatingPhone").href = phone
       ? "tel:" + phone.replace(/[^\d+]/g, "")
       : "#contact";
 
-    const digits = whatsapp.replace(/\D/g, "");
-
-    $("floatingWhatsApp").href = digits
-      ? "https://wa.me/" + digits
+    $("floatingWhatsApp").href = whatsappDigits
+      ? "https://wa.me/" + whatsappDigits
       : "#contact";
 
   } catch (error) {
     console.error("Settings error:", error);
+  }
+}
+
+/* Load and display products */
+async function loadProducts() {
+  const grid = $("productGrid");
+  grid.textContent = "Products load ho rahe hain...";
+
+  try {
+    const response = await fetch("/api/products", {
+      headers: { Accept: "application/json" }
+    });
+
+    if (!response.ok) {
+      throw new Error("Products API error: " + response.status);
+    }
+
+    const data = await response.json();
+
+    products = Array.isArray(data)
+      ? data
+      : Array.isArray(data.products)
+        ? data.products
+        : [];
+
+    renderProducts();
+
+  } catch (error) {
+    console.error("Products error:", error);
+    grid.textContent =
+      "Products load nahi hue. Server/API check karein.";
   }
 }
 
@@ -627,21 +644,18 @@ function renderProducts() {
     image.loading = "lazy";
     image.alt = safeText(product.name, "Jewellery product");
 
-    const imageUrl = getImageUrl(
-      product.image_url ||
-      product.image ||
-      product.imageUrl
+    const imageUrl = safeImageUrl(
+      product.image_url || product.image || product.imageUrl
     );
 
     if (imageUrl) {
       image.src = imageUrl;
+      image.addEventListener("error", () => {
+        image.style.display = "none";
+      }, { once: true });
     } else {
       image.style.display = "none";
     }
-
-    image.addEventListener("error", () => {
-      image.style.display = "none";
-    }, { once: true });
 
     const info = document.createElement("div");
     info.className = "product-info";
@@ -649,16 +663,16 @@ function renderProducts() {
     const name = document.createElement("h3");
     name.textContent = safeText(product.name, "Jewellery");
 
+    const price = document.createElement("p");
+    price.className = "price";
+    price.textContent = formatPrice(product.price);
+
     const description = document.createElement("p");
     description.className = "notice";
     description.textContent = safeText(
       product.description,
       "Beautiful jewellery for your collection."
     );
-
-    const price = document.createElement("p");
-    price.className = "price";
-    price.textContent = formatPrice(product.price);
 
     const button = document.createElement("button");
     button.type = "button";
@@ -672,39 +686,75 @@ function renderProducts() {
   });
 }
 
-async function loadProducts() {
-  const grid = $("productGrid");
-  grid.textContent = "Loading products...";
+/* Read the current UPI details */
+function getUpiId() {
+  return safeText(
+    storeSettings.upi_id ||
+    storeSettings.upiId ||
+    storeSettings.admin_upi_id
+  );
+}
 
-  try {
-    const response = await fetch("/api/products", {
-      headers: { Accept: "application/json" }
-    });
+function getUpiQrUrl() {
+  return safeImageUrl(
+    storeSettings.qr_url ||
+    storeSettings.qrUrl ||
+    storeSettings.upi_qr_url ||
+    storeSettings.upiQrUrl
+  );
+}
 
-    if (!response.ok) {
-      throw new Error("Products API returned " + response.status);
-    }
+function updatePaymentDisplay() {
+  const method = $("paymentMethod").value;
+  const qrBox = $("upiQrBox");
+  const qrImage = $("upiQrImage");
+  const upiId = getUpiId();
+  const qrUrl = getUpiQrUrl();
 
-    const data = await response.json();
+  const quantity = Number($("orderQuantity").value) || 1;
+  const price = selectedProduct
+    ? Number(selectedProduct.price)
+    : 0;
 
-    products = Array.isArray(data)
-      ? data
-      : Array.isArray(data.products)
-        ? data.products
-        : [];
+  $("upiAmount").textContent = formatPrice(price * quantity);
+  $("upiIdText").textContent = upiId || "Store UPI ID not configured";
 
-    renderProducts();
+  if (method !== "upi") {
+    qrBox.style.display = "none";
+    return;
+  }
 
-  } catch (error) {
-    console.error("Products error:", error);
-    grid.textContent =
-      "Products load nahi hue. Server/API check karein.";
+  qrBox.style.display = "block";
+
+  if (qrUrl) {
+    qrImage.src = qrUrl;
+    qrImage.style.display = "block";
+    qrImage.onerror = () => {
+      qrImage.style.display = "none";
+      showStatus(
+        "orderStatus",
+        "QR image load nahi hui. Store se contact karein.",
+        true
+      );
+    };
+  } else {
+    qrImage.removeAttribute("src");
+    qrImage.style.display = "none";
+  }
+
+  if (!upiId && !qrUrl) {
+    showStatus(
+      "orderStatus",
+      "Store ne abhi UPI ID ya QR configure nahi kiya hai.",
+      true
+    );
+  } else {
+    showStatus("orderStatus", "");
   }
 }
 
 function openOrder(index) {
   selectedProduct = products[index];
-
   if (!selectedProduct) return;
 
   $("selectedProduct").textContent =
@@ -712,13 +762,16 @@ function openOrder(index) {
     " — " + formatPrice(selectedProduct.price);
 
   $("orderQuantity").value = "1";
+  $("paymentMethod").value = "cod";
   showStatus("orderStatus", "");
+  updatePaymentDisplay();
 
   if (!$("orderDialog").open) {
     $("orderDialog").showModal();
   }
 }
 
+/* Mobile navigation */
 $("menuButton").addEventListener("click", () => {
   const nav = $("mainNav");
   nav.classList.toggle("open");
@@ -736,179 +789,133 @@ $("mainNav").querySelectorAll("a").forEach((link) => {
   });
 });
 
+/* Close order dialog */
 $("closeOrder").addEventListener("click", () => {
   $("orderDialog").close();
 });
 
-$("orderQuantity").addEventListener("change", () => {
-  const quantity = Number($("orderQuantity").value);
-
-  if (
-    !Number.isInteger(quantity) ||
-    quantity < 1 ||
-    quantity > 100
-  ) {
-    $("orderQuantity").value = "1";
-  }
-});
+/* Update QR amount when payment method or quantity changes */
+$("paymentMethod").addEventListener("change", updatePaymentDisplay);
+$("orderQuantity").addEventListener("input", updatePaymentDisplay);
 
 $("year").textContent = String(new Date().getFullYear());
 
-/* Order submit: matches server.js POST /api/orders */
-$("orderForm").addEventListener("submit", async (event) => {
+  async function submitOrder(event) {
   event.preventDefault();
 
   if (!selectedProduct) {
-    showStatus("orderStatus", "Pehle product select karein.", true);
+    showStatus("कृपया पहले कोई प्रोडक्ट चुनें।", true);
     return;
   }
 
   const customerName = $("orderName").value.trim();
+  const email = $("orderEmail").value.trim();
   const phone = $("orderPhone").value.trim();
   const address = $("orderAddress").value.trim();
   const quantity = Number($("orderQuantity").value);
-  const price = Number(selectedProduct.price);
+  const method = $("paymentMethod").value;
 
   if (!customerName || !phone || !address) {
-    showStatus(
-      "orderStatus",
-      "Name, mobile number aur address bharna zaroori hai.",
-      true
-    );
+    $("orderStatus").textContent =
+      "नाम, मोबाइल नंबर और पता भरना ज़रूरी है।";
     return;
   }
 
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
-    showStatus("orderStatus", "Quantity 1 se 100 ke beech honi chahiye.", true);
+    $("orderStatus").textContent = "कृपया सही मात्रा चुनें।";
     return;
   }
+
+  if (method === "upi" && !getUpiId() && !getUpiQrUrl()) {
+    $("orderStatus").textContent =
+      "UPI की जानकारी अभी उपलब्ध नहीं है। कृपया स्टोर से संपर्क करें।";
+    return;
+  }
+
+  const price = Number(
+    selectedProduct.price ?? selectedProduct.selling_price ?? 0
+  );
 
   if (!Number.isFinite(price) || price < 0) {
-    showStatus(
-      "orderStatus",
-      "Product ki price valid nahi hai.",
-      true
-    );
+    $("orderStatus").textContent = "इस प्रोडक्ट की कीमत सही नहीं है।";
     return;
   }
 
+  const total = price * quantity;
   const submitButton = $("orderForm").querySelector(
     'button[type="submit"]'
   );
 
   submitButton.disabled = true;
-  showStatus("orderStatus", "Order submit ho raha hai...");
+  submitButton.textContent = "ऑर्डर भेजा जा रहा है...";
+  $("orderStatus").textContent = "";
 
-  const order = {
+  const orderPayload = {
     customer_name: customerName,
+    email: email,
     phone: phone,
     address: address,
-    items: [{
-      productId: selectedProduct.id,
-      name: safeText(selectedProduct.name, "Jewellery"),
-      price: price,
-      quantity: quantity
-    }],
-    total: price * quantity
+    items: [
+      {
+        productId: selectedProduct.id,
+        name: selectedProduct.name || selectedProduct.title || "Jewellery",
+        price: price,
+        quantity: quantity
+      }
+    ],
+    total: total,
+    payment_method: method === "upi" ? "UPI" : "COD"
   };
 
   try {
     const response = await fetch("/api/orders", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify(order)
+      body: JSON.stringify(orderPayload)
     });
 
     const result = await response.json().catch(() => ({}));
 
-    if (!response.ok) {
+    if (!response.ok || result.success === false) {
       throw new Error(
-        result.message || "Order submit nahi hua. Dobara try karein."
+        result.message || result.error || "ऑर्डर जमा नहीं हो पाया।"
       );
     }
 
-    showStatus(
-      "orderStatus",
-      "Order submit ho gaya! Admin se confirmation ka wait karein."
-    );
+    $("orderStatus").textContent =
+      method === "upi"
+        ? "ऑर्डर भेज दिया गया है। UPI भुगतान की पुष्टि स्टोर द्वारा की जाएगी।"
+        : "ऑर्डर भेज दिया गया है। स्टोर आपसे संपर्क करेगा।";
+
+    $("orderStatus").style.color = "#15803d";
 
     $("orderForm").reset();
-    selectedProduct = null;
+    updatePaymentDisplay();
 
-    window.setTimeout(() => {
-      if ($("orderDialog").open) {
-        $("orderDialog").close();
-      }
-      showStatus("orderStatus", "");
+    setTimeout(() => {
+      $("orderDialog").classList.add("hidden");
+      $("orderDialog").setAttribute("aria-hidden", "true");
+      selectedProduct = null;
     }, 2500);
 
   } catch (error) {
-    console.error("Order submit error:", error);
-    showStatus("orderStatus", error.message, true);
+    $("orderStatus").textContent =
+      error.message || "समस्या हुई। कृपया दोबारा कोशिश करें।";
+    $("orderStatus").style.color = "#b91c1c";
+
   } finally {
     submitButton.disabled = false;
+    submitButton.textContent = "Place Order";
   }
-});
+}
 
-/* Feedback form: opens the store email app; it does not save to the database. */
-$("feedbackForm").addEventListener("submit", (event) => {
-  event.preventDefault();
+$("orderForm").addEventListener("submit", submitOrder);
 
-  const name = $("feedbackName").value.trim();
-  const email = $("feedbackEmail").value.trim();
-  const rating = $("feedbackRating").value;
-  const message = $("feedbackMessage").value.trim();
-
-  if (!name || !rating || !message) {
-    showStatus(
-      "feedbackStatus",
-      "Please fill in all required fields.",
-      true
-    );
-    return;
-  }
-
-  const emailLink = $("contactEmail").getAttribute("href");
-
-  if (!emailLink || !emailLink.startsWith("mailto:")) {
-    showStatus(
-      "feedbackStatus",
-      "Store email settings mein add karein.",
-      true
-    );
-    return;
-  }
-
-  const subject = encodeURIComponent("Jewellery Store Feedback");
-  const body = encodeURIComponent(
-    "Name: " + name +
-    "\nEmail: " + (email || "Not provided") +
-    "\nRating: " + rating + "/5" +
-    "\nFeedback: " + message
-  );
-
-  window.location.href =
-    emailLink + "?subject=" + subject + "&body=" + body;
-
-  showStatus(
-    "feedbackStatus",
-    "Email app open karein aur feedback send karein."
-  );
-});
-
-/* Start the page */
+// Initial page loading
 loadSettings();
 loadProducts();
 </script>
 </body>
 </html>
-
-</script>
-</body>
-</html>
-
-
-  
