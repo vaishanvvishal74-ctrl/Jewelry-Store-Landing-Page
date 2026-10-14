@@ -257,10 +257,47 @@ function showLogin() {
   $("appScreen").classList.add("hidden");
 }
 
-function showAdmin() {
-  $("loginScreen").classList.add("hidden");
-  $("appScreen").classList.remove("hidden");
+
+async function login(event) {
+  event.preventDefault();
+
+  const password = $("password").value;
+  const button = $("loginButton");
+
+  showMessage("loginError", "Logging in...");
+  button.disabled = true;
+
+  try {
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Login failed");
+    }
+
+    if (!data.token) {
+      throw new Error("Server did not return a login token.");
+    }
+
+    sessionStorage.setItem(TOKEN_KEY, data.token);
+    $("password").value = "";
+
+    showAdmin();
+    await loadDashboard();
+
+    showMessage("globalMessage", "Login successful.");
+  } catch (error) {
+    showMessage("loginError", error.message, true);
+  } finally {
+    button.disabled = false;
+  }
 }
+  
 
   const password = $("password").value;
   const button = $("loginButton");
@@ -761,7 +798,6 @@ $("resetProductButton").addEventListener("click", resetProductForm);
 $("settingsForm").addEventListener("submit", saveSettings);
 $("searchOrdersButton").addEventListener("click", renderOrders);
 $("orderFilter").addEventListener("change", renderOrders);
-
 $("productImage").addEventListener("change", () => {
   const file = $("productImage").files[0];
 
