@@ -1,8 +1,7 @@
-
 {
   "name": "jewellery-store",
   "version": "1.0.0",
-  "description": "Jewellery Store Website",
+  "description": "Vishal Jewellers Website",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -13,6 +12,7 @@
     "cloudinary": "^2.7.0",
     "multer": "^2.0.2",
     "sharp": "^0.34.4",
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7"
   }
 }
