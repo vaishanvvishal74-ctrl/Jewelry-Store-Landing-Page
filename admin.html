@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -6,105 +7,123 @@
 <title>Vishal Jewellers Admin</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font:15px Arial,sans-serif;background:#f6f3ef;color:#292522}
+body{margin:0;font:15px Arial;background:#f6f3ef;color:#292522}
 button,input,textarea,select{font:inherit;padding:10px;border:1px solid #ddd;border-radius:6px}
 button{background:#8b5e3c;color:white;border:0;cursor:pointer;margin:3px}
-button:disabled{opacity:.6}
 input,textarea,select{width:100%;margin:5px 0}
 label{display:block;font-weight:bold;margin-top:10px}
 .hidden{display:none!important}
 .login{max-width:380px;margin:10vh auto;padding:22px;background:white;border-radius:12px}
-.layout{display:grid;grid-template-columns:190px minmax(0,1fr);min-height:100vh}
+.layout{display:grid;grid-template-columns:190px 1fr;min-height:100vh}
 aside{background:#292522;color:white;padding:12px}
 aside button{width:100%;text-align:left}
 main{padding:16px;min-width:0}
-.card{background:white;padding:16px;margin:12px 0;border-radius:10px}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.stat{background:white;padding:15px;border-radius:10px}
+.card,.stat{background:white;padding:15px;margin:12px 0;border-radius:10px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .stat strong{font-size:24px}
 .table-wrap{overflow:auto}
-table{border-collapse:collapse;width:100%;min-width:500px;background:white}
+table{border-collapse:collapse;width:100%;min-width:450px;background:white}
 th,td{padding:9px;border-bottom:1px solid #ddd;text-align:left}
 .error{color:#b42318}
 .success{color:#16803c}
-img.preview{max-width:160px;max-height:160px;object-fit:contain}
 @media(max-width:650px){
 .layout{grid-template-columns:1fr}
 aside button{width:auto}
-main{padding:8px}
 .stats{grid-template-columns:1fr}
+main{padding:8px}
 }
 </style>
 </head>
 <body>
 
 <section id="loginScreen" class="login">
-  <h2>💎 Vishal Jewellers</h2>
-  <p>Admin Panel Login</p>
-  <form id="loginForm">
-    <label for="password">Admin Password</label>
-    <input id="password" type="password" required
-      autocomplete="current-password" placeholder="Enter admin password">
-    <button id="loginButton" type="submit">Login</button>
-    <p id="loginMessage" role="status"></p>
-  </form>
+<h2>💎 Vishal Jewellers</h2>
+<p>Admin Panel Login</p>
+<form id="loginForm">
+<label for="password">Admin Password</label>
+<input id="password" type="password" required
+autocomplete="current-password" placeholder="Enter admin password">
+<button id="loginButton" type="submit">Login</button>
+<p id="loginMessage" role="status"></p>
+</form>
 </section>
 
 <section id="appScreen" class="layout hidden">
-  <aside>
-    <h3>💎 Vishal Jewellers</h3>
-    <button data-page="dashboard">Dashboard</button>
-    <button data-page="orders">Orders</button>
-    <button data-page="products">Products</button>
-    <button data-page="settings">Store Settings</button>
-    <button id="logoutButton" type="button">Logout</button>
-  </aside>
+<aside>
+<h3>💎 Vishal Jewellers</h3>
+<button data-page="dashboard">Dashboard</button>
+<button data-page="orders">Orders</button>
+<button data-page="products">Products</button>
+<button data-page="settings">Store Settings</button>
+<button id="logoutButton" type="button">Logout</button>
+</aside>
+<main>
+<h2 id="pageTitle">Dashboard</h2>
+<p id="message" role="status"></p>
 
-  <main>
-    <h2 id="pageTitle">Dashboard</h2>
-    <p id="message" role="status"></p>
+<section id="dashboardPage">
+<div class="stats">
+<div class="stat">Total Orders<br><strong id="totalOrders">0</strong></div>
+<div class="stat">Products<br><strong id="totalProducts">0</strong></div>
+<div class="stat">Pending Orders<br><strong id="pendingOrders">0</strong></div>
+</div>
+<div class="card">
+<h3>Recent Orders</h3>
+<div id="recentOrders" class="table-wrap">Loading...</div>
+</div>
+</section>
 
-    <section id="dashboardPage">
-      <div class="stats">
-        <div class="stat">Total Orders<br><strong id="totalOrders">0</strong></div>
-        <div class="stat">Products<br><strong id="totalProducts">0</strong></div>
-        <div class="stat">Pending Orders<br><strong id="pendingOrders">0</strong></div>
-      </div>
-      <div class="card">
-        <h3>Recent Orders</h3>
-        <div id="recentOrders" class="table-wrap">Loading...</div>
-      </div>
-    </section>
+<section id="ordersPage" class="hidden">
+<div class="card">
+<h3>Orders</h3>
+<button id="refreshOrders" type="button">Refresh Orders</button>
+<div id="ordersTable" class="table-wrap"></div>
+</div>
+</section>
 
-    <section id="ordersPage" class="hidden">
-      <div class="card">
-        <h3>Orders</h3>
-        <button id="refreshOrders" type="button">Refresh Orders</button>
-        <div id="ordersTable" class="table-wrap"></div>
-      </div>
-    </section>
+<section id="productsPage" class="hidden">
+<div class="card">
+<h3>Add / Edit Product</h3>
+<form id="productForm">
+<input id="productId" type="hidden">
+<label>Product Name</label>
+<input id="productName" required>
+<label>Price (₹)</label>
+<input id="productPrice" type="number" min="0" step="0.01" required>
+<label>Image URL</label>
+<input id="productImage" type="url" placeholder="https://...">
+<button type="submit">Save Product</button>
+<button id="clearProduct" type="button">Clear</button>
+</form>
+<p id="productMessage"></p>
+</div>
+<div class="card">
+<h3>All Products</h3>
+<div id="productsTable" class="table-wrap"></div>
+</div>
+</section>
 
-    <section id="productsPage" class="hidden">
-      <div class="card">
-        <h3>Add / Edit Product</h3>
-        <form id="productForm">
-          <input id="productId" type="hidden">
-          <label for="productName">Product Name</label>
-          <input id="productName" required>
-          <label for="productPrice">Price (₹)</label>
-          <input id="productPrice" type="number" min="0" step="0.01" required>
-          <label for="productImage">Image URL</label>
-          <input id="productImage" type="url" placeholder="https://...">
-          <button id="saveProduct" type="submit">Save Product</button>
-          <button id="clearProduct" type="button">Clear</button>
-        </form>
-        <p id="productMessage"></p>
-      </div>
-      <div class="card">
-        <h3>All Products</h
-                          <script>
+<section id="settingsPage" class="hidden">
+<div class="card">
+<h3>Store Settings</h3>
+<form id="settingsForm">
+<label>Store Name</label><input id="storeName">
+<label>Phone</label><input id="phone">
+<label>WhatsApp</label><input id="whatsapp">
+<label>Email</label><input id="email">
+<label>Address</label><textarea id="address"></textarea>
+<label>UPI ID</label><input id="upiId">
+<label>QR Image URL</label><input id="qrUrl">
+<button type="submit">Save Settings</button>
+</form>
+<p id="settingsMessage"></p>
+</div>
+</section>
+</main>
+</section>
+<script>
+  
 const $ = id => document.getElementById(id);
-
 let orders = [];
 let products = [];
 let settings = {};
@@ -127,61 +146,47 @@ function money(value) {
   return "₹" + Number(value || 0).toLocaleString("en-IN");
 }
 
+// हर protected request में token भेजना जरूरी है।
 async function api(url, options = {}) {
   const headers = { ...(options.headers || {}) };
+  const token = sessionStorage.getItem("adminToken");
 
-  if (options.body) {
-    headers["Content-Type"] = "application/json";
-  }
+  if (token) headers.Authorization = "Bearer " + token;
+  if (options.body) headers["Content-Type"] = "application/json";
 
-  const response = await fetch(url, { ...options, headers });
+  const response = await fetch(url, {...options, headers});
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
     throw new Error(data.message || "Request failed: " + response.status);
   }
-
   return data;
 }
 
-/*
-  This login requires POST /api/admin/login in server.js.
-  It is not implemented by the current server.js yet.
-*/
 $("loginForm").addEventListener("submit", async event => {
   event.preventDefault();
-
-  const button = $("loginButton");
-  button.disabled = true;
+  $("loginButton").disabled = true;
   showMessage("loginMessage", "Logging in...");
 
   try {
     const data = await api("/api/admin/login", {
       method: "POST",
-      body: JSON.stringify({
-        password: $("password").value
-      })
+      body: JSON.stringify({password: $("password").value})
     });
 
-    if (!data.token) {
-      throw new Error("Login token missing from server response.");
-    }
+    if (!data.token) throw new Error("Server ne login token nahi diya.");
 
     sessionStorage.setItem("adminToken", data.token);
+    $("password").value = "";
     $("loginScreen").classList.add("hidden");
     $("appScreen").classList.remove("hidden");
-    $("password").value = "";
 
     await loadDashboard();
     showMessage("message", "Login successful.");
   } catch (error) {
-    showMessage(
-      "loginMessage",
-      error.message + " — server.js mein admin login route chahiye.",
-      true
-    );
+    showMessage("loginMessage", error.message, true);
   } finally {
-    button.disabled = false;
+    $("loginButton").disabled = false;
   }
 });
 
@@ -193,10 +198,9 @@ $("logoutButton").addEventListener("click", () => {
 });
 
 function showPage(page) {
-  ["dashboard", "orders", "products", "settings"].forEach(name => {
+  ["dashboard","orders","products","settings"].forEach(name => {
     $(name + "Page").classList.toggle("hidden", name !== page);
   });
-
   $("pageTitle").textContent =
     page.charAt(0).toUpperCase() + page.slice(1);
 
@@ -214,21 +218,15 @@ async function loadDashboard() {
     await Promise.all([loadOrders(), loadProducts()]);
     $("totalOrders").textContent = orders.length;
     $("totalProducts").textContent = products.length;
-    $("pendingOrders").textContent = orders.filter(order =>
-      String(order.status || "Pending").toLowerCase() === "pending"
+    $("pendingOrders").textContent = orders.filter(o =>
+      String(o.status || "Pending").toLowerCase() === "pending"
     ).length;
 
     $("recentOrders").innerHTML = orders.length
-      ? `<table>
-          <tr><th>ID</th><th>Customer</th><th>Total</th></tr>
-          ${orders.slice(0, 5).map(order => `
-            <tr>
-              <td>${safe(order.id)}</td>
-              <td>${safe(order.customer_name || "Customer")}</td>
-              <td>${money(order.total)}</td>
-            </tr>
-          `).join("")}
-        </table>`
+      ? `<table><tr><th>ID</th><th>Customer</th><th>Total</th></tr>
+        ${orders.slice(0,5).map(o => `<tr>
+        <td>${safe(o.id)}</td><td>${safe(o.customer_name || "Customer")}</td>
+        <td>${money(o.total)}</td></tr>`).join("")}</table>`
       : "<p>No orders found.</p>";
   } catch (error) {
     showMessage("message", error.message, true);
@@ -240,18 +238,12 @@ async function loadOrders() {
   orders = Array.isArray(data) ? data : (data.orders || []);
 
   $("ordersTable").innerHTML = orders.length
-    ? `<table>
-        <tr><th>ID</th><th>Customer</th><th>Phone</th><th>Total</th><th>Status</th></tr>
-        ${orders.map(order => `
-          <tr>
-            <td>${safe(order.id)}</td>
-            <td>${safe(order.customer_name)}</td>
-            <td>${safe(order.phone)}</td>
-            <td>${money(order.total)}</td>
-            <td>${safe(order.status || order.payment_status || "Pending")}</td>
-          </tr>
-        `).join("")}
-      </table>`
+    ? `<table><tr><th>ID</th><th>Customer</th><th>Phone</th><th>Total</th><th>Status</th></tr>
+      ${orders.map(o => `<tr>
+      <td>${safe(o.id)}</td><td>${safe(o.customer_name)}</td>
+      <td>${safe(o.phone)}</td><td>${money(o.total)}</td>
+      <td>${safe(o.status || o.payment_status || "Pending")}</td>
+      </tr>`).join("")}</table>`
     : "<p>No orders found.</p>";
 
   return orders;
@@ -265,41 +257,37 @@ $("refreshOrders").addEventListener("click", async () => {
     showMessage("message", error.message, true);
   }
 });
-
+  
 async function loadProducts() {
   const data = await api("/api/products");
   products = Array.isArray(data) ? data : (data.products || []);
 
   $("productsTable").innerHTML = products.length
-    ? `<table>
-        <tr><th>Name</th><th>Price</th><th>Actions</th></tr>
-        ${products.map(product => `
-          <tr>
-            <td>${safe(product.name)}</td>
-            <td>${money(product.price)}</td>
-            <td>
-              <button type="button"
-                onclick="editProduct('${safe(product.id)}')">Edit</button>
-              <button type="button"
-                onclick="deleteProduct('${safe(product.id)}')">Delete</button>
-            </td>
-          </tr>
-        `).join("")}
-      </table>`
+    ? `<table><tr><th>Name</th><th>Price</th><th>Actions</th></tr>
+      ${products.map(p => `<tr>
+      <td>${safe(p.name)}</td><td>${money(p.price)}</td>
+      <td><button type="button" data-edit="${safe(p.id)}">Edit</button>
+      <button type="button" data-delete="${safe(p.id)}">Delete</button></td>
+      </tr>`).join("")}</table>`
     : "<p>No products found.</p>";
 
   $("totalProducts").textContent = products.length;
-  return products;
+
+  $("productsTable").querySelectorAll("[data-edit]").forEach(button => {
+    button.addEventListener("click", () => editProduct(button.dataset.edit));
+  });
+  $("productsTable").querySelectorAll("[data-delete]").forEach(button => {
+    button.addEventListener("click", () => deleteProduct(button.dataset.delete));
+  });
 }
 
 function editProduct(id) {
-  const product = products.find(p => String(p.id) === String(id));
-  if (!product) return;
-
-  $("productId").value = product.id;
-  $("productName").value = product.name || "";
-  $("productPrice").value = product.price || "";
-  $("productImage").value = product.image || "";
+  const p = products.find(item => String(item.id) === String(id));
+  if (!p) return;
+  $("productId").value = p.id;
+  $("productName").value = p.name || "";
+  $("productPrice").value = p.price || "";
+  $("productImage").value = p.image || "";
   showPage("products");
 }
 
@@ -308,9 +296,9 @@ $("clearProduct").addEventListener("click", () => {
   $("productId").value = "";
   showMessage("productMessage", "");
 });
-                            $("productForm").addEventListener("submit", async event => {
-  event.preventDefault();
 
+$("productForm").addEventListener("submit", async event => {
+  event.preventDefault();
   const id = $("productId").value;
   const product = {
     name: $("productName").value.trim(),
@@ -318,23 +306,14 @@ $("clearProduct").addEventListener("click", () => {
     image: $("productImage").value.trim()
   };
 
-  if (!product.name || !Number.isFinite(product.price) || product.price < 0) {
-    showMessage("productMessage", "Valid name aur price enter karein.", true);
-    return;
-  }
-
   try {
-    await api(
-      id ? "/api/products/" + encodeURIComponent(id) : "/api/products",
-      {
-        method: id ? "PUT" : "POST",
-        body: JSON.stringify(product)
-      }
-    );
-
+    await api(id ? "/api/products/" + encodeURIComponent(id) : "/api/products", {
+      method: id ? "PUT" : "POST",
+      body: JSON.stringify(product)
+    });
     $("productForm").reset();
     $("productId").value = "";
-    showMessage("productMessage", "Product saved successfully.");
+    showMessage("productMessage", "Product saved.");
     await loadProducts();
   } catch (error) {
     showMessage("productMessage", error.message, true);
@@ -342,13 +321,9 @@ $("clearProduct").addEventListener("click", () => {
 });
 
 async function deleteProduct(id) {
-  if (!confirm("Kya aap is product ko delete karna chahte hain?")) return;
-
+  if (!confirm("Product delete karna hai?")) return;
   try {
-    await api("/api/products/" + encodeURIComponent(id), {
-      method: "DELETE"
-    });
-
+    await api("/api/products/" + encodeURIComponent(id), {method:"DELETE"});
     showMessage("message", "Product deleted.");
     await loadProducts();
   } catch (error) {
@@ -360,7 +335,6 @@ async function loadSettings() {
   try {
     const data = await api("/api/settings");
     settings = data.settings || {};
-
     $("storeName").value = settings.store_name || "Vishal Jewellers";
     $("phone").value = settings.phone || "";
     $("whatsapp").value = settings.whatsapp || "";
@@ -375,7 +349,6 @@ async function loadSettings() {
 
 $("settingsForm").addEventListener("submit", async event => {
   event.preventDefault();
-
   const newSettings = {
     store_name: $("storeName").value.trim(),
     phone: $("phone").value.trim(),
@@ -389,22 +362,30 @@ $("settingsForm").addEventListener("submit", async event => {
   try {
     await api("/api/settings", {
       method: "PUT",
-      body: JSON.stringify({ settings: newSettings })
+      body: JSON.stringify({settings: newSettings})
     });
-
-    settings = newSettings;
-    showMessage("settingsMessage", "Settings saved successfully.");
+    showMessage("settingsMessage", "Settings saved.");
   } catch (error) {
     showMessage("settingsMessage", error.message, true);
   }
 });
 
-// Restore the login screen after page refresh.
-if (sessionStorage.getItem("adminToken")) {
-  $("loginScreen").classList.add("hidden");
-  $("appScreen").classList.remove("hidden");
-  loadDashboard();
+// Page refresh par purana token validate karo.
+async function restoreSession() {
+  const token = sessionStorage.getItem("adminToken");
+  if (!token) return;
+
+  try {
+    await api("/api/admin/me");
+    $("loginScreen").classList.add("hidden");
+    $("appScreen").classList.remove("hidden");
+    await loadDashboard();
+  } catch {
+    sessionStorage.removeItem("adminToken");
+  }
 }
+
+restoreSession();
 </script>
 </body>
 </html>
