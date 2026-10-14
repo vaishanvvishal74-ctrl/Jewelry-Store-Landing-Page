@@ -2,79 +2,47 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jewellery Store Admin</title>
 <style>
-:root{--primary:#8b5e3c;--bg:#f6f3ef;--text:#292522;--border:#e8e1da}
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
-button,input,textarea,select{font:inherit}
-button{border:0;border-radius:7px;padding:10px 14px;background:var(--primary);color:white;cursor:pointer;font-weight:bold}
-button:disabled{opacity:.6;cursor:wait}
-input,textarea,select{width:100%;padding:10px;border:1px solid var(--border);border-radius:7px;background:white}
-label{display:block;margin:12px 0 6px;font-size:14px;font-weight:bold}
+body{margin:0;font:15px Arial;background:#f6f3ef;color:#292522}
+button,input,textarea,select{font:inherit;padding:10px;border-radius:6px;border:1px solid #ddd}
+button{background:#8b5e3c;color:white;border:0;cursor:pointer;margin:3px}
+button:disabled{opacity:.5}
+input,textarea,select{width:100%;margin:5px 0}
 .hidden{display:none!important}
+.card{background:white;padding:16px;margin:12px 0;border-radius:10px}
+.login{max-width:380px;margin:12vh auto;padding:22px;background:white;border-radius:12px}
+.layout{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
+aside{background:#292522;color:white;padding:14px}
+aside button{width:100%;text-align:left}
+main{padding:15px;min-width:0}
+table{border-collapse:collapse;width:100%;min-width:600px}
+td,th{padding:9px;border-bottom:1px solid #ddd;text-align:left}
+.table{overflow:auto}
 .error{color:#b42318;white-space:pre-wrap}
 .success{color:#16803c;white-space:pre-wrap}
-.muted{color:#777;font-size:13px}
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-card{width:100%;max-width:390px;background:white;padding:25px;border-radius:14px;border:1px solid var(--border)}
-.login-card h1{margin-top:0}
-.login-card button{width:100%;margin-top:16px}
-.layout{display:grid;grid-template-columns:210px minmax(0,1fr);min-height:100vh}
-aside{background:#292522;color:white;padding:16px}
-.brand{font-size:19px;font-weight:bold;margin:10px 0 20px}
-.nav{display:grid;gap:7px}
-.nav button{text-align:left;background:transparent}
-.nav button.active,.nav button:hover{background:#ffffff25}
-.logout{background:#a72d2d;width:100%;margin-top:20px}
-main{padding:20px;min-width:0}
-.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px}
-.topbar h1{margin:0;font-size:25px}
-.card{background:white;border:1px solid var(--border);border-radius:11px;padding:16px;min-width:0}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:15px}
-.stat-num{font-size:25px;font-weight:bold;margin-top:8px}
-.section-title{font-size:19px;margin:0 0 15px}
-.toolbar{display:flex;gap:9px;margin-bottom:12px}
-.toolbar input{flex:1;min-width:0}
-.table-wrap{overflow:auto}
-table{width:100%;border-collapse:collapse;min-width:620px}
-th,td{padding:10px;text-align:left;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top}
-th{background:#faf8f6}
-td button{font-size:12px;margin:2px;padding:8px}
-.secondary{background:#625c56}
-.danger{background:#b42318}
-.green{background:#16803c}
-.badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#eee;font-size:12px}
-.badge.approved,.badge.delivered{background:#d9f5e3;color:#146c36}
-.badge.rejected,.badge.cancelled{background:#fde3e1;color:#a21b14}
-.badge.pending{background:#fff0c2;color:#795500}
-.form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.preview{max-width:140px;max-height:110px;object-fit:contain;margin-top:8px}
-.empty{text-align:center;padding:22px;color:#777}
-.notice{background:#fff4d4;padding:12px;border-radius:7px;font-size:13px;margin-bottom:12px}
-@media(max-width:850px){
+label{display:block;margin-top:10px;font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:650px){
 .layout{grid-template-columns:1fr}
-aside{padding:12px}
-.brand{margin:5px 0 12px}
-.nav{grid-template-columns:repeat(3,minmax(0,1fr))}
-.nav button{text-align:center;padding:9px 4px;font-size:12px}
-.logout{width:auto;margin-top:10px}
-main{padding:12px}
-.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+aside{padding:8px}
+aside button{width:auto}
+main{padding:8px}
+.grid{grid-template-columns:1fr}
 }
-@media(max-width:520px){.grid{grid-template-columns:1fr}.nav{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
 
-<section id="loginScreen" class="login-wrap">
-<form id="loginForm" class="login-card">
-<h1>💎 Jewellery Store</h1>
-<p class="muted">Admin Panel Login</p>
+<section id="loginScreen" class="login">
+<h2>💎 Jewellery Store</h2>
+<p>Admin Panel Login</p>
+<form id="loginForm">
 <label for="password">Admin Password</label>
-<input id="password" type="password" autocomplete="current-password" required placeholder="Enter admin password">
+<input id="password" type="password" required
+autocomplete="current-password" placeholder="Enter admin password">
 <button id="loginButton" type="submit">Login</button>
 <p id="loginError" class="error" role="alert"></p>
 </form>
@@ -82,130 +50,120 @@ main{padding:12px}
 
 <section id="appScreen" class="layout hidden">
 <aside>
-<div class="brand">💎 Jewellery Admin</div>
-<nav class="nav">
-<button type="button" class="active" data-page="dashboard">Dashboard</button>
-<button type="button" data-page="orders">Orders</button>
-<button type="button" data-page="payments">Payments</button>
-<button type="button" data-page="products">Products</button>
-<button type="button" data-page="gallery">Gallery</button>
-<button type="button" data-page="settings">Settings</button>
-</nav>
-<button id="logoutButton" type="button" class="logout">Logout</button>
+<h3>💎 Admin Panel</h3>
+<button data-page="dashboard">Dashboard</button>
+<button data-page="orders">Orders</button>
+<button data-page="payments">Payments</button>
+<button data-page="products">Products</button>
+<button data-page="gallery">Gallery Upload</button>
+<button data-page="settings">Store Settings</button>
+<button id="logoutButton">Logout</button>
 </aside>
 
 <main>
-<div class="topbar">
-<h1 id="pageTitle">Dashboard</h1>
-<button id="refreshButton" type="button" class="secondary">Refresh</button>
-</div>
-<div id="globalMessage" role="status"></div>
+<h2 id="pageTitle">Dashboard</h2>
+<button id="refreshButton">Refresh Data</button>
+<p id="globalMessage" role="status"></p>
 
 <section id="page-dashboard" class="page">
-<div class="stats">
-<div class="card"><div class="muted">Total Orders</div><div id="statOrders" class="stat-num">0</div></div>
-<div class="card"><div class="muted">Pending Orders</div><div id="statPending" class="stat-num">0</div></div>
-<div class="card"><div class="muted">Products</div><div id="statProducts" class="stat-num">0</div></div>
-<div class="card"><div class="muted">Pending Payments</div><div id="statPayments" class="stat-num">0</div></div>
-</div>
+<div class="card">Total Orders: <b id="statOrders">0</b></div>
+<div class="card">Pending Orders: <b id="statPending">0</b></div>
+<div class="card">Products: <b id="statProducts">0</b></div>
+<div class="card">Pending Payments: <b id="statPayments">0</b></div>
 <div class="card">
-<h2 class="section-title">Recent Orders</h2>
-<div id="recentOrders" class="empty">Loading...</div>
+<h3>Recent Orders</h3>
+<div id="recentOrders">Loading...</div>
 </div>
 </section>
 
 <section id="page-orders" class="page hidden">
 <div class="card">
-<h2 class="section-title">Manage Orders</h2>
-<div class="toolbar"><input id="orderSearch" placeholder="Search order or customer"></div>
-<div id="ordersTable" class="empty">Loading orders...</div>
+<h3>Manage Orders</h3>
+<input id="orderSearch" placeholder="Search orders">
+<div id="ordersTable">Loading...</div>
 </div>
 </section>
 
 <section id="page-payments" class="page hidden">
 <div class="card">
-<h2 class="section-title">Payment Approval</h2>
-<div class="toolbar"><input id="paymentSearch" placeholder="Search payments"></div>
-<div id="paymentsTable" class="empty">Loading payments...</div>
+<h3>Payment Approval</h3>
+<input id="paymentSearch" placeholder="Search payments">
+<div id="paymentsTable">Loading...</div>
 </div>
 </section>
 
 <section id="page-products" class="page hidden">
 <div class="grid">
 <div class="card">
-<h2 id="productFormTitle" class="section-title">Add Product</h2>
+<h3 id="productFormTitle">Add Product</h3>
 <form id="productForm">
 <input id="productId" type="hidden">
-<label for="productName">Product Name *</label>
+<label for="productName">Product Name</label>
 <input id="productName" required maxlength="200">
-<label for="productPrice">Price (₹) *</label>
+<label for="productPrice">Price (₹)</label>
 <input id="productPrice" type="number" min="0" step="0.01" required>
-<label for="productImage">Image URL *</label>
+<label for="productImage">Image URL</label>
 <input id="productImage" type="url" required placeholder="https://...">
-<label for="productFile">Or Upload Image</label>
+<label for="productFile">Upload Image (optional)</label>
 <input id="productFile" type="file" accept="image/*">
-<img id="productPreview" class="preview hidden" alt="Product preview">
-<div class="form-actions">
-<button id="saveProductButton" type="submit">Save Product</button>
-<button id="cancelProductEdit" type="button" class="secondary">Clear</button>
-</div>
-<p id="productMessage" role="status"></p>
+<button type="submit" id="saveProductButton">Save Product</button>
+<button type="button" id="clearProductButton">Clear</button>
+<p id="productMessage"></p>
 </form>
 </div>
 <div class="card">
-<h2 class="section-title">Products List</h2>
-<div class="toolbar"><input id="productSearch" placeholder="Search products"></div>
-<div id="productsTable" class="empty">Loading products...</div>
+<h3>Products List</h3>
+<input id="productSearch" placeholder="Search products">
+<div id="productsTable">Loading...</div>
 </div>
 </div>
 </section>
 
 <section id="page-gallery" class="page hidden">
 <div class="card">
-<h2 class="section-title">Gallery Image Upload</h2>
-<div class="notice">Upload के लिए Render में Cloudinary की environment variables सेट होना जरूरी है। Gallery की स्थायी सूची के लिए अलग backend API भी चाहिए।</div>
+<h3>Upload Gallery Image</h3>
+<p>यह फ़ॉर्म Cloudinary upload API का उपयोग करता है।</p>
 <form id="galleryForm">
-<label for="galleryFile">Choose Image</label>
 <input id="galleryFile" type="file" accept="image/*" required>
-<div class="form-actions"><button id="galleryUploadButton" type="submit">Upload Image</button></div>
+<button type="submit" id="galleryButton">Upload Image</button>
 </form>
-<p id="galleryMessage" role="status"></p>
+<p id="galleryMessage"></p>
 <div id="galleryResult"></div>
 </div>
 </section>
 
 <section id="page-settings" class="page hidden">
 <div class="card">
-<h2 class="section-title">Store Settings</h2>
+<h3>Store Settings</h3>
 <form id="settingsForm">
 <div class="grid">
-<div><label for="setting_store_name">Store Name</label><input id="setting_store_name"></div>
-<div><label for="setting_logo_url">Logo URL</label><input id="setting_logo_url" type="url"></div>
-<div><label for="setting_whatsapp">WhatsApp</label><input id="setting_whatsapp"></div>
-<div><label for="setting_instagram">Instagram URL</label><input id="setting_instagram" type="url"></div>
-<div><label for="setting_phone">Phone</label><input id="setting_phone"></div>
-<div><label for="setting_email">Email</label><input id="setting_email" type="email"></div>
-<div><label for="setting_address">Address</label><textarea id="setting_address"></textarea></div>
-<div><label for="setting_google_maps">Google Maps URL</label><input id="setting_google_maps" type="url"></div>
-<div><label for="setting_upi_id">UPI ID</label><input id="setting_upi_id"></div>
-<div><label for="setting_qr_url">QR Image URL</label><input id="setting_qr_url" type="url"></div>
+<div><label for="store_name">Store Name</label><input id="store_name"></div>
+<div><label for="logo_url">Logo URL</label><input id="logo_url" type="url"></div>
+<div><label for="whatsapp">WhatsApp</label><input id="whatsapp"></div>
+<div><label for="instagram">Instagram URL</label><input id="instagram" type="url"></div>
+<div><label for="phone">Phone</label><input id="phone"></div>
+<div><label for="email">Email</label><input id="email" type="email"></div>
+<div><label for="address">Address</label><textarea id="address"></textarea></div>
+<div><label for="google_maps">Google Maps URL</label><input id="google_maps" type="url"></div>
+<div><label for="upi_id">UPI ID</label><input id="upi_id"></div>
+<div><label for="qr_url">QR Image URL</label><input id="qr_url" type="url"></div>
 </div>
-<div class="form-actions"><button id="saveSettingsButton" type="submit">Save Settings</button></div>
-<p id="settingsMessage" role="status"></p>
+<button type="submit" id="settingsButton">Save Settings</button>
 </form>
-<hr style="border:0;border-top:1px solid #eee;margin:20px 0">
+<p id="settingsMessage"></p>
+
+<hr>
 <h3>Upload Logo / QR</h3>
 <form id="settingsUploadForm">
-<label for="settingsUploadType">Image Type</label>
-<select id="settingsUploadType">
+<label for="uploadType">Image Type</label>
+<select id="uploadType">
 <option value="logo_url">Store Logo</option>
 <option value="qr_url">Payment QR</option>
 </select>
-<label for="settingsFile">Choose Image</label>
 <input id="settingsFile" type="file" accept="image/*" required>
-<div class="form-actions"><button id="settingsUploadButton" type="submit">Upload Image</button></div>
-<p id="settingsUploadMessage" role="status"></p>
+<button type="submit" id="settingsUploadButton">Upload</button>
 </form>
+<p id="settingsUploadMessage"></p>
 </div>
 </section>
 </main>
@@ -221,261 +179,438 @@ let token = sessionStorage.getItem(TOKEN_KEY) || "";
 let orders = [];
 let products = [];
 let settings = {};
-let currentPage = "dashboard";
 let busy = false;
 
-function msg(id,text,type){
-const el=$(id);
-if(!el)return;
-el.textContent=text||"";
-el.className=type||"";
+function message(id,text,type){
+  $(id).textContent = text || "";
+  $(id).className = type || "";
 }
 
-function esc(value){
-return String(value==null?"":value).replace(/[&<>"']/g,function(c){
-return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
-});
-}
-
-function safeUrl(value){
-try{
-const u=new URL(String(value||""),location.href);
-return ["http:","https:"].includes(u.protocol)?u.href:"";
-}catch(e){return "";}
+function escapeHTML(value){
+  return String(value ?? "").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",
+    '"':"&quot;","'":"&#39;"
+  })[c]);
 }
 
 function money(value){
-const n=Number(value||0);
-return "₹"+(Number.isFinite(n)?n.toLocaleString("en-IN",{maximumFractionDigits:2}):"0");
+  const n = Number(value || 0);
+  return "₹" + (Number.isFinite(n) ? n.toLocaleString("en-IN") : "0");
 }
 
-function orderId(o){return o&&(o.id??o.order_id??"");}
-function customer(o){return o&&(o.customer_name||o.name||"Customer");}
-function orderStatus(o){return String(o&&o.status||"pending").toLowerCase();}
-function payStatus(o){return String(o&&o.payment_status||"pending").toLowerCase();}
-
-async function api(url,options){
-options=options||{};
-const headers=Object.assign({},options.headers||{});
-if(options.body&&!(options.body instanceof FormData)){
-headers["Content-Type"]="application/json";
-}
-if(token&&url!=="/api/admin/login"){
-headers.Authorization="Bearer "+token;
-}
-let response;
-try{
-response=await fetch(url,Object.assign({},options,{headers:headers}));
-}catch(e){
-throw new Error("Server से संपर्क नहीं हो पाया। Render service और URL चेक करें।");
-}
-const raw=await response.text();
-let data={};
-try{data=raw?JSON.parse(raw):{};}catch(e){data={message:raw};}
-if(!response.ok){
-if((response.status===401||response.status===403)&&url!=="/api/admin/login"){
-logout(false);
-}
-throw new Error(data.error||data.message||("HTTP Error "+response.status));
-}
-return data;
+function status(o){
+  return String(o.status || "pending").toLowerCase();
 }
 
-function listFrom(data,key){
-if(Array.isArray(data))return data;
-if(data&&Array.isArray(data[key]))return data[key];
-if(data&&data.data&&Array.isArray(data.data))return data.data;
-return [];
+function paymentStatus(o){
+  return String(o.payment_status || "pending").toLowerCase();
+}
+
+async function api(url,options={}){
+  const headers = {...(options.headers || {})};
+
+  if(options.body && !(options.body instanceof FormData)){
+    headers["Content-Type"] = "application/json";
+  }
+
+  if(token && url !== "/api/admin/login"){
+    headers.Authorization = "Bearer " + token;
+  }
+
+  let response;
+  try{
+    response = await fetch(url,{...options,headers});
+  }catch(e){
+    throw new Error("Server से संपर्क नहीं हुआ। Render की /health URL खोलकर जाँचें।");
+  }
+
+  const raw = await response.text();
+  let data = {};
+  try{data = raw ? JSON.parse(raw) : {};}
+  catch(e){data = {message:raw};}
+
+  if(!response.ok){
+    if((response.status === 401 || response.status === 403)
+      && url !== "/api/admin/login"){
+      logout();
+    }
+    throw new Error(data.error || data.message || ("HTTP " + response.status));
+  }
+  return data;
+}
+
+function getList(data,key){
+  if(Array.isArray(data)) return data;
+  if(Array.isArray(data[key])) return data[key];
+  if(Array.isArray(data.data)) return data.data;
+  return [];
 }
 
 function showLogin(){
-$("loginScreen").classList.remove("hidden");
-$("appScreen").classList.add("hidden");
+  $("loginScreen").classList.remove("hidden");
+  $("appScreen").classList.add("hidden");
 }
 
 function showApp(){
-$("loginScreen").classList.add("hidden");
-$("appScreen").classList.remove("hidden");
-showPage(currentPage);
+  $("loginScreen").classList.add("hidden");
+  $("appScreen").classList.remove("hidden");
+  showPage("dashboard");
 }
 
-function logout(showMessage){
-token="";
-sessionStorage.removeItem(TOKEN_KEY);
-orders=[];
-products=[];
-showLogin();
-if(showMessage)msg("loginError","आप लॉग आउट हो गए हैं।","");
+function logout(){
+  token = "";
+  sessionStorage.removeItem(TOKEN_KEY);
+  orders = [];
+  products = [];
+  showLogin();
 }
 
-function showPage(page){
-currentPage=page;
-document.querySelectorAll(".page").forEach(el=>el.classList.add("hidden"));
-const section=$("page-"+page);
-if(section)section.classList.remove("hidden");
-document.querySelectorAll("[data-page]").forEach(btn=>{
-btn.classList.toggle("active",btn.dataset.page===page);
+function showPage(name){
+  document.querySelectorAll(".page").forEach(el=>el.classList.add("hidden"));
+  $("page-" + name).classList.remove("hidden");
+  $("pageTitle").textContent = ({
+    dashboard:"Dashboard",orders:"Orders",payments:"Payments",
+    products:"Products",gallery:"Gallery Upload",settings:"Store Settings"
+  })[name] || "Admin";
+}
+
+$("loginForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  if(busy) return;
+
+  const button = $("loginButton");
+  const password = $("password").value.trim();
+
+  if(!password){
+    message("loginError","Admin password डालें।","error");
+    return;
+  }
+
+  busy = true;
+  button.disabled = true;
+  button.textContent = "Logging in...";
+  message("loginError","","");
+
+  try{
+    const data = await api("/api/admin/login",{
+      method:"POST",
+      body:JSON.stringify({password})
+    });
+
+    const newToken = data.token || data.accessToken ||
+      data.access_token || (data.data && data.data.token);
+
+    if(!newToken){
+      throw new Error("Login response में token नहीं मिला। server.js की जाँच जरूरी है।");
+    }
+
+    token = newToken;
+    sessionStorage.setItem(TOKEN_KEY,token);
+    $("password").value = "";
+    showApp();
+    message("globalMessage","Login सफल हुआ।","success");
+    await refreshAll();
+  }catch(e){
+    message("loginError",e.message || "Login failed.","error");
+  }finally{
+    busy = false;
+    button.disabled = false;
+    button.textContent = "Login";
+  }
 });
-const titles={dashboard:"Dashboard",orders:"Orders",payments:"Payment Approval",products:"Products",gallery:"Gallery",settings:"Store Settings"};
-$("pageTitle").textContent=titles[page]||"Admin";
-}
 
-$("loginForm").addEventListener("submit",async function(event){
-event.preventDefault();
-if(busy)return;
-const button=$("loginButton");
-const password=$("password").value;
-if(!password){msg("loginError","Admin password डालें।","error");return;}
-busy=true;
-button.disabled=true;
-button.textContent="Logging in...";
-msg("loginError","","");
-try{
-const data=await api("/api/admin/login",{method:"POST",body:JSON.stringify({password:password})});
-const newToken=data.token||data.accessToken||data.access_token||(data.data&&data.data.token);
-if(!newToken)throw new Error("Server ने login token नहीं भेजा। server.js का login response चेक करें।");
-token=newToken;
-sessionStorage.setItem(TOKEN_KEY,token);
-$("password").value="";
-showApp();
-msg("globalMessage","Login successful.","success");
-await refreshAll();
-}catch(e){
-msg("loginError",e.message||"Login failed.","error");
-}finally{
-busy=false;
-button.disabled=false;
-button.textContent="Login";
-}
+$("logoutButton").addEventListener("click",logout);
+
+document.querySelectorAll("[data-page]").forEach(button=>{
+  button.addEventListener("click",()=>showPage(button.dataset.page));
 });
 
-$("logoutButton").addEventListener("click",()=>logout(true));
 $("refreshButton").addEventListener("click",refreshAll);
-document.querySelectorAll("[data-page]").forEach(btn=>{
-btn.addEventListener("click",()=>showPage(btn.dataset.page));
-});
 
 async function loadOrders(){
-const data=await api("/api/orders");
-orders=listFrom(data,"orders");
-renderOrders();
-renderPayments();
-renderDashboard();
+  const data = await api("/api/orders");
+  orders = getList(data,"orders");
+  renderOrders();
+  renderPayments();
+  renderDashboard();
 }
 
 async function loadProducts(){
-const data=await api("/api/products");
-products=listFrom(data,"products");
-renderProducts();
-renderDashboard();
+  const data = await api("/api/products");
+  products = getList(data,"products");
+  renderProducts();
+  renderDashboard();
 }
 
 async function loadSettings(){
-const data=await api("/api/admin/settings");
-settings=data.settings||data.data||data||{};
-if(Array.isArray(settings))settings={};
-["store_name","logo_url","whatsapp","instagram","phone","email","address","google_maps","upi_id","qr_url"].forEach(key=>{
-const el=$("setting_"+key);
-if(el)el.value=settings[key]==null?"":settings[key];
-});
+  const data = await api("/api/admin/settings");
+  settings = data.settings || data.data || data || {};
+  if(Array.isArray(settings)) settings = {};
+
+  ["store_name","logo_url","whatsapp","instagram","phone",
+   "email","address","google_maps","upi_id","qr_url"].forEach(key=>{
+    if($(key)) $(key).value = settings[key] ?? "";
+  });
 }
 
 async function refreshAll(){
-if(!token){showLogin();return;}
-const button=$("refreshButton");
-button.disabled=true;
-button.textContent="Loading...";
-msg("globalMessage","Data load हो रहा है...","");
-const results=await Promise.allSettled([loadOrders(),loadProducts(),loadSettings()]);
-button.disabled=false;
-button.textContent="Refresh";
-const failures=results.filter(r=>r.status==="rejected");
-if(failures.length){
-msg("globalMessage",failures.map(r=>r.reason&&r.reason.message||"Load failed").join(" | "),"error");
-}else{
-msg("globalMessage","Data updated.","success");
-}
-renderDashboard();
+  if(!token){showLogin();return;}
+
+  $("refreshButton").disabled = true;
+  message("globalMessage","Data लोड हो रहा है...","");
+
+  const results = await Promise.allSettled([
+    loadOrders(),loadProducts(),loadSettings()
+  ]);
+
+  $("refreshButton").disabled = false;
+  const errors = results.filter(r=>r.status === "rejected");
+
+  if(errors.length){
+    message("globalMessage",
+      errors.map(r=>r.reason.message).join(" | "),"error");
+  }else{
+    message("globalMessage","Data अपडेट हो गया।","success");
+  }
+  renderDashboard();
 }
 
 function renderDashboard(){
-$("statOrders").textContent=orders.length;
-$("statPending").textContent=orders.filter(o=>orderStatus(o)==="pending").length;
-$("statProducts").textContent=products.length;
-$("statPayments").textContent=orders.filter(o=>payStatus(o)==="pending").length;
-const recent=orders.slice().reverse().slice(0,5);
-if(!recent.length){
-$("recentOrders").innerHTML='<div class="empty">अभी कोई order नहीं है।</div>';
-return;
-}
-$("recentOrders").innerHTML='<div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>'+
-recent.map(o=>'<tr><td>'+esc(orderId(o))+'</td><td>'+esc(customer(o))+'</td><td>'+money(o.total)+'</td><td><span class="badge '+esc(orderStatus(o))+'">'+esc(orderStatus(o))+'</span></td></tr>').join("")+
-'</tbody></table></div>';
+  $("statOrders").textContent = orders.length;
+  $("statPending").textContent = orders.filter(o=>status(o)==="pending").length;
+  $("statProducts").textContent = products.length;
+  $("statPayments").textContent = orders.filter(o=>paymentStatus(o)==="pending").length;
+
+  const recent = orders.slice(-5).reverse();
+  $("recentOrders").innerHTML = recent.length
+    ? "<div class='table'><table><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr>"+
+      recent.map(o=>"<tr><td>"+escapeHTML(o.id)+"</td><td>"+
+      escapeHTML(o.customer_name || o.name || "Customer")+"</td><td>"+
+      money(o.total)+"</td><td>"+escapeHTML(status(o))+"</td></tr>").join("")+
+      "</table></div>"
+    : "अभी कोई order नहीं है।";
 }
 
 function renderOrders(){
-const q=$("orderSearch").value.toLowerCase().trim();
-const filtered=orders.filter(o=>[orderId(o),customer(o),o.phone,o.customer_email,o.address,orderStatus(o)].join(" ").toLowerCase().includes(q));
-if(!filtered.length){$("ordersTable").innerHTML='<div class="empty">कोई order नहीं मिला।</div>';return;}
-$("ordersTable").innerHTML='<div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Update</th></tr></thead><tbody>'+
-filtered.map(o=>{
-const id=String(orderId(o));
-const items=Array.isArray(o.items)?o.items.map(i=>(i.name||i.product_name||"Item")+" × "+(i.quantity||i.qty||1)).join(", "):(typeof o.items==="string"?o.items:"—");
-return '<tr><td>'+esc(id)+'<br><span class="muted">'+esc(o.created_at||"")+'</span></td>'+
-'<td>'+esc(customer(o))+'<br>'+esc(o.phone||"")+'<br>'+esc(o.customer_email||"")+'<br>'+esc(o.address||"")+'</td>'+
-'<td>'+esc(items)+'</td><td>'+money(o.total)+'</td>'+
-'<td>'+esc(o.payment_method||"—")+'<br><span class="badge '+esc(payStatus(o))+'">'+esc(payStatus(o))+'</span></td>'+
-'<td><span class="badge '+esc(orderStatus(o))+'">'+esc(orderStatus(o))+'</span></td>'+
-'<td><select aria-label="Order status" id="orderStatus-'+esc(id)+'">'+
-["pending","approved","processing","shipped","delivered","rejected","cancelled"].map(s=>'<option value="'+s+'" '+(orderStatus(o)===s?"selected":"")+'>'+s+'</option>').join("")+
-'</select><button type="button" data-order-save="'+esc(id)+'">Update</button></td></tr>';
-}).join("")+'</tbody></table></div>';
+  const q = $("orderSearch").value.toLowerCase();
+  const rows = orders.filter(o=>
+    JSON.stringify(o).toLowerCase().includes(q));
 
-document.querySelectorAll("[data-order-save]").forEach(btn=>{
-btn.addEventListener("click",async()=>{
-const id=btn.dataset.orderSave;
-const newStatus=$("orderStatus-"+id).value;
-btn.disabled=true;
-try{
-await api("/api/orders/"+encodeURIComponent(id)+"/status",{method:"PATCH",body:JSON.stringify({status:newStatus})});
-msg("globalMessage","Order status updated.","success");
-await loadOrders();
-}catch(e){msg("globalMessage",e.message,"error");}
-finally{btn.disabled=false;}
-});
-});
+  $("ordersTable").innerHTML = rows.length
+    ? "<div class='table'><table><tr><th>ID</th><th>Customer</th><th>Total</th><th>Payment</th><th>Status</th><th>Update</th></tr>"+
+      rows.map(o=>{
+        const id = String(o.id ?? o.order_id ?? "");
+        return "<tr><td>"+escapeHTML(id)+"</td><td>"+
+          escapeHTML(o.customer_name || o.name || "Customer")+
+          "<br>"+escapeHTML(o.phone || "")+"</td><td>"+
+          money(o.total)+"</td><td>"+escapeHTML(paymentStatus(o))+
+          "</td><td>"+escapeHTML(status(o))+"</td><td>"+
+          "<select id='os"+escapeHTML(id)+"'>"+
+          ["pending","approved","processing","shipped","delivered","rejected","cancelled"]
+          .map(s=>"<option "+(status(o)===s?"selected":"")+" value='"+s+"'>"+s+"</option>").join("")+
+          "</select><button data-order='"+escapeHTML(id)+"'>Save</button></td></tr>";
+      }).join("")+"</table></div>"
+    : "कोई order नहीं मिला।";
+
+  document.querySelectorAll("[data-order]").forEach(button=>{
+    button.addEventListener("click",async()=>{
+      const id = button.dataset.order;
+      button.disabled = true;
+      try{
+        await api("/api/orders/"+encodeURIComponent(id)+"/status",{
+          method:"PATCH",
+          body:JSON.stringify({status:$("os"+id).value})
+        });
+        await loadOrders();
+        message("globalMessage","Order status अपडेट हुआ।","success");
+      }catch(e){message("globalMessage",e.message,"error");}
+      finally{button.disabled=false;}
+    });
+  });
 }
 
 function renderPayments(){
-const q=$("paymentSearch").value.toLowerCase().trim();
-const filtered=orders.filter(o=>[orderId(o),customer(o),o.phone,o.payment_reference,o.payment_method,payStatus(o)].join(" ").toLowerCase().includes(q));
-if(!filtered.length){$("paymentsTable").innerHTML='<div class="empty">कोई payment record नहीं मिला।</div>';return;}
-$("paymentsTable").innerHTML='<div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Method</th><th>Amount</th><th>Reference</th><th>Status</th><th>Action</th></tr></thead><tbody>'+
-filtered.map(o=>'<tr><td>'+esc(orderId(o))+'</td><td>'+esc(customer(o))+'<br>'+esc(o.phone||"")+'</td>'+
-'<td>'+esc(o.payment_method||"—")+'</td><td>'+money(o.total)+'</td><td>'+esc(o.payment_reference||"—")+'</td>'+
-'<td><span class="badge '+esc(payStatus(o))+'">'+esc(payStatus(o))+'</span></td><td>'+
-'<button type="button" class="green" data-payment-action="approved" data-payment-id="'+esc(orderId(o))+'">Approve</button>'+
-'<button type="button" class="danger" data-payment-action="rejected" data-payment-id="'+esc(orderId(o))+'">Reject</button></td></tr>').join("")+
-'</tbody></table></div>';
+  const q = $("paymentSearch").value.toLowerCase();
+  const rows = orders.filter(o=>
+    JSON.stringify(o).toLowerCase().includes(q));
 
-document.querySelectorAll("[data-payment-action]").forEach(btn=>{
-btn.addEventListener("click",async()=>{
-const id=btn.dataset.paymentId;
-const payment_status=btn.dataset.paymentAction;
-btn.disabled=true;
-try{
-await api("/api/orders/"+encodeURIComponent(id)+"/payment",{method:"PATCH",body:JSON.stringify({payment_status:payment_status})});
-msg("globalMessage","Payment "+payment_status+".","success");
-await loadOrders();
-}catch(e){msg("globalMessage",e.message,"error");}
-finally{btn.disabled=false;}
-});
-});
+  $("paymentsTable").innerHTML = rows.length
+    ? "<div class='table'><table><tr><th>Order</th><th>Amount</th><th>Payment</th><th>Action</th></tr>"+
+      rows.map(o=>{
+        const id = String(o.id ?? o.order_id ?? "");
+        return "<tr><td>"+escapeHTML(id)+"<br>"+
+          escapeHTML(o.customer_name || o.name || "Customer")+
+          "</td><td>"+money(o.total)+"</td><td>"+
+          escapeHTML(paymentStatus(o))+"</td><td>"+
+          "<button data-pay='approved' data-id='"+escapeHTML(id)+"'>Approve</button>"+
+          "<button data-pay='rejected' data-id='"+escapeHTML(id)+"'>Reject</button>"+
+          "</td></tr>";
+      }).join("")+"</table></div>"
+    : "कोई payment नहीं मिला।";
+
+  document.querySelectorAll("[data-pay]").forEach(button=>{
+    button.addEventListener("click",async()=>{
+      button.disabled = true;
+      try{
+        await api("/api/orders/"+encodeURIComponent(button.dataset.id)+"/payment",{
+          method:"PATCH",
+          body:JSON.stringify({payment_status:button.dataset.pay})
+        });
+        await loadOrders();
+        message("globalMessage","Payment status अपडेट हुआ।","success");
+      }catch(e){message("globalMessage",e.message,"error");}
+      finally{button.disabled=false;}
+    });
+  });
 }
 
 function resetProductForm(){
-$("productForm").reset();
-$("productId").value="";
-$("productFormTitle").textContent="Add Product";
-$("saveProductButton").textContent="Save Product";
-$("productPreview").classList.add("hidden
+  $("productForm").reset();
+  $("productId").value = "";
+  $("productFormTitle").textContent = "Add Product";
+  $("saveProductButton").textContent = "Save Product";
+}
+
+function renderProducts(){
+  const q = $("productSearch").value.toLowerCase();
+  const rows = products.filter(p=>
+    String(p.name || "").toLowerCase().includes(q));
+
+  $("productsTable").innerHTML = rows.length
+    ? "<div class='table'><table><tr><th>ID</th><th>Product</th><th>Price</th><th>Actions</th></tr>"+
+      rows.map(p=>"<tr><td>"+escapeHTML(p.id)+"</td><td>"+
+      escapeHTML(p.name)+"</td><td>"+money(p.price)+"</td><td>"+
+      "<button data-edit='"+escapeHTML(p.id)+"'>Edit</button>"+
+      "<button data-delete='"+escapeHTML(p.id)+"'>Delete</button>"+
+      "</td></tr>").join("")+"</table></div>"
+    : "कोई product नहीं मिला।";
+
+  document.querySelectorAll("[data-edit]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      const p = products.find(x=>String(x.id)===button.dataset.edit);
+      if(!p)return;
+      $("productId").value = p.id;
+      $("productName").value = p.name || "";
+      $("productPrice").value = p.price || "";
+      $("productImage").value = p.image || "";
+      $("productFormTitle").textContent = "Edit Product";
+      $("saveProductButton").textContent = "Update Product";
+      showPage("products");
+      window.scrollTo(0,0);
+    });
+  });
+
+  document.querySelectorAll("[data-delete]").forEach(button=>{
+    button.addEventListener("click",async()=>{
+      if(!confirm("क्या यह product हटाना है?"))return;
+      button.disabled = true;
+      try{
+        await api("/api/products/"+encodeURIComponent(button.dataset.delete),{
+          method:"DELETE"
+        });
+        await loadProducts();
+        message("globalMessage","Product हटाया गया।","success");
+      }catch(e){message("globalMessage",e.message,"error");}
+      finally{button.disabled=false;}
+    });
+  });
+}
+
+async function uploadImage(file){
+  const form = new FormData();
+  form.append("image",file);
+  const data = await api("/api/admin/upload",{
+    method:"POST",body:form
+  });
+  if(!data.url)throw new Error("Upload response में image URL नहीं मिला।");
+  return data.url;
+}
+
+$("productForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const button = $("saveProductButton");
+  button.disabled = true;
+
+  try{
+    let image = $("productImage").value.trim();
+    const file = $("productFile").files[0];
+    if(file) image = await uploadImage(file);
+
+    const id = $("productId").value;
+    const product = {
+      name:$("productName").value.trim(),
+      price:Number($("productPrice").value),
+      image:image
+    };
+
+    await api(id ? "/api/products/"+encodeURIComponent(id) : "/api/products",{
+      method:id ? "PUT" : "POST",
+      body:JSON.stringify(product)
+    });
+
+    resetProductForm();
+    await loadProducts();
+    message("productMessage","Product सेव हो गया।","success");
+  }catch(e){message("productMessage",e.message,"error");}
+  finally{button.disabled=false;}
+});
+
+$("clearProductButton").addEventListener("click",resetProductForm);
+
+$("settingsForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const button = $("settingsButton");
+  button.disabled = true;
+
+  try{
+    const body = {};
+    ["store_name","logo_url","whatsapp","instagram","phone",
+     "email","address","google_maps","upi_id","qr_url"].forEach(key=>{
+      body[key] = $(key).value.trim();
+    });
+
+    await api("/api/admin/settings",{
+      method:"PUT",body:JSON.stringify(body)
+    });
+    message("settingsMessage","Settings सेव हो गईं।","success");
+  }catch(e){message("settingsMessage",e.message,"error");}
+  finally{button.disabled=false;}
+});
+
+$("settingsUploadForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const button = $("settingsUploadButton");
+  button.disabled = true;
+
+  try{
+    const file = $("settingsFile").files[0];
+    if(!file)throw new Error("पहले image चुनें।");
+    const url = await uploadImage(file);
+    const key = $("uploadType").value;
+    $(key).value = url;
+
+    const body = {};
+    ["store_name","logo_url","whatsapp","instagram","phone",
+     "email","address","google_maps","upi_id","qr_url"].forEach(k=>{
+      body[k] = $(k).value.trim();
+    });
+
+    await api("/api/admin/settings",{
+      method:"PUT",body:JSON.stringify(body)
+    });
+    message("settingsUploadMessage","Image upload और settings सेव हो गईं।","success");
+  }catch(e){message("settingsUploadMessage",e.message,"error");}
+  finally{button.disabled=false;}
+});
+
+$("galleryForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const button = $("galleryButton");
+  button.disabled = true;
+
+  try{
+    const file = $("galleryFile").files[0];
+    if(!file)throw new Error("Image चुनें।");
+    const url = await uploadImage(file);
+    $("galleryResult").innerHTML = "";
+    const link = document.createElement("a
