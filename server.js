@@ -202,7 +202,6 @@ async function initDatabase() {
     );
   `);
 
-  // Purane database mein missing settings columns add karein.
   await pool.query(`
     ALTER TABLE store_settings
       ADD COLUMN IF NOT EXISTS store_name TEXT NOT NULL DEFAULT 'Jewellery Store',
@@ -218,7 +217,6 @@ async function initDatabase() {
       ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   `);
 
-  // Check karein ki purana "data" column hai ya nahi.
   const legacy = await pool.query(`
     SELECT data_type, udt_name
     FROM information_schema.columns
@@ -261,8 +259,9 @@ async function initDatabase() {
       ON CONFLICT (id) DO NOTHING
     `);
   }
-}
-
+  }
+    
+  
 // ADMIN LOGIN
 app.post("/api/admin/login", (req, res) => {
   const password =
@@ -341,7 +340,36 @@ app.post("/api/admin/upload", requireAdmin, (req, res) => {
   });
 });
 
-// GET STORE SETTINGS
+// PUBLIC STORE SETTINGS
+app.get("/api/settings", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT store_name, logo_url, whatsapp, instagram,
+       phone, email, address, google_maps, upi_id, qr_url
+       FROM store_settings WHERE id = 1`
+    );
+
+    const row = result.rows[0] || {};
+
+    res.set("Cache-Control", "no-store");
+    res.json({
+      storeName: row.store_name || "Jewellery Store",
+      logoUrl: row.logo_url || "",
+      whatsapp: row.whatsapp || "",
+      instagram: row.instagram || "",
+      phone: row.phone || "",
+      email: row.email || "",
+      address: row.address || "",
+      googleMaps: row.google_maps || "",
+      upiId: row.upi_id || "",
+      qrUrl: row.qr_url || ""
+    });
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// GET STORE SETTINGS FOR ADMIN
 app.get("/api/admin/settings", requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(
@@ -448,12 +476,14 @@ app.put("/api/admin/settings", requireAdmin, async (req, res) => {
 });
 
 // LIST PRODUCTS
-app.get("/api/products", requireAdmin, async (req, res) => {
+// Public website ko products dikhane ke liye GET route public hai.
+app.get("/api/products", async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT id, name, price, image FROM products ORDER BY created_at DESC"
     );
 
+    res.set("Cache-Control", "no-store");
     res.json(result.rows);
   } catch (error) {
     sendError(res, error);
@@ -547,126 +577,151 @@ app.delete("/api/products/:id", requireAdmin, async (req, res) => {
     sendError(res, error);
   }
 });
+            
+/* =========================
+   PART 3: ORDERS + SERVER START
+========================= */
 
-// LIST ORDERS
-app.get("/api/orders", requireAdmin, async (req, res) => {
+// Get all orders (Admin only)
+app.get('/api/orders', requireAdmin, async (req, res, next) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM orders ORDER BY created_at DESC"
+      'SELECT * FROM orders ORDER BY created_at DESC'
     );
 
-    res.json(result.rows);
+    res.json(result.rows.map(row => ({
+      id: row.id,
+      customerName: row.customer_name,
+      phone: row.phone,
+      address: row.address,
+      items: row.items,
+      total: Number(row.total),
+      status: row.status,
+      paymentMethod: row.payment_method,
+      paymentStatus: row.payment_status,
+      createdAt: row.created_at
+    })));
   } catch (error) {
-    sendError(res, error);
+    next(error);
   }
 });
 
-// UPDATE ORDER STATUS
-app.patch("/api/orders/:id/status", requireAdmin, async (req, res) => {
+// Update order status (Admin only)
+app.patch('/api/orders/:id/status', requireAdmin, async (req, res, next) => {
   try {
-    const status = req.body.status;
+    const { status } = req.body;
 
-    if (!STATUSES.includes(status)) {
+    const allowedStatuses = [
+      'pending',
+      'confirmed',
+      'processing',
+      'shipped',
+      'delivered',
+      'cancelled'
+    ];
+
+    if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
-        error: "Invalid order status."
+        error: 'Invalid order status'
       });
     }
 
     const result = await pool.query(
-      `UPDATE orders SET status=$1
-       WHERE id=$2 RETURNING *`,
+      'UPDATE orders SET status = $1 WHERE id = $2 RETURNING *',
       [status, req.params.id]
     );
 
-    if (!result.rowCount) {
+    if (result.rows.length === 0) {
       return res.status(404).json({
-        error: "Order nahi mila."
+        error: 'Order not found'
       });
     }
 
     res.json({
-      message: "Order status update ho gaya.",
+      success: true,
       order: result.rows[0]
     });
   } catch (error) {
-    sendError(res, error);
+    next(error);
   }
 });
 
-// APPROVE / REJECT PAYMENT
-app.patch("/api/orders/:id/payment", requireAdmin, async (req, res) => {
+// Update payment status (Admin only)
+app.patch('/api/orders/:id/payment', requireAdmin, async (req, res, next) => {
   try {
-    const paymentStatus = req.body.payment_status;
-    const reference =
-      typeof req.body.payment_reference === "string"
-        ? req.body.payment_reference.trim().slice(0, 200)
-        : null;
+    const { paymentStatus } = req.body;
 
-    if (!PAYMENT_STATUSES.includes(paymentStatus)) {
+    const allowedStatuses = [
+      'pending',
+      'paid',
+      'failed',
+      'refunded'
+    ];
+
+    if (!allowedStatuses.includes(paymentStatus)) {
       return res.status(400).json({
-        error: "Invalid payment status."
+        error: 'Invalid payment status'
       });
     }
 
     const result = await pool.query(
-      `UPDATE orders
-       SET payment_status=$1,
-           payment_reference=COALESCE($2, payment_reference)
-       WHERE id=$3 RETURNING *`,
-      [paymentStatus, reference, req.params.id]
+      'UPDATE orders SET payment_status = $1 WHERE id = $2 RETURNING *',
+      [paymentStatus, req.params.id]
     );
 
-    if (!result.rowCount) {
+    if (result.rows.length === 0) {
       return res.status(404).json({
-        error: "Order nahi mila."
+        error: 'Order not found'
       });
     }
 
     res.json({
-      message: "Payment status update ho gaya.",
+      success: true,
       order: result.rows[0]
     });
   } catch (error) {
-    sendError(res, error);
+    next(error);
   }
 });
 
-// HEALTH CHECK
-app.get("/health", (req, res) => {
-  res.json({ status: "OK" });
-});
-
-// ADMIN PAGE
-app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "admin.html"));
-});
-
-app.get("/admin.html", (req, res) => {
-  res.sendFile(path.join(__dirname, "admin.html"));
-});
-
-// ERROR HANDLER
-app.use((error, req, res, next) => {
-  console.error(error);
-
-  if (res.headersSent) {
-    return next(error);
-  }
-
-  res.status(400).json({
-    error: error.message || "Request error."
+// Health check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Jewellery Store API is running'
   });
 });
 
-// START SERVER
+// Admin page
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+app.get('/admin.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('Server error:', err.message);
+
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(500).json({
+    error: 'Internal server error'
+  });
+});
+
+// Initialize database and start server
 initDatabase()
   .then(() => {
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log("Jewellery Store server running on port " + PORT);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Jewellery Store server running on port ${PORT}`);
     });
   })
   .catch(error => {
-    console.error("Database startup failed:", error);
+    console.error('Failed to initialize database:', error);
     process.exit(1);
   });
-            
