@@ -12,11 +12,21 @@ const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Basic middleware
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 
-// PostgreSQL database
+// Serve the website's main pages from the project root.
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.get("/admin.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "admin.html"));
+});
+
+// Serve any other static files in the public folder.
+app.use(express.static(path.join(__dirname, "public")));
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.DATABASE_URL
@@ -28,15 +38,12 @@ pool.on("error", (error) => {
   console.error("Database connection error:", error.message);
 });
 
-// Cloudinary configuration.
-// Set these values in Render Environment Variables.
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Memory storage lets Cloudinary receive image buffers.
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -47,13 +54,9 @@ const upload = multer({
     if (!file.mimetype || !file.mimetype.startsWith("image/")) {
       return callback(new Error("Only image files are allowed."));
     }
-
     callback(null, true);
   }
 });
-
-// Serve website files
-app.use(express.static(path.join(__dirname, "public")));
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -64,7 +67,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Database connection check
+// Database check
 app.get("/api/db-status", async (req, res) => {
   try {
     await pool.query("SELECT 1");
@@ -77,10 +80,15 @@ app.get("/api/db-status", async (req, res) => {
     });
   }
 });
-
-// Store settings
 app.get("/api/settings", async (req, res) => {
   try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS store_settings (
+        key TEXT PRIMARY KEY,
+        value JSONB NOT NULL DEFAULT '{}'::jsonb
+      )
+    `);
+
     const result = await pool.query(
       "SELECT value FROM store_settings WHERE key = $1",
       ["settings"]
@@ -104,9 +112,8 @@ app.get("/api/settings", async (req, res) => {
   }
 });
 
-// Save store settings.
-// Admin authentication must be added/connected in Part 3
-// before using this route in production.
+// IMPORTANT: protect this route with admin authentication
+// before using store settings in production.
 app.put("/api/settings", async (req, res) => {
   try {
     const settings = req.body.settings;
@@ -144,7 +151,7 @@ app.put("/api/settings", async (req, res) => {
   }
 });
 
-// Upload an image to Cloudinary
+// Image upload
 app.post("/api/upload-image", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
@@ -180,10 +187,7 @@ app.post("/api/upload-image", upload.single("image"), async (req, res) => {
       stream.end(req.file.buffer);
     });
 
-    res.json({
-      success: true,
-      url: imageUrl
-    });
+    res.json({ success: true, url: imageUrl });
   } catch (error) {
     console.error("Image upload failed:", error.message);
     res.status(500).json({
@@ -212,9 +216,6 @@ app.get("/api/products", async (req, res) => {
     });
   }
 });
-
-// Create the orders table if it does not exist.
-// Existing orders tables are not replaced.
 app.post("/api/orders", async (req, res) => {
   const {
     customer_name,
@@ -238,8 +239,7 @@ app.post("/api/orders", async (req, res) => {
     });
   }
 
-  const method =
-    String(payment_method || "COD").toUpperCase();
+  const method = String(payment_method || "COD").toUpperCase();
 
   if (!["COD", "UPI"].includes(method)) {
     return res.status(400).json({
@@ -274,20 +274,6 @@ app.post("/api/orders", async (req, res) => {
         payment_status TEXT NOT NULL DEFAULT 'PENDING',
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
-    `);
-
-    // Supports databases created with an older version
-    // of this same orders table.
-    await client.query(`
-      ALTER TABLE orders
-      ADD COLUMN IF NOT EXISTS payment_method
-      TEXT NOT NULL DEFAULT 'COD'
-    `);
-
-    await client.query(`
-      ALTER TABLE orders
-      ADD COLUMN IF NOT EXISTS payment_status
-      TEXT NOT NULL DEFAULT 'PENDING'
     `);
 
     const result = await client.query(
@@ -327,14 +313,14 @@ app.post("/api/orders", async (req, res) => {
   }
 });
 
-// JSON and upload error handler
+// Handle JSON and image-upload errors
 app.use((error, req, res, next) => {
   console.error("Request error:", error.message);
 
   if (error instanceof multer.MulterError) {
     return res.status(400).json({
       success: false,
-      message: "Image upload failed. Maximum file size is 10 MB."
+      message: "Image upload failed. Maximum size is 10 MB."
     });
   }
 
@@ -347,17 +333,17 @@ app.use((error, req, res, next) => {
 
   res.status(error.status || 500).json({
     success: false,
-    message: error.message || "Internal server error"
+    message: "Internal server error"
   });
 });
 
-// Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Vishal Jewellers server running on port ${PORT}`);
 });
 
-// Graceful shutdown
-process.on("SIGTERM", async () => {
-  await pool.end();
-  process.exit(0);
+process.on("SIGTERM", () => {
+  server.close(async () => {
+    await pool.end();
+    process.exit(0);
+  });
 });
