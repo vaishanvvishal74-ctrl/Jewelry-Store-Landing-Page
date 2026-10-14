@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vishal Jewellers | Admin Panel</title>
+<title>Vishal Jewellers - Admin Panel</title>
+
 <style>
 :root {
   --gold: #c99b35;
@@ -25,69 +26,73 @@ body {
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
 .hidden { display: none !important; }
+
 .topbar {
   background: var(--dark);
   color: white;
-  padding: 16px 20px;
+  padding: 16px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   gap: 12px;
   flex-wrap: wrap;
 }
 .brand { font-size: 20px; font-weight: 800; }
 .brand span { color: var(--gold); }
+
 .container {
   width: min(1200px, 100%);
   margin: auto;
-  padding: 20px;
+  padding: 16px;
 }
 .login-wrap {
   min-height: 80vh;
   display: grid;
   place-items: center;
-  padding: 20px;
+  padding: 16px;
 }
 .card {
   background: white;
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
   box-shadow: 0 4px 18px #00000008;
 }
 .login-card { width: min(420px, 100%); }
 h1, h2, h3 { margin-top: 0; }
 .muted { color: var(--muted); font-size: 14px; }
+
 label {
   display: block;
   font-weight: 700;
-  margin: 13px 0 6px;
+  margin: 12px 0 6px;
   font-size: 14px;
 }
 input, select, textarea {
   width: 100%;
-  padding: 11px 12px;
+  padding: 11px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   background: white;
-  color: #222;
 }
-textarea { resize: vertical; min-height: 85px; }
+textarea { min-height: 85px; resize: vertical; }
+
 .btn {
   border: 0;
   border-radius: 8px;
-  padding: 11px 15px;
+  padding: 10px 14px;
   font-weight: 700;
 }
 .btn-gold { background: var(--gold); color: #171717; }
 .btn-dark { background: #222; color: white; }
 .btn-red { background: #b42318; color: white; }
-.btn-green { background: #18794e; color: white; }
 .btn-light { background: #eee; color: #222; }
-.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn:disabled { opacity: .55; }
 .full { width: 100%; margin-top: 16px; }
+
 .notice {
-  padding: 11px 13px;
+  padding: 11px;
   border-radius: 8px;
   margin: 12px 0;
   font-size: 14px;
@@ -96,6 +101,7 @@ textarea { resize: vertical; min-height: 85px; }
 .notice.error { background: #fee2e2; color: #991b1b; }
 .notice.success { background: #dcfce7; color: #166534; }
 .notice.info { background: #e0f2fe; color: #075985; }
+
 .tabs {
   display: flex;
   gap: 8px;
@@ -111,21 +117,20 @@ textarea { resize: vertical; min-height: 85px; }
   font-weight: 700;
 }
 .tab.active { background: #222; color: white; }
+
 .stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 20px;
+  gap: 10px;
 }
-.stat-number { font-size: 26px; font-weight: 800; margin-top: 8px; }
-.section { margin-bottom: 22px; }
+.stat-number { font-size: 24px; font-weight: 800; margin-top: 8px; }
+
 .section-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 14px;
 }
 .form-grid {
   display: grid;
@@ -133,12 +138,8 @@ textarea { resize: vertical; min-height: 85px; }
   gap: 12px;
 }
 .field-full { grid-column: 1 / -1; }
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
-}
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+
 .table-wrap { overflow-x: auto; }
 table {
   width: 100%;
@@ -148,18 +149,25 @@ table {
 }
 th, td {
   text-align: left;
-  padding: 12px;
+  padding: 11px;
   border-bottom: 1px solid var(--border);
   font-size: 14px;
   vertical-align: middle;
 }
 th { background: #f9fafb; }
+
 .product-thumb {
   width: 55px;
   height: 55px;
   object-fit: cover;
   border-radius: 8px;
   background: #eee;
+}
+.preview {
+  max-width: 160px;
+  max-height: 160px;
+  object-fit: contain;
+  margin-top: 10px;
 }
 .badge {
   display: inline-block;
@@ -172,31 +180,25 @@ th { background: #f9fafb; }
 .badge.pending { background: #fef3c7; color: #92400e; }
 .badge.completed { background: #dcfce7; color: #166534; }
 .badge.cancelled { background: #fee2e2; color: #991b1b; }
-.preview {
-  max-width: 160px;
-  max-height: 160px;
-  object-fit: contain;
-  margin-top: 10px;
-  border-radius: 8px;
-}
-hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
-@media (max-width: 800px) {
+
+@media(max-width:700px) {
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (max-width: 520px) {
-  .container { padding: 12px; }
-  .stats { gap: 8px; }
-  .stat-number { font-size: 22px; }
+@media(max-width:520px) {
+  .container { padding: 10px; }
   .form-grid { grid-template-columns: 1fr; }
   .field-full { grid-column: auto; }
-  .card { padding: 15px; }
+  .stat-number { font-size: 20px; }
 }
 </style>
 </head>
 <body>
+
 <header class="topbar">
   <div class="brand">VISHAL <span>JEWELLERS</span> · ADMIN</div>
-  <button id="logoutBtn" class="btn btn-light hidden" type="button">Logout</button>
+  <button id="logoutBtn" class="btn btn-light hidden" type="button">
+    Logout
+  </button>
 </header>
 
 <div id="loginView" class="login-wrap">
@@ -205,36 +207,61 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
     <p class="muted">Sign in to manage your jewellery store.</p>
     <div id="loginMessage" aria-live="polite"></div>
     <label for="adminPassword">Admin Password</label>
-    <input id="adminPassword" type="password" autocomplete="current-password" required>
-    <button id="loginBtn" class="btn btn-gold full" type="submit">Login</button>
-    <p class="muted">Use the password configured for your server admin account.</p>
+    <input id="adminPassword" type="password"
+      autocomplete="current-password" required>
+    <button id="loginBtn" class="btn btn-gold full" type="submit">
+      Login
+    </button>
   </form>
 </div>
 
 <main id="dashboardView" class="container hidden">
   <div id="globalMessage" aria-live="polite"></div>
+
   <div class="stats">
-    <div class="card"><div class="muted">Products</div><div id="statProducts" class="stat-number">0</div></div>
-    <div class="card"><div class="muted">Total Orders</div><div id="statOrders" class="stat-number">0</div></div>
-    <div class="card"><div class="muted">Pending Orders</div><div id="statPending" class="stat-number">0</div></div>
-    <div class="card"><div class="muted">Order Revenue</div><div id="statRevenue" class="stat-number">₹0</div></div>
+    <div class="card">
+      <div class="muted">Products</div>
+      <div id="statProducts" class="stat-number">0</div>
+    </div>
+    <div class="card">
+      <div class="muted">Total Orders</div>
+      <div id="statOrders" class="stat-number">0</div>
+    </div>
+    <div class="card">
+      <div class="muted">Pending Orders</div>
+      <div id="statPending" class="stat-number">0</div>
+    </div>
+    <div class="card">
+      <div class="muted">Order Revenue</div>
+      <div id="statRevenue" class="stat-number">₹0</div>
+    </div>
   </div>
 
-  <nav class="tabs" aria-label="Admin sections">
-    <button class="tab active" data-tab="products" type="button">Products</button>
-    <button class="tab" data-tab="orders" type="button">Orders</button>
-    <button class="tab" data-tab="settings" type="button">Store Settings</button>
+  <nav class="tabs">
+    <button class="tab active" data-tab="products" type="button">
+      Products
+    </button>
+    <button class="tab" data-tab="orders" type="button">
+      Orders
+    </button>
+    <button class="tab" data-tab="settings" type="button">
+      Store Settings
+    </button>
   </nav>
 
-  <section id="productsSection" class="section">
+  <section id="productsSection">
     <div class="section-head">
       <h2>Manage Products</h2>
-      <button id="newProductBtn" class="btn btn-gold" type="button">+ Add Product</button>
+      <button id="newProductBtn" class="btn btn-gold" type="button">
+        + Add Product
+      </button>
     </div>
+
     <div id="productFormCard" class="card hidden">
       <h3 id="productFormTitle">Add Product</h3>
       <form id="productForm">
         <input id="productId" type="hidden">
+
         <div class="form-grid">
           <div>
             <label for="productName">Product Name *</label>
@@ -242,29 +269,33 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
           </div>
           <div>
             <label for="productCategory">Category</label>
-            <input id="productCategory" maxlength="100" placeholder="Rings, Necklace, Earrings">
+            <input id="productCategory" maxlength="100">
           </div>
           <div>
             <label for="productPrice">Price (₹) *</label>
-            <input id="productPrice" type="number" min="0" step="0.01" required>
+            <input id="productPrice" type="number"
+              min="0" step="0.01" required>
           </div>
           <div>
             <label for="productStock">Stock Quantity</label>
-            <input id="productStock" type="number" min="0" step="1" value="0">
+            <input id="productStock" type="number"
+              min="0" step="1" value="0">
           </div>
           <div class="field-full">
             <label for="productDescription">Description</label>
-            <textarea id="productDescription" maxlength="3000"></textarea>
+            <textarea id="productDescription"></textarea>
           </div>
           <div class="field-full">
             <label for="productImageUrl">Image URL</label>
-            <input id="productImageUrl" type="url" placeholder="https://...">
-            <p class="muted">Or choose an image file below to upload it to the server.</p>
+            <input id="productImageUrl" type="url"
+              placeholder="https://...">
           </div>
           <div class="field-full">
             <label for="productImageFile">Upload Product Image</label>
-            <input id="productImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
-            <img id="imagePreview" class="preview hidden" alt="Product image preview">
+            <input id="productImageFile" type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif">
+            <img id="imagePreview" class="preview hidden"
+              alt="Product image preview">
           </div>
           <div>
             <label for="productFeatured">Featured Product</label>
@@ -281,23 +312,34 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
             </select>
           </div>
         </div>
+
         <div id="productFormMessage" aria-live="polite"></div>
         <div class="actions">
-          <button id="saveProductBtn" class="btn btn-gold" type="submit">Save Product</button>
-          <button id="cancelProductBtn" class="btn btn-light" type="button">Cancel</button>
+          <button id="saveProductBtn" class="btn btn-gold" type="submit">
+            Save Product
+          </button>
+          <button id="cancelProductBtn" class="btn btn-light" type="button">
+            Cancel
+          </button>
         </div>
       </form>
     </div>
+
     <div class="card">
       <div class="section-head">
         <h3>Product List</h3>
-        <button id="refreshProductsBtn" class="btn btn-light" type="button">Refresh</button>
+        <button id="refreshProductsBtn" class="btn btn-light" type="button">
+          Refresh
+        </button>
       </div>
       <div id="productsMessage" aria-live="polite"></div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Image</th><th>Product</th><th>Price</th><th>Stock</th><th>Visible</th><th>Actions</th></tr>
+            <tr>
+              <th>Image</th><th>Product</th><th>Price</th>
+              <th>Stock</th><th>Visible</th><th>Actions</th>
+            </tr>
           </thead>
           <tbody id="productsTableBody">
             <tr><td colspan="6">Loading products...</td></tr>
@@ -306,13 +348,24 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
       </div>
     </div>
   </section>
-  <section id="ordersSection" class="section hidden">
+
+</main>
+</body>
+    </html>
+
+  <section id="ordersSection" class="hidden">
     <div class="section-head">
       <h2>Manage Orders</h2>
-      <button id="refreshOrdersBtn" class="btn btn-light" type="button">Refresh Orders</button>
+      <button id="refreshOrdersBtn" class="btn btn-light" type="button">
+        Refresh Orders
+      </button>
     </div>
-    <div id="ordersMessage" aria-live="polite"></div>
+
     <div class="card">
+      <p class="muted">
+        Customer details, ordered items, payment method and order status.
+      </p>
+      <div id="ordersMessage" aria-live="polite"></div>
       <div class="table-wrap">
         <table>
           <thead>
@@ -323,75 +376,101 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
               <th>Total</th>
               <th>Payment</th>
               <th>Status</th>
-              <th>Update</th>
+              <th>Update Status</th>
             </tr>
           </thead>
           <tbody id="ordersTableBody">
-            <tr><td colspan="7">Orders will appear here.</td></tr>
+            <tr>
+              <td colspan="7">Orders will appear here.</td>
+            </tr>
           </tbody>
         </table>
       </div>
     </div>
   </section>
 
-  <section id="settingsSection" class="section hidden">
-    <div class="section-head">
-      <h2>Store Settings</h2>
-    </div>
+  <section id="settingsSection" class="hidden">
+    <h2>Store Settings</h2>
+
     <div class="card">
-      <p class="muted">These settings are saved through your server API.</p>
+      <p class="muted">
+        Update the contact and payment details displayed for your store.
+      </p>
+
+      <div id="settingsMessage" aria-live="polite"></div>
+
       <form id="settingsForm">
         <div class="form-grid">
-          <div>
+          <div class="field-full">
             <label for="storeName">Store Name</label>
-            <input id="storeName" maxlength="160" placeholder="Vishal Jewellers">
+            <input id="storeName" maxlength="200"
+              placeholder="Vishal Jewellers">
           </div>
+
           <div>
             <label for="storePhone">Phone Number</label>
-            <input id="storePhone" maxlength="40">
+            <input id="storePhone" type="tel" maxlength="50"
+              placeholder="Store contact number">
           </div>
+
           <div>
-            <label for="storeEmail">Store Email</label>
-            <input id="storeEmail" type="email" maxlength="200">
+            <label for="storeEmail">Email Address</label>
+            <input id="storeEmail" type="email" maxlength="200"
+              placeholder="store@example.com">
           </div>
-          <div>
-            <label for="storeUPI">UPI ID</label>
-            <input id="storeUPI" maxlength="160" placeholder="yourname@upi">
-          </div>
+
           <div class="field-full">
             <label for="storeAddress">Store Address</label>
-            <textarea id="storeAddress" maxlength="1000"></textarea>
+            <textarea id="storeAddress" maxlength="1000"
+              placeholder="Enter complete store address"></textarea>
           </div>
+
+          <div class="field-full">
+            <label for="storeUPI">UPI ID</label>
+            <input id="storeUPI" maxlength="200"
+              placeholder="yourname@upi">
+          </div>
+
           <div class="field-full">
             <label for="storeQR">UPI QR Image URL</label>
-            <input id="storeQR" type="url" placeholder="https://...">
+            <input id="storeQR" type="url" maxlength="2000"
+              placeholder="https://...">
+            <p class="muted">
+              Enter a publicly accessible image URL.
+            </p>
           </div>
+
           <div class="field-full">
             <label for="storeAnnouncement">Store Announcement</label>
-            <textarea id="storeAnnouncement" maxlength="1000" placeholder="Optional announcement for customers"></textarea>
+            <textarea id="storeAnnouncement" maxlength="500"
+              placeholder="Optional message for customers"></textarea>
           </div>
         </div>
-        <div id="settingsMessage" aria-live="polite"></div>
-        <button id="saveSettingsBtn" class="btn btn-gold" type="submit">Save Settings</button>
+
+        <button id="saveSettingsBtn" class="btn btn-gold full" type="submit">
+          Save Store Settings
+        </button>
       </form>
     </div>
   </section>
 </main>
 
+
 <script>
 "use strict";
 
 const API = "/api";
-let adminToken = "";
-let products = [];
-let orders = [];
-let settings = {};
 
 const $ = (id) => document.getElementById(id);
+
+let products = [];
+let orders = [];
+let adminToken = "";
 
 function showMessage(id, message, type = "info") {
   const el = $(id);
   if (!el) return;
+
   el.replaceChildren();
   if (!message) return;
 
@@ -402,52 +481,68 @@ function showMessage(id, message, type = "info") {
 }
 
 function money(value) {
-  const number = Number(value);
-  return "₹" + (Number.isFinite(number) ? number : 0).toLocaleString("en-IN", {
-    minimumFractionDigits: 0,
+  const amount = Number(value || 0);
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
     maximumFractionDigits: 2
-  });
+  }).format(Number.isFinite(amount) ? amount : 0);
 }
 
 function safeImageUrl(value) {
+  if (!value) return "";
   try {
-    const url = new URL(String(value || ""), window.location.origin);
-    if (url.protocol !== "https:" && url.origin !== window.location.origin) {
-      return "";
+    const url = new URL(value, window.location.origin);
+    if (url.protocol === "https:" ||
+        (url.protocol === "http:" &&
+         url.origin === window.location.origin)) {
+      return url.href;
     }
-    if (url.protocol !== "https:" && url.protocol !== "http:") return "";
-    return url.href;
-  } catch {
-    return "";
-  }
+  } catch (_) {}
+  return "";
 }
 
 async function apiRequest(path, options = {}) {
   const headers = new Headers(options.headers || {});
-  if (adminToken) headers.set("Authorization", "Bearer " + adminToken);
+  const isForm = options.body instanceof FormData;
 
-  if (options.body && !(options.body instanceof FormData)) {
+  if (options.body != null && !isForm &&
+      !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
+  }
+
+  if (adminToken) {
+    headers.set("Authorization", "Bearer " + adminToken);
   }
 
   const response = await fetch(API + path, {
     ...options,
-    headers
+    headers,
+    credentials: "same-origin"
   });
 
-  const raw = await response.text();
+  const text = await response.text();
   let data = {};
+
   try {
-    data = raw ? JSON.parse(raw) : {};
-  } catch {
-    data = { message: raw || "Unexpected server response" };
+    data = text ? JSON.parse(text) : {};
+  } catch (_) {
+    data = { message: text || "Unexpected server response" };
+  }
+
+  if (response.status === 401 || response.status === 403) {
+    if (path !== "/admin/login" && path !== "/admin/me") {
+      showMessage("globalMessage",
+        "Session expired or access denied. Please log in again.",
+        "error");
+    }
   }
 
   if (!response.ok) {
-    if (response.status === 401 || response.status === 403) {
-      logout(false);
-    }
-    throw new Error(data.error || data.message || "Request failed (" + response.status + ")");
+    throw new Error(
+      data.message || data.error ||
+      ("Request failed (" + response.status + ")")
+    );
   }
 
   return data;
@@ -459,21 +554,24 @@ function setLoggedIn(loggedIn) {
   $("logoutBtn").classList.toggle("hidden", !loggedIn);
 }
 
-function logout(showNotice = true) {
-  adminToken = "";
-  setLoggedIn(false);
-  $("adminPassword").value = "";
-  if (showNotice) {
-    showMessage("loginMessage", "You have been logged out.", "info");
-  }
+function switchTab(name) {
+  ["products", "orders", "settings"].forEach((tab) => {
+    $(tab + "Section").classList.toggle("hidden", tab !== name);
+    document.querySelector('[data-tab="' + tab + '"]')
+      .classList.toggle("active", tab === name);
+  });
 }
+
+document.querySelectorAll("[data-tab]").forEach((button) => {
+  button.addEventListener("click", () => switchTab(button.dataset.tab));
+});
 
 $("loginForm").addEventListener("submit", async (event) => {
   event.preventDefault();
+
   const button = $("loginBtn");
   button.disabled = true;
-  button.textContent = "Signing in...";
-  showMessage("loginMessage", "");
+  showMessage("loginMessage", "Signing in...");
 
   try {
     const result = await apiRequest("/admin/login", {
@@ -483,42 +581,33 @@ $("loginForm").addEventListener("submit", async (event) => {
       })
     });
 
-    if (!result.token) throw new Error("Server did not return a login token.");
+    adminToken = result.token || result.accessToken || "";
 
-    adminToken = result.token;
-    setLoggedIn(true);
+    if (result.authenticated === false || result.success === false) {
+      throw new Error(result.message || "Login failed");
+    }
+
     $("adminPassword").value = "";
+    showMessage("loginMessage", "");
+    setLoggedIn(true);
     await loadDashboard();
   } catch (error) {
     showMessage("loginMessage", error.message, "error");
   } finally {
     button.disabled = false;
-    button.textContent = "Login";
   }
 });
 
 $("logoutBtn").addEventListener("click", async () => {
   try {
     await apiRequest("/admin/logout", { method: "POST" });
-  } catch (error) {
-    console.warn("Logout request:", error.message);
-  }
-  logout(true);
-});
+  } catch (_) {}
 
-document.querySelectorAll(".tab").forEach((button) => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach((tab) => {
-      tab.classList.toggle("active", tab === button);
-    });
-
-    ["products", "orders", "settings"].forEach((name) => {
-      $(name + "Section").classList.toggle(
-        "hidden",
-        name !== button.dataset.tab
-      );
-    });
-  });
+  adminToken = "";
+  products = [];
+  orders = [];
+  setLoggedIn(false);
+  switchTab("products");
 });
 
 async function loadDashboard() {
@@ -531,15 +620,71 @@ async function loadDashboard() {
   updateStats();
 }
 
-async function loadProducts() {
-  $("productsTableBody").replaceChildren();
-  const loadingRow = document.createElement("tr");
-  const loadingCell = document.createElement("td");
-  loadingCell.colSpan = 6;
-  loadingCell.textContent = "Loading products...";
-  loadingRow.appendChild(loadingCell);
-  $("productsTableBody").appendChild(loadingRow);
+function resetProductForm() {
+  $("productForm").reset();
+  $("productId").value = "";
+  $("productStock").value = "0";
+  $("productFeatured").value = "false";
+  $("productActive").value = "true";
+  $("imagePreview").removeAttribute("src");
+  $("imagePreview").classList.add("hidden");
+  $("productFormTitle").textContent = "Add Product";
+  $("saveProductBtn").textContent = "Save Product";
+  showMessage("productFormMessage", "");
+}
 
+$("newProductBtn").addEventListener("click", () => {
+  resetProductForm();
+  $("productFormCard").classList.remove("hidden");
+  $("productFormCard").scrollIntoView({ behavior: "smooth" });
+});
+
+$("cancelProductBtn").addEventListener("click", () => {
+  $("productFormCard").classList.add("hidden");
+  resetProductForm();
+});
+
+$("productImageUrl").addEventListener("input", () => {
+  const url = safeImageUrl($("productImageUrl").value.trim());
+
+  if (url) {
+    $("imagePreview").src = url;
+    $("imagePreview").classList.remove("hidden");
+  } else {
+    $("imagePreview").removeAttribute("src");
+    $("imagePreview").classList.add("hidden");
+  }
+});
+
+$("productImageFile").addEventListener("change", () => {
+  const file = $("productImageFile").files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    showMessage("productFormMessage", "Choose a valid image file.", "error");
+    $("productImageFile").value = "";
+    return;
+  }
+
+  $("imagePreview").src = URL.createObjectURL(file);
+  $("imagePreview").classList.remove("hidden");
+});
+
+async function uploadProductImage(file) {
+  const form = new FormData();
+  form.append("image", file);
+
+  const result = await apiRequest("/admin/upload", {
+    method: "POST",
+    body: form
+  });
+
+  const url = result.url || result.image_url;
+  if (!url) throw new Error("Image URL was not returned by the server.");
+  return url;
+}
+
+async function loadProducts() {
   try {
     const result = await apiRequest("/products");
     products = Array.isArray(result) ? result : (result.products || []);
@@ -560,10 +705,10 @@ function renderProducts() {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
     cell.colSpan = 6;
-    cell.textContent = "No products found. Add your first product.";
+    cell.textContent = "No products found.";
     row.appendChild(cell);
     body.appendChild(row);
-    $("statProducts").textContent = "0";
+    updateStats();
     return;
   }
 
@@ -574,23 +719,12 @@ function renderProducts() {
     const image = document.createElement("img");
     image.className = "product-thumb";
     image.alt = product.name || "Product";
-    image.loading = "lazy";
-    image.src = safeImageUrl(product.image_url || product.imageUrl) || "";
-    image.onerror = () => {
-      image.removeAttribute("src");
-      image.alt = "No image";
-    };
+    image.src = safeImageUrl(product.image_url || product.image);
+    image.onerror = () => image.removeAttribute("src");
     imageCell.appendChild(image);
 
     const nameCell = document.createElement("td");
-    const name = document.createElement("strong");
-    name.textContent = product.name || "Unnamed product";
-    nameCell.appendChild(name);
-
-    const category = document.createElement("div");
-    category.className = "muted";
-    category.textContent = product.category || "";
-    nameCell.appendChild(category);
+    nameCell.textContent = product.name || "Unnamed";
 
     const priceCell = document.createElement("td");
     priceCell.textContent = money(product.price);
@@ -598,61 +732,31 @@ function renderProducts() {
     const stockCell = document.createElement("td");
     stockCell.textContent = String(product.stock ?? 0);
 
-    const visibleCell = document.createElement("td");
-    const badge = document.createElement("span");
-    const active = product.active !== false && product.active !== 0;
-    badge.className = "badge " + (active ? "completed" : "cancelled");
-    badge.textContent = active ? "Visible" : "Hidden";
-    visibleCell.appendChild(badge);
+    const activeCell = document.createElement("td");
+    activeCell.textContent =
+      product.active === false || product.active === 0 ? "Hidden" : "Visible";
 
     const actionsCell = document.createElement("td");
-    const editButton = document.createElement("button");
-    editButton.type = "button";
-    editButton.className = "btn btn-light";
-    editButton.textContent = "Edit";
-    editButton.addEventListener("click", () => editProduct(product));
 
-    const deleteButton = document.createElement("button");
-    deleteButton.type = "button";
-    deleteButton.className = "btn btn-red";
-    deleteButton.style.marginTop = "6px";
-    deleteButton.textContent = "Delete";
-    deleteButton.addEventListener("click", () => deleteProduct(product));
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "btn btn-light";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => editProduct(product));
 
-    actionsCell.append(editButton, document.createElement("br"), deleteButton);
-    row.append(imageCell, nameCell, priceCell, stockCell, visibleCell, actionsCell);
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "btn btn-red";
+    del.textContent = "Delete";
+    del.style.marginTop = "6px";
+    del.addEventListener("click", () => deleteProduct(product));
+
+    actionsCell.append(edit, document.createElement("br"), del);
+    row.append(imageCell, nameCell, priceCell, stockCell, activeCell, actionsCell);
     body.appendChild(row);
   });
 
-  $("statProducts").textContent = String(products.length);
-}
-
-$("refreshProductsBtn").addEventListener("click", loadProducts);
-
-$("newProductBtn").addEventListener("click", () => {
-  resetProductForm();
-  $("productFormCard").classList.remove("hidden");
-  $("productFormCard").scrollIntoView({ behavior: "smooth", block: "start" });
-});
-
-$("cancelProductBtn").addEventListener("click", () => {
-  $("productFormCard").classList.add("hidden");
-  resetProductForm();
-});
-
-function resetProductForm() {
-  $("productForm").reset();
-  $("productId").value = "";
-  $("productStock").value = "0";
-  $("productFeatured").value = "false";
-  $("productActive").value = "true";
-  $("productImageUrl").value = "";
-  $("productImageFile").value = "";
-  $("imagePreview").removeAttribute("src");
-  $("imagePreview").classList.add("hidden");
-  $("productFormTitle").textContent = "Add Product";
-  $("saveProductBtn").textContent = "Save Product";
-  showMessage("productFormMessage", "");
+  updateStats();
 }
 
 function editProduct(product) {
@@ -663,104 +767,58 @@ function editProduct(product) {
   $("productPrice").value = product.price ?? "";
   $("productStock").value = product.stock ?? 0;
   $("productDescription").value = product.description || "";
-  $("productImageUrl").value = product.image_url || product.imageUrl || "";
+  $("productImageUrl").value = product.image_url || product.image || "";
   $("productFeatured").value = String(Boolean(product.featured));
-  $("productActive").value = String(product.active !== false && product.active !== 0);
-  $("productFormTitle").textContent = "Edit Product";
-  $("saveProductBtn").textContent = "Update Product";
+  $("productActive").value = String(
+    product.active !== false && product.active !== 0
+  );
 
-  const imageUrl = safeImageUrl($("productImageUrl").value);
-  if (imageUrl) {
-    $("imagePreview").src = imageUrl;
-    $("imagePreview").classList.remove("hidden");
-  }
-
-  $("productFormCard").classList.remove("hidden");
-  $("productFormCard").scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-$("productImageUrl").addEventListener("input", () => {
   const url = safeImageUrl($("productImageUrl").value);
   if (url) {
     $("imagePreview").src = url;
     $("imagePreview").classList.remove("hidden");
-  } else {
-    $("imagePreview").removeAttribute("src");
-    $("imagePreview").classList.add("hidden");
-  }
-});
-
-$("productImageFile").addEventListener("change", () => {
-  const file = $("productImageFile").files[0];
-  if (!file) return;
-
-  if (!file.type.startsWith("image/")) {
-    showMessage("productFormMessage", "Please select a valid image.", "error");
-    $("productImageFile").value = "";
-    return;
   }
 
-  const temporaryUrl = URL.createObjectURL(file);
-  $("imagePreview").src = temporaryUrl;
-  $("imagePreview").classList.remove("hidden");
-});
-
-async function uploadProductImage(file) {
-  const formData = new FormData();
-  formData.append("image", file);
-
-  const result = await apiRequest("/upload-image", {
-    method: "POST",
-    body: formData
-  });
-
-  const url = result.url || result.image_url;
-  if (!url) throw new Error("Image upload did not return a URL.");
-  return url;
+  $("productFormTitle").textContent = "Edit Product";
+  $("saveProductBtn").textContent = "Update Product";
+  $("productFormCard").classList.remove("hidden");
+  $("productFormCard").scrollIntoView({ behavior: "smooth" });
 }
-  async function saveProduct(event) {
+
+$("productForm").addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const button = $("saveProductBtn");
   button.disabled = true;
-  showMessage("productFormMessage", "Saving product...", "info");
 
   try {
     let imageUrl = $("productImageUrl").value.trim();
-    const imageFile = $("productImageFile").files[0];
+    const file = $("productImageFile").files[0];
 
-    if (imageFile) {
-      imageUrl = await uploadProductImage(imageFile);
-    }
-
-    const price = Number($("productPrice").value);
-    const stock = Number($("productStock").value || 0);
-
-    if (!Number.isFinite(price) || price < 0) {
-      throw new Error("Enter a valid product price.");
-    }
-
-    if (!Number.isInteger(stock) || stock < 0) {
-      throw new Error("Stock must be a non-negative whole number.");
-    }
+    if (file) imageUrl = await uploadProductImage(file);
 
     const payload = {
       name: $("productName").value.trim(),
       category: $("productCategory").value.trim(),
-      price,
-      stock,
+      price: Number($("productPrice").value),
+      stock: Number($("productStock").value || 0),
       description: $("productDescription").value.trim(),
+      image: imageUrl,
       image_url: imageUrl,
       featured: $("productFeatured").value === "true",
       active: $("productActive").value === "true"
     };
 
-    if (!payload.name) {
-      throw new Error("Product name is required.");
+    if (!payload.name) throw new Error("Product name is required.");
+    if (!Number.isFinite(payload.price) || payload.price < 0) {
+      throw new Error("Enter a valid price.");
+    }
+    if (!Number.isInteger(payload.stock) || payload.stock < 0) {
+      throw new Error("Stock must be a whole number of zero or more.");
     }
 
     const id = $("productId").value;
-    const result = await apiRequest(
+    await apiRequest(
       id ? "/admin/products/" + encodeURIComponent(id) : "/admin/products",
       {
         method: id ? "PUT" : "POST",
@@ -768,60 +826,36 @@ async function uploadProductImage(file) {
       }
     );
 
-    showMessage(
-      "globalMessage",
-      result.message || "Product saved successfully.",
-      "success"
-    );
-
     $("productFormCard").classList.add("hidden");
     resetProductForm();
+    showMessage("globalMessage", "Product saved successfully.", "success");
     await loadProducts();
-    updateStats();
   } catch (error) {
     showMessage("productFormMessage", error.message, "error");
   } finally {
     button.disabled = false;
-    button.textContent = $("productId").value ? "Update Product" : "Save Product";
   }
-}
-
-$("productForm").addEventListener("submit", saveProduct);
+});
 
 async function deleteProduct(product) {
-  const confirmed = window.confirm(
-    'Delete "' + (product.name || "this product") + '"? This cannot be undone.'
-  );
-
-  if (!confirmed) return;
+  if (!confirm("Delete " + (product.name || "this product") + "?")) return;
 
   try {
-    await apiRequest(
-      "/admin/products/" + encodeURIComponent(product.id),
-      { method: "DELETE" }
-    );
-
+    await apiRequest("/admin/products/" + encodeURIComponent(product.id), {
+      method: "DELETE"
+    });
     showMessage("globalMessage", "Product deleted.", "success");
     await loadProducts();
-    updateStats();
   } catch (error) {
     showMessage("globalMessage", error.message, "error");
   }
 }
 
+$("refreshProductsBtn").addEventListener("click", loadProducts);
+
 async function loadOrders() {
-  const body = $("ordersTableBody");
-  body.replaceChildren();
-
-  const loadingRow = document.createElement("tr");
-  const loadingCell = document.createElement("td");
-  loadingCell.colSpan = 7;
-  loadingCell.textContent = "Loading orders...";
-  loadingRow.appendChild(loadingCell);
-  body.appendChild(loadingRow);
-
   try {
-    const result = await apiRequest("/orders");
+    const result = await apiRequest("/admin/orders");
     orders = Array.isArray(result) ? result : (result.orders || []);
     renderOrders();
     showMessage("ordersMessage", "");
@@ -830,7 +864,6 @@ async function loadOrders() {
     renderOrders();
     showMessage("ordersMessage", error.message, "error");
   }
-
   updateStats();
 }
 
@@ -850,70 +883,65 @@ function renderOrders() {
 
   orders.forEach((order) => {
     const row = document.createElement("tr");
+    const id = document.createElement("td");
+    id.textContent = String(order.id ?? "");
 
-    const idCell = document.createElement("td");
-    idCell.textContent = String(order.id ?? "");
-
-    const customerCell = document.createElement("td");
+    const customer = document.createElement("td");
     const customerName = document.createElement("strong");
-    customerName.textContent = order.customer_name || order.customerName || "Customer";
-    customerCell.appendChild(customerName);
-
+    customerName.textContent = order.customer_name || "Customer";
     const contact = document.createElement("div");
     contact.className = "muted";
-    contact.textContent = order.phone || order.customer_phone || "";
-    customerCell.appendChild(contact);
+    contact.textContent = [order.phone, order.email, order.address]
+      .filter(Boolean).join(" · ");
+    customer.append(customerName, contact);
 
     const itemsCell = document.createElement("td");
-    const itemList = Array.isArray(order.items) ? order.items : [];
-    itemsCell.textContent = itemList.map((item) => {
-      const name = item.name || item.product_name || "Item";
-      return name + " × " + Number(item.quantity || 1);
-    }).join(", ") || "—";
+    const items = Array.isArray(order.items) ? order.items : [];
+    itemsCell.textContent = items.map((item) =>
+      (item.name || item.product_name || "Item") +
+      " × " + Number(item.quantity || 1)
+    ).join(", ") || "—";
 
-    const totalCell = document.createElement("td");
-    totalCell.textContent = money(order.total);
+    const total = document.createElement("td");
+    total.textContent = money(order.total);
 
-    const paymentCell = document.createElement("td");
-    paymentCell.textContent = order.payment_method || order.paymentMethod || "—";
+    const payment = document.createElement("td");
+    payment.textContent = order.payment_method || "COD";
 
     const statusCell = document.createElement("td");
-    const status = String(order.status || "pending").toLowerCase();
-    const statusBadge = document.createElement("span");
-    statusBadge.className = "badge " +
-      (status === "completed" || status === "delivered"
-        ? "completed"
-        : status === "cancelled"
-          ? "cancelled"
-          : "pending");
-    statusBadge.textContent = status;
-    statusCell.appendChild(statusBadge);
+    const current = String(order.status || "pending").toLowerCase();
+    const badge = document.createElement("span");
+    badge.className = "badge " +
+      (["delivered", "completed"].includes(current) ? "completed" :
+       current === "cancelled" ? "cancelled" : "pending");
+    badge.textContent = current;
+    statusCell.appendChild(badge);
 
     const updateCell = document.createElement("td");
     const select = document.createElement("select");
-    select.setAttribute("aria-label", "Order status");
-
-    ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"]
-      .forEach((value) => {
-        const option = document.createElement("option");
-        option.value = value;
-        option.textContent = value.charAt(0).toUpperCase() + value.slice(1);
-        select.appendChild(option);
-      });
+    [
+      "pending", "confirmed", "processing",
+      "shipped", "delivered", "cancelled"
+    ].forEach((status) => {
+      const option = document.createElement("option");
+      option.value = status;
+      option.textContent = status;
+      select.appendChild(option);
+    });
 
     select.value = [
-      "pending", "confirmed", "processing", "shipped", "delivered", "cancelled"
-    ].includes(status) ? status : "pending";
+      "pending", "confirmed", "processing",
+      "shipped", "delivered", "cancelled"
+    ].includes(current) ? current : "pending";
 
-    const updateButton = document.createElement("button");
-    updateButton.type = "button";
-    updateButton.className = "btn btn-dark";
-    updateButton.style.marginTop = "6px";
-    updateButton.textContent = "Update";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn btn-dark";
+    button.textContent = "Update";
+    button.style.marginTop = "6px";
 
-    updateButton.addEventListener("click", async () => {
-      updateButton.disabled = true;
-
+    button.addEventListener("click", async () => {
+      button.disabled = true;
       try {
         await apiRequest(
           "/admin/orders/" + encodeURIComponent(order.id) + "/status",
@@ -922,26 +950,17 @@ function renderOrders() {
             body: JSON.stringify({ status: select.value })
           }
         );
-
         showMessage("ordersMessage", "Order status updated.", "success");
         await loadOrders();
       } catch (error) {
         showMessage("ordersMessage", error.message, "error");
       } finally {
-        updateButton.disabled = false;
+        button.disabled = false;
       }
     });
 
-    updateCell.append(select, document.createElement("br"), updateButton);
-    row.append(
-      idCell,
-      customerCell,
-      itemsCell,
-      totalCell,
-      paymentCell,
-      statusCell,
-      updateCell
-    );
+    updateCell.append(select, document.createElement("br"), button);
+    row.append(id, customer, itemsCell, total, payment, statusCell, updateCell);
     body.appendChild(row);
   });
 }
@@ -951,14 +970,15 @@ $("refreshOrdersBtn").addEventListener("click", loadOrders);
 async function loadSettings() {
   try {
     const result = await apiRequest("/settings");
-    settings = result.settings || result || {};
+    const settings = result.settings || result || {};
 
     $("storeName").value = settings.store_name || settings.storeName || "";
     $("storePhone").value = settings.phone || settings.store_phone || "";
     $("storeEmail").value = settings.email || settings.store_email || "";
     $("storeUPI").value = settings.upi_id || settings.upiId || "";
     $("storeAddress").value = settings.address || "";
-    $("storeQR").value = settings.upi_qr_url || settings.upiQrUrl || "";
+    $("storeQR").value =
+      settings.qr_image || settings.upi_qr_url || settings.upiQrUrl || "";
     $("storeAnnouncement").value =
       settings.announcement || settings.store_announcement || "";
   } catch (error) {
@@ -968,7 +988,6 @@ async function loadSettings() {
 
 $("settingsForm").addEventListener("submit", async (event) => {
   event.preventDefault();
-
   const button = $("saveSettingsBtn");
   button.disabled = true;
 
@@ -978,16 +997,15 @@ $("settingsForm").addEventListener("submit", async (event) => {
     email: $("storeEmail").value.trim(),
     upi_id: $("storeUPI").value.trim(),
     address: $("storeAddress").value.trim(),
-    upi_qr_url: $("storeQR").value.trim(),
+    qr_image: $("storeQR").value.trim(),
     announcement: $("storeAnnouncement").value.trim()
   };
 
   try {
-    await apiRequest("/settings", {
+    await apiRequest("/admin/settings", {
       method: "PUT",
       body: JSON.stringify(payload)
     });
-
     showMessage("settingsMessage", "Store settings saved.", "success");
   } catch (error) {
     showMessage("settingsMessage", error.message, "error");
@@ -1000,27 +1018,23 @@ function updateStats() {
   $("statProducts").textContent = String(products.length);
   $("statOrders").textContent = String(orders.length);
 
-  const pending = orders.filter((order) => {
-    const status = String(order.status || "pending").toLowerCase();
-    return !["delivered", "completed", "cancelled"].includes(status);
-  }).length;
-
-  $("statPending").textContent = String(pending);
+  $("statPending").textContent = String(orders.filter((order) =>
+    !["delivered", "completed", "cancelled"].includes(
+      String(order.status || "pending").toLowerCase()
+    )
+  ).length);
 
   const revenue = orders.reduce((sum, order) => {
-    const status = String(order.status || "pending").toLowerCase();
-    if (status === "cancelled") return sum;
-    const amount = Number(order.total || 0);
-    return sum + (Number.isFinite(amount) ? amount : 0);
+    if (String(order.status).toLowerCase() === "cancelled") return sum;
+    return sum + (Number(order.total) || 0);
   }, 0);
 
   $("statRevenue").textContent = money(revenue);
 }
 
-// Check whether an existing admin session is available.
-// The token is kept in memory, not saved in browser storage.
 (async function initAdmin() {
   setLoggedIn(false);
+  switchTab("products");
 
   try {
     const result = await apiRequest("/admin/me");
@@ -1028,12 +1042,15 @@ function updateStats() {
       setLoggedIn(true);
       await loadDashboard();
     }
-  } catch {
-    // Not logged in yet. Show the login screen.
+  } catch (_) {
     setLoggedIn(false);
   }
 })();
 </script>
 </body>
 </html>
-  
+
+</body>
+</html>
+
+      
