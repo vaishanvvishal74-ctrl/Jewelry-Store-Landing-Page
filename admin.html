@@ -250,10 +250,57 @@ function showMessage(id, message, isError = false) {
   element.style.color = isError ? "#dc2626" : "#15803d";
 }
 
+
 function showLogin() {
   $("loginScreen").classList.remove("hidden");
-  $("adminScreen").classList.add("hidden");
+  $("appScreen").classList.add("hidden");
 }
+
+function showAdmin() {
+  $("loginScreen").classList.add("hidden");
+  $("appScreen").classList.remove("hidden");
+}
+
+async function login(event) {
+  event.preventDefault();
+
+  const password = $("password").value;
+  const button = $("loginButton");
+
+  showMessage("loginError", "Logging in...");
+  button.disabled = true;
+
+  try {
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Login failed");
+    }
+
+    if (!data.token) {
+      throw new Error("Server did not return a login token.");
+    }
+
+    sessionStorage.setItem(TOKEN_KEY, data.token);
+    $("password").value = "";
+
+    showAdmin();
+    await loadDashboard();
+
+    showMessage("globalMessage", "Login successful.");
+  } catch (error) {
+    showMessage("loginError", error.message, true);
+  } finally {
+    button.disabled = false;
+  }
+  }
+  
 
 function showAdmin() {
   $("loginScreen").classList.add("hidden");
