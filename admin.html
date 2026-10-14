@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -10,6 +9,7 @@
 body{margin:0;font-family:Arial,sans-serif;background:#f5f5fa;color:#25243a}
 button,input,select,textarea{font:inherit;padding:11px;border-radius:8px;border:1px solid #ddd}
 button{cursor:pointer;background:#eee}
+button:disabled{opacity:.6;cursor:wait}
 .primary{background:#8238bd;color:white;border:0}
 .danger{background:#ffe5e5;color:#b42332}
 .success{background:#dff8e9;color:#137448}
@@ -25,7 +25,8 @@ nav{width:210px;background:#30203e;padding:12px;flex-shrink:0}
 nav button{width:100%;margin:5px 0;text-align:left;background:transparent;color:white;border:0}
 nav button:hover{background:#ffffff20}
 main{padding:20px;flex:1;min-width:0}
-.page{display:none}.page.active{display:block}
+.page{display:none}
+.page.active{display:block}
 .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
 .card,.panel{background:white;padding:17px;border-radius:12px;margin-bottom:15px;box-shadow:0 3px 15px #00000008}
 .card strong{display:block;font-size:25px;margin-top:10px;color:#8238bd}
@@ -41,7 +42,10 @@ td button{margin:2px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .form-grid input,.form-grid textarea{width:100%}
 .full{grid-column:1/-1}
-#productForm{display:none}
+#productForm{display:none;margin-top:15px}
+.photo-box{background:#faf8fc;border:1px dashed #bca5ce;border-radius:12px;padding:15px;margin-top:12px}
+#productPreview{display:none;max-width:190px;max-height:190px;object-fit:contain;background:white;border-radius:10px;margin-top:12px;padding:6px}
+.small{font-size:13px;color:#666}
 @media(max-width:750px){
 .layout{display:block}
 nav{width:100%;display:flex;overflow-x:auto}
@@ -67,9 +71,8 @@ main{padding:12px}
 </section>
 
 <div id="app">
-<header>
-<h2>✦ Jewellery Store Admin</h2>
-</header>
+<header><h2>✦ Jewellery Store Admin</h2></header>
+
 <div class="layout">
 <nav>
 <button onclick="showPage('dashboard')">🏠 Dashboard</button>
@@ -117,7 +120,10 @@ main{padding:12px}
 <p>Payment status को approve या reject करें।</p>
 <div class="table-wrap">
 <table>
-<thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Payment Status</th><th>Action</th></tr></thead>
+<thead><tr>
+<th>Order ID</th><th>Customer</th><th>Amount</th>
+<th>Payment Status</th><th>Action</th>
+</tr></thead>
 <tbody id="paymentsTable"></tbody>
 </table>
 </div>
@@ -126,31 +132,57 @@ main{padding:12px}
 <section id="products" class="page">
 <h2>Products Management</h2>
 <div class="panel">
-<button class="primary" onclick="toggleProductForm()">+ Add Product</button>
+<button class="primary" onclick="toggleProductForm(true)">+ Add Product</button>
+
 <form id="productForm">
 <h3 id="formTitle">Add Product</h3>
 <input id="productId" type="hidden">
+
 <div class="form-grid">
 <input id="productName" placeholder="Product Name" required>
-<input id="productCategory" placeholder="Category">
-<input id="productPrice" type="number" min="0" placeholder="Price" required>
-<input id="productStock" type="number" min="0" placeholder="Stock" value="0">
-<input id="productImage" class="full" placeholder="Image URL">
-<textarea id="productDescription" class="full" placeholder="Description"></textarea>
+<input id="productCategory" placeholder="Category (display only)">
+<input id="productPrice" type="number" min="0" step="0.01" placeholder="Price" required>
+<input id="productStock" type="number" min="0" placeholder="Stock (display only)" value="0">
+
+<div class="photo-box full">
+<label for="productPhoto"><strong>📸 Mobile Gallery से Product Photo चुनें</strong></label>
+<p class="small">JPG, PNG, WebP या AVIF · अधिकतम 10 MB</p>
+
+<input
+id="productPhoto"
+class="full"
+type="file"
+accept="image/jpeg,image/png,image/webp,image/avif"
+>
+
+<img id="productPreview" alt="Product photo preview">
+
+<p id="uploadMessage" class="small"></p>
 </div>
+
+<label class="full" for="productImage">Image URL (अगर पहले से फोटो URL है)</label>
+<input id="productImage" class="full" type="url" placeholder="https://...">
+
+<textarea id="productDescription" class="full" placeholder="Description (display only)"></textarea>
+</div>
+
 <br>
-<button class="primary" type="submit">Save Product</button>
+<button class="primary" id="saveProductButton" type="submit">Save Product</button>
 <button type="button" onclick="toggleProductForm(false)">Cancel</button>
 <div id="productError" class="notice"></div>
 </form>
 </div>
+
 <div class="toolbar">
 <input id="productSearch" placeholder="Search product">
 <button onclick="loadProducts()">Refresh</button>
 </div>
+
 <div class="table-wrap">
 <table>
-<thead><tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Action</th></tr></thead>
+<thead><tr>
+<th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Action</th>
+</tr></thead>
 <tbody id="productsTable"></tbody>
 </table>
 </div>
@@ -167,6 +199,8 @@ main{padding:12px}
 let token = sessionStorage.getItem("jewellery_admin_token") || "";
 let products = [];
 let orders = [];
+let selectedProductFile = null;
+let previewObjectUrl = "";
 
 const $ = id => document.getElementById(id);
 
@@ -211,10 +245,11 @@ function showMessage(message) {
 }
 
 async function api(url, options = {}) {
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {})
-  };
+  const headers = { ...(options.headers || {}) };
+
+  if (options.body && !(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
 
   if (token) headers.Authorization = "Bearer " + token;
 
@@ -232,7 +267,10 @@ async function api(url, options = {}) {
     if (response.status === 401 || response.status === 403) {
       if (url !== "/api/admin/login") logout(false);
     }
-    throw new Error(data.error || data.message || "Request failed: " + response.status);
+
+    throw new Error(
+      data.error || data.message || "Request failed: " + response.status
+    );
   }
 
   return data;
@@ -246,6 +284,7 @@ function unwrap(data, key) {
   return [];
 }
 
+/* LOGIN */
 $("loginForm").addEventListener("submit", async event => {
   event.preventDefault();
   $("loginError").textContent = "";
@@ -266,6 +305,7 @@ $("loginForm").addEventListener("submit", async event => {
     sessionStorage.setItem("jewellery_admin_token", token);
     $("login").style.display = "none";
     $("app").style.display = "block";
+
     await refreshAll();
   } catch (error) {
     $("loginError").textContent = error.message || "Login failed";
@@ -281,6 +321,7 @@ function logout(show = true) {
   $("app").style.display = "none";
   $("login").style.display = "grid";
   $("password").value = "";
+
   if (show) $("loginError").textContent = "Logout हो गया।";
 }
 
@@ -296,6 +337,7 @@ async function refreshAll() {
   renderDashboard();
 }
 
+/* PRODUCTS */
 async function loadProducts() {
   try {
     products = unwrap(await api("/api/products"), "products");
@@ -306,6 +348,7 @@ async function loadProducts() {
   }
 }
 
+/* ORDERS */
 async function loadOrders() {
   try {
     orders = unwrap(await api("/api/orders"), "orders");
@@ -320,8 +363,10 @@ async function loadOrders() {
 function renderDashboard() {
   $("totalProducts").textContent = products.length;
   $("totalOrders").textContent = orders.length;
-  $("pendingOrders").textContent =
-    orders.filter(o => ["pending","processing"].includes(orderStatus(o))).length;
+
+  $("pendingOrders").textContent = orders.filter(o =>
+    ["pending", "processing"].includes(orderStatus(o))
+  ).length;
 
   $("totalSales").textContent = money(
     orders.reduce((sum, o) => sum + (Number(amount(o)) || 0), 0)
@@ -343,9 +388,13 @@ function renderOrders() {
   $("ordersTable").innerHTML = filtered.map(o => {
     const id = getId(o);
     const status = orderStatus(o);
-    const options = ["pending","processing","approved","shipped","delivered","rejected","cancelled"]
-      .map(s => `<option value="${s}" ${s === status ? "selected" : ""}>${s}</option>`)
-      .join("");
+
+    const options = [
+      "pending", "confirmed", "processing",
+      "shipped", "delivered", "cancelled", "rejected"
+    ].map(s =>
+      `<option value="${s}" ${s === status ? "selected" : ""}>${s}</option>`
+    ).join("");
 
     return `<tr>
       <td>#${escapeHTML(id)}</td>
@@ -374,6 +423,7 @@ $("ordersTable").addEventListener("click", async event => {
   if (!id || !select) return showMessage("Order ID नहीं मिला।");
 
   button.disabled = true;
+
   try {
     await api("/api/orders/" + encodeURIComponent(id) + "/status", {
       method: "PATCH",
@@ -389,6 +439,7 @@ $("ordersTable").addEventListener("click", async event => {
   }
 });
 
+/* PAYMENT APPROVAL */
 function renderPayments() {
   $("paymentsTable").innerHTML = orders.map(o => {
     const id = getId(o);
@@ -415,6 +466,7 @@ $("paymentsTable").addEventListener("click", async event => {
   const status = button.dataset.paymentStatus;
 
   if (!id) return showMessage("Order ID नहीं मिला।");
+
   button.disabled = true;
 
   try {
@@ -422,7 +474,7 @@ $("paymentsTable").addEventListener("click", async event => {
       method: "PATCH",
       body: JSON.stringify({
         payment_status: status,
-        status: status
+        payment_reference: ""
       })
     });
 
@@ -435,11 +487,77 @@ $("paymentsTable").addEventListener("click", async event => {
   }
 });
 
+/* PHOTO PREVIEW */
+$("productPhoto").addEventListener("change", () => {
+  const file = $("productPhoto").files[0];
+
+  selectedProductFile = null;
+  $("uploadMessage").textContent = "";
+
+  if (previewObjectUrl) {
+    URL.revokeObjectURL(previewObjectUrl);
+    previewObjectUrl = "";
+  }
+
+  $("productPreview").style.display = "none";
+  $("productPreview").removeAttribute("src");
+
+  if (!file) return;
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/avif"
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
+    $("uploadMessage").textContent =
+      "JPG, PNG, WebP ya AVIF image select karein.";
+    $("productPhoto").value = "";
+    return;
+  }
+
+  if (file.size > 10 * 1024 * 1024) {
+    $("uploadMessage").textContent =
+      "Image 10 MB se chhoti honi chahiye.";
+    $("productPhoto").value = "";
+    return;
+  }
+
+  selectedProductFile = file;
+  previewObjectUrl = URL.createObjectURL(file);
+
+  $("productPreview").src = previewObjectUrl;
+  $("productPreview").style.display = "block";
+
+  $("uploadMessage").textContent =
+    "Photo select ho gayi. Save Product dabayein.";
+});
+
+/* CLOUDINARY UPLOAD API */
+async function uploadProductImage(file) {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const data = await api("/api/admin/upload", {
+    method: "POST",
+    body: formData
+  });
+
+  if (!data.url || !data.url.startsWith("https://")) {
+    throw new Error("Cloudinary se valid HTTPS image URL nahi mila.");
+  }
+
+  return data.url;
+}
+
 function renderProducts() {
   const query = $("productSearch").value.toLowerCase().trim();
 
   const filtered = products.filter(p =>
-    (productName(p) + " " + (p.category || "")).toLowerCase().includes(query)
+    (productName(p) + " " + (p.category || ""))
+      .toLowerCase().includes(query)
   );
 
   $("productsTable").innerHTML = filtered.map(p => `
@@ -448,7 +566,7 @@ function renderProducts() {
       <td>${escapeHTML(productName(p))}</td>
       <td>${escapeHTML(p.category || "—")}</td>
       <td>${money(p.price)}</td>
-      <td>${escapeHTML(p.stock ?? p.quantity ?? 0)}</td>
+      <td>${escapeHTML(p.stock ?? p.quantity ?? "—")}</td>
       <td>
         <button data-edit-product="${escapeHTML(getId(p))}">Edit</button>
         <button class="danger" data-delete-product="${escapeHTML(getId(p))}">Delete</button>
@@ -459,9 +577,26 @@ function renderProducts() {
 
 $("productSearch").addEventListener("input", renderProducts);
 
+function clearPhotoSelection() {
+  selectedProductFile = null;
+  $("productPhoto").value = "";
+
+  if (previewObjectUrl) {
+    URL.revokeObjectURL(previewObjectUrl);
+    previewObjectUrl = "";
+  }
+
+  $("productPreview").removeAttribute("src");
+  $("productPreview").style.display = "none";
+  $("uploadMessage").textContent = "";
+}
+
 function toggleProductForm(show) {
   const form = $("productForm");
-  const visible = show === undefined ? form.style.display === "none" : show;
+  const visible = show === undefined
+    ? form.style.display === "none"
+    : show;
+
   form.style.display = visible ? "block" : "none";
 
   if (!visible) {
@@ -470,6 +605,7 @@ function toggleProductForm(show) {
     $("productStock").value = 0;
     $("formTitle").textContent = "Add Product";
     $("productError").textContent = "";
+    clearPhotoSelection();
   }
 }
 
@@ -478,16 +614,22 @@ $("productsTable").addEventListener("click", event => {
   const del = event.target.closest("[data-delete-product]");
 
   if (edit) {
-    const p = products.find(item => String(getId(item)) === edit.dataset.editProduct);
+    const p = products.find(
+      item => String(getId(item)) === edit.dataset.editProduct
+    );
+
     if (!p) return;
 
+    clearPhotoSelection();
+
     $("productId").value = getId(p);
-    $("productName").value = p.name ?? p.title ?? p.product_name ?? "";
+    $("productName").value = p.name ?? p.title ?? "";
     $("productCategory").value = p.category ?? "";
     $("productPrice").value = p.price ?? 0;
     $("productStock").value = p.stock ?? p.quantity ?? 0;
-    $("productImage").value = p.image_url ?? p.image ?? "";
+    $("productImage").value = p.image ?? p.image_url ?? "";
     $("productDescription").value = p.description ?? "";
+    $("productError").textContent = "";
     $("formTitle").textContent = "Edit Product";
     $("productForm").style.display = "block";
   }
@@ -502,6 +644,7 @@ async function deleteProduct(id) {
     await api("/api/products/" + encodeURIComponent(id), {
       method: "DELETE"
     });
+
     showMessage("Product delete हो गया।");
     await loadProducts();
   } catch (error) {
@@ -509,47 +652,37 @@ async function deleteProduct(id) {
   }
 }
 
+/* SAVE PRODUCT */
 $("productForm").addEventListener("submit", async event => {
   event.preventDefault();
+
   $("productError").textContent = "";
 
   const id = $("productId").value;
-  const product = {
-    name: $("productName").value.trim(),
-    category: $("productCategory").value.trim(),
-    price: Number($("productPrice").value),
-    stock: Number($("productStock").value || 0),
-    image_url: $("productImage").value.trim(),
-    description: $("productDescription").value.trim()
-  };
+  const name = $("productName").value.trim();
+  const price = Number($("productPrice").value);
+  let image = $("productImage").value.trim();
 
-  if (!product.name || !Number.isFinite(product.price) || product.price < 0) {
-    $("productError").textContent = "Product name और valid price डालें।";
+  const saveButton = $("saveProductButton");
+
+  if (!name || !Number.isFinite(price) || price < 0) {
+    $("productError").textContent =
+      "Product name aur valid price daalein.";
     return;
   }
 
-  try {
-    const data = await api(
-      id ? "/api/products/" + encodeURIComponent(id) : "/api/products",
-      {
-        method: id ? "PUT" : "POST",
-        body: JSON.stringify(product)
-      }
-    );
-
-    showMessage(data.message || "Product save request सफल हुआ।");
-    toggleProductForm(false);
-    await loadProducts();
-  } catch (error) {
-    $("productError").textContent = error.message;
+  if (!selectedProductFile && !image) {
+    $("productError").textContent =
+      "Photo select karein ya HTTPS image URL daalein.";
+    return;
   }
-});
 
-if (token) {
-  $("login").style.display = "none";
-  $("app").style.display = "block";
-  refreshAll();
-}
-</script>
-</body>
-</html>
+  saveButton.disabled = true;
+  saveButton.textContent = "Saving...";
+
+  try {
+    if (selectedProductFile) {
+      $("uploadMessage").textContent =
+        "Photo Cloudinary par upload ho rahi hai...";
+
+      image = 
