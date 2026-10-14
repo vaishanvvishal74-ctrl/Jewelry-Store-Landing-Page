@@ -1,46 +1,38 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vishal Jewellers - Admin Panel</title>
-
+<title>Vishal Jewellers Admin</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font:15px Arial,sans-serif;background:#f6f3ef;color:#292522}
-button,input,textarea,select{font:inherit;padding:10px;border-radius:6px;border:1px solid #ddd}
+button,input,textarea,select{font:inherit;padding:10px;border:1px solid #ddd;border-radius:6px}
 button{background:#8b5e3c;color:white;border:0;cursor:pointer;margin:3px}
-button:disabled{opacity:.5;cursor:not-allowed}
+button:disabled{opacity:.6}
 input,textarea,select{width:100%;margin:5px 0}
+label{display:block;font-weight:bold;margin-top:10px}
 .hidden{display:none!important}
 .login{max-width:380px;margin:10vh auto;padding:22px;background:white;border-radius:12px}
-.layout{display:grid;grid-template-columns:200px minmax(0,1fr);min-height:100vh}
-aside{background:#292522;color:white;padding:14px}
+.layout{display:grid;grid-template-columns:190px minmax(0,1fr);min-height:100vh}
+aside{background:#292522;color:white;padding:12px}
 aside button{width:100%;text-align:left}
-aside button.active{background:#b8865b}
-main{padding:15px;min-width:0}
-.card,.stat-card{background:white;padding:16px;margin:12px 0;border-radius:10px}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.stat-card p{font-size:24px;font-weight:bold}
-table{border-collapse:collapse;width:100%;min-width:650px;background:white}
-td,th{padding:9px;border-bottom:1px solid #ddd;text-align:left}
-.table-wrap{overflow:auto;margin:12px 0}
-.error{color:#b42318;white-space:pre-wrap}
-.success{color:#16803c;white-space:pre-wrap}
-label{display:block;margin-top:10px;font-weight:bold}
-.form-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.form-row>*{flex:1;min-width:130px}
-.panel{margin-top:16px}
-img.preview{max-width:180px;max-height:180px;object-fit:contain;border:1px solid #ddd;border-radius:8px}
-.upload-box{padding:12px;border:1px dashed #b8865b;border-radius:8px;margin:8px 0;background:#fffaf5}
-small{color:#666}
+main{padding:16px;min-width:0}
+.card{background:white;padding:16px;margin:12px 0;border-radius:10px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{background:white;padding:15px;border-radius:10px}
+.stat strong{font-size:24px}
+.table-wrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:500px;background:white}
+th,td{padding:9px;border-bottom:1px solid #ddd;text-align:left}
+.error{color:#b42318}
+.success{color:#16803c}
+img.preview{max-width:160px;max-height:160px;object-fit:contain}
 @media(max-width:650px){
-  .layout{grid-template-columns:1fr}
-  aside{padding:8px}
-  aside button{width:auto}
-  main{padding:8px}
-  .stats{grid-template-columns:1fr}
+.layout{grid-template-columns:1fr}
+aside button{width:auto}
+main{padding:8px}
+.stats{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -54,775 +46,365 @@ small{color:#666}
     <input id="password" type="password" required
       autocomplete="current-password" placeholder="Enter admin password">
     <button id="loginButton" type="submit">Login</button>
-    <p id="loginError" class="error" role="alert"></p>
+    <p id="loginMessage" role="status"></p>
   </form>
 </section>
 
 <section id="appScreen" class="layout hidden">
   <aside>
     <h3>💎 Vishal Jewellers</h3>
-    <button data-section="dashboard" class="active">Dashboard</button>
-    <button data-section="orders">Orders</button>
-    <button data-section="payments">Payments</button>
-    <button data-section="products">Products</button>
-    <button data-section="settings">Store Settings</button>
+    <button data-page="dashboard">Dashboard</button>
+    <button data-page="orders">Orders</button>
+    <button data-page="products">Products</button>
+    <button data-page="settings">Store Settings</button>
     <button id="logoutButton" type="button">Logout</button>
   </aside>
 
   <main>
     <h2 id="pageTitle">Dashboard</h2>
-    <button id="refreshButton" type="button">Refresh Data</button>
-    <p id="globalMessage" role="status"></p>
+    <p id="message" role="status"></p>
 
-    <section id="dashboardSection" class="panel">
+    <section id="dashboardPage">
       <div class="stats">
-        <div class="stat-card"><h3>Total Orders</h3><p id="totalOrders">0</p></div>
-        <div class="stat-card"><h3>Pending Orders</h3><p id="pendingOrders">0</p></div>
-        <div class="stat-card"><h3>Total Products</h3><p id="totalProducts">0</p></div>
+        <div class="stat">Total Orders<br><strong id="totalOrders">0</strong></div>
+        <div class="stat">Products<br><strong id="totalProducts">0</strong></div>
+        <div class="stat">Pending Orders<br><strong id="pendingOrders">0</strong></div>
       </div>
-      <h3>Recent Orders</h3>
-      <div id="recentOrders" class="table-wrap"></div>
-    </section>
-
-    <section id="ordersSection" class="panel hidden">
-      <h3>Manage Orders</h3>
-      <div class="form-row">
-        <input id="orderSearch" placeholder="Search order or customer">
-        <select id="orderFilter">
-          <option value="">All Orders</option>
-          <option value="pending">Pending</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="processing">Processing</option>
-          <option value="shipped">Shipped</option>
-          <option value="delivered">Delivered</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-        <button id="searchOrdersButton" type="button">Search</button>
+      <div class="card">
+        <h3>Recent Orders</h3>
+        <div id="recentOrders" class="table-wrap">Loading...</div>
       </div>
-      <div id="ordersTable" class="table-wrap"></div>
     </section>
 
-    <section id="paymentsSection" class="panel hidden">
-      <h3>Payment Management</h3>
-      <div id="paymentsTable" class="table-wrap"></div>
+    <section id="ordersPage" class="hidden">
+      <div class="card">
+        <h3>Orders</h3>
+        <button id="refreshOrders" type="button">Refresh Orders</button>
+        <div id="ordersTable" class="table-wrap"></div>
+      </div>
     </section>
 
-    <section id="productsSection" class="panel hidden">
-      <h3>Add / Edit Product</h3>
-      <form id="productForm">
-        <input id="productId" type="hidden">
-
-        <label for="productName">Product Name</label>
-        <input id="productName" required placeholder="Enter product name">
-
-        <label for="productPrice">Price (₹)</label>
-        <input id="productPrice" type="number" min="0" step="0.01" required>
-
-        <label for="productImageFile">Product Photo (HD)</label>
-        <div class="upload-box">
-          <input id="productImageFile" type="file" accept="image/*">
-          <small>Mobile gallery se photo select karein. Upload Cloudinary par hoga.</small>
-          <div id="productPreview" class="hidden">
-            <img id="productPreviewImage" class="preview" alt="Product preview">
-          </div>
-          <p id="productUploadMessage" role="status"></p>
-        </div>
-
-        <label for="productImageUrl">Or Image URL</label>
-        <input id="productImageUrl" type="url" placeholder="https://...">
-
-        <div class="form-row">
-          <button type="submit" id="saveProductButton">Save Product</button>
-          <button type="button" id="resetProductButton">Clear Form</button>
-        </div>
-        <p id="productMessage" role="status"></p>
-      </form>
-
-      <h3>All Products</h3>
-      <div id="productsTable" class="table-wrap"></div>
-    </section>
-
-    <section id="settingsSection" class="panel hidden">
-      <h3>Store Settings</h3>
-      <form id="settingsForm">
-        <label for="settingStoreName">Store Name</label>
-        <input id="settingStoreName" value="Vishal Jewellers" required>
-
-        <label for="settingLogoFile">Store Logo (optional)</label>
-        <div class="upload-box">
-          <input id="settingLogoFile" type="file" accept="image/*">
-          <img id="settingLogoPreview" class="preview hidden" alt="Store logo preview">
-          <p id="logoUploadMessage" role="status"></p>
-        </div>
-        <label for="settingLogoUrl">Logo URL</label>
-        <input id="settingLogoUrl" type="url" placeholder="https://...">
-
-        <label for="settingWhatsapp">WhatsApp Number</label>
-        <input id="settingWhatsapp" placeholder="91XXXXXXXXXX">
-
-        <label for="settingInstagram">Instagram URL</label>
-        <input id="settingInstagram" type="url" placeholder="https://instagram.com/yourstore">
-
-        <label for="settingPhone">Phone Number</label>
-        <input id="settingPhone" placeholder="Store phone number">
-
-        <label for="settingEmail">Email</label>
-        <input id="settingEmail" type="email" placeholder="store@example.com">
-
-        <label for="settingAddress">Store Address</label>
-        <textarea id="settingAddress" rows="3"></textarea>
-
-        <label for="settingGoogleMaps">Google Maps URL</label>
-        <input id="settingGoogleMaps" type="url" placeholder="https://maps.google.com/...">
-
-        <label for="settingUpiId">UPI ID</label>
-        <input id="settingUpiId" placeholder="yourname@upi">
-
-        <label for="settingQrFile">UPI QR Code Image</label>
-        <div class="upload-box">
-          <input id="settingQrFile" type="file" accept="image/*">
-          <img id="settingQrPreview" class="preview hidden" alt="UPI QR preview">
-          <p id="qrUploadMessage" role="status"></p>
-          <small>Apna asli payment QR upload karein. Payment verification automatic nahi hogi.</small>
-        </div>
-
-        <label for="settingQrUrl">UPI QR Image URL</label>
-        <input id="settingQrUrl" type="url" placeholder="https://...">
-
-        <button type="submit" id="saveSettingsButton">Save Settings</button>
-        <p id="settingsMessage" role="status"></p>
-      </form>
-    </section>
-  </main>
-</section>
-
-
-<script>
+    <section id="productsPage" class="hidden">
+      <div class="card">
+        <h3>Add / Edit Product</h3>
+        <form id="productForm">
+          <input id="productId" type="hidden">
+          <label for="productName">Product Name</label>
+          <input id="productName" required>
+          <label for="productPrice">Price (₹)</label>
+          <input id="productPrice" type="number" min="0" step="0.01" required>
+          <label for="productImage">Image URL</label>
+          <input id="productImage" type="url" placeholder="https://...">
+          <button id="saveProduct" type="submit">Save Product</button>
+          <button id="clearProduct" type="button">Clear</button>
+        </form>
+        <p id="productMessage"></p>
+      </div>
+      <div class="card">
+        <h3>All Products</h
+                          <script>
 const $ = id => document.getElementById(id);
-const TOKEN_KEY = "jewellery_admin_token";
 
 let orders = [];
 let products = [];
 let settings = {};
 
-function token() {
-  return sessionStorage.getItem(TOKEN_KEY) || "";
+function showMessage(id, text, error = false) {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = text;
+  el.className = error ? "error" : "success";
 }
 
-async function request(url, options = {}) {
-  const headers = { ...(options.headers || {}) };
-
-  if (token()) {
-    headers.Authorization = `Bearer ${token()}`;
-  }
-
-  if (options.body) {
-    headers["Content-Type"] = "application/json";
-  }
-
-  const response = await fetch(url, { ...options, headers });
-  const text = await response.text();
-  let data = {};
-
-  try {
-    data = text ? JSON.parse(text) : {};
-  } catch {
-    data = { message: text };
-  }
-
-  if (!response.ok) {
-    throw new Error(data.message || data.error || `Request failed (${response.status})`);
-  }
-
-  return data;
-}
-
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[char]);
+function safe(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[c]);
 }
 
 function money(value) {
   return "₹" + Number(value || 0).toLocaleString("en-IN");
 }
 
-function showMessage(id, message, isError = false) {
-  const el = $(id);
-  if (!el) return;
-  el.textContent = message;
-  el.className = isError ? "error" : "success";
+async function api(url, options = {}) {
+  const headers = { ...(options.headers || {}) };
+
+  if (options.body) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  const response = await fetch(url, { ...options, headers });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.message || "Request failed: " + response.status);
+  }
+
+  return data;
 }
 
-function showLogin() {
-  $("loginScreen").classList.remove("hidden");
-  $("appScreen").classList.add("hidden");
-}
-
-function showAdmin() {
-  $("loginScreen").classList.add("hidden");
-  $("appScreen").classList.remove("hidden");
-}
-
-async function login(event) {
+/*
+  This login requires POST /api/admin/login in server.js.
+  It is not implemented by the current server.js yet.
+*/
+$("loginForm").addEventListener("submit", async event => {
   event.preventDefault();
 
   const button = $("loginButton");
   button.disabled = true;
-  showMessage("loginError", "Logging in...");
+  showMessage("loginMessage", "Logging in...");
 
   try {
-    const response = await fetch("/api/admin/login", {
+    const data = await api("/api/admin/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password: $("password").value })
+      body: JSON.stringify({
+        password: $("password").value
+      })
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Login failed");
-    }
-
     if (!data.token) {
-      throw new Error("Server did not return a login token.");
+      throw new Error("Login token missing from server response.");
     }
 
-    sessionStorage.setItem(TOKEN_KEY, data.token);
+    sessionStorage.setItem("adminToken", data.token);
+    $("loginScreen").classList.add("hidden");
+    $("appScreen").classList.remove("hidden");
     $("password").value = "";
-    showAdmin();
+
     await loadDashboard();
-    showMessage("globalMessage", "Login successful.");
+    showMessage("message", "Login successful.");
   } catch (error) {
-    showMessage("loginError", error.message, true);
+    showMessage(
+      "loginMessage",
+      error.message + " — server.js mein admin login route chahiye.",
+      true
+    );
   } finally {
     button.disabled = false;
   }
+});
+
+$("logoutButton").addEventListener("click", () => {
+  sessionStorage.removeItem("adminToken");
+  $("appScreen").classList.add("hidden");
+  $("loginScreen").classList.remove("hidden");
+  showMessage("loginMessage", "Logged out.");
+});
+
+function showPage(page) {
+  ["dashboard", "orders", "products", "settings"].forEach(name => {
+    $(name + "Page").classList.toggle("hidden", name !== page);
+  });
+
+  $("pageTitle").textContent =
+    page.charAt(0).toUpperCase() + page.slice(1);
+
+  if (page === "settings") loadSettings();
+  if (page === "orders") loadOrders();
+  if (page === "products") loadProducts();
 }
 
-async function checkLogin() {
-  if (!token()) {
-    showLogin();
-    return;
-  }
-
-  try {
-    await request("/api/admin/check");
-    showAdmin();
-    await loadDashboard();
-  } catch {
-    sessionStorage.removeItem(TOKEN_KEY);
-    showLogin();
-  }
-}
-
-async function logout() {
-  try {
-    if (token()) {
-      await request("/api/admin/logout", { method: "POST" });
-    }
-  } catch (error) {
-    console.warn("Logout request failed:", error.message);
-  }
-
-  sessionStorage.removeItem(TOKEN_KEY);
-  showLogin();
-  showMessage("loginError", "You have been logged out.");
-}
+document.querySelectorAll("[data-page]").forEach(button => {
+  button.addEventListener("click", () => showPage(button.dataset.page));
+});
 
 async function loadDashboard() {
   try {
-    const [ordersData, productsData] = await Promise.all([
-      request("/api/orders"),
-      request("/api/products")
-    ]);
-
-    orders = Array.isArray(ordersData) ? ordersData : (ordersData.orders || []);
-    products = Array.isArray(productsData) ? productsData : (productsData.products || []);
-
+    await Promise.all([loadOrders(), loadProducts()]);
     $("totalOrders").textContent = orders.length;
-    $("pendingOrders").textContent = orders.filter(
-      order => String(order.status || "Pending").toLowerCase() === "pending"
-    ).length;
     $("totalProducts").textContent = products.length;
+    $("pendingOrders").textContent = orders.filter(order =>
+      String(order.status || "Pending").toLowerCase() === "pending"
+    ).length;
 
     $("recentOrders").innerHTML = orders.length
       ? `<table>
-          <thead><tr><th>Order</th><th>Customer</th><th>Amount</th><th>Payment</th><th>Status</th></tr></thead>
-          <tbody>${orders.slice(0, 5).map(order => `
+          <tr><th>ID</th><th>Customer</th><th>Total</th></tr>
+          ${orders.slice(0, 5).map(order => `
             <tr>
-              <td>${escapeHtml(order.id)}</td>
-              <td>${escapeHtml(order.customer_name || "Customer")}</td>
+              <td>${safe(order.id)}</td>
+              <td>${safe(order.customer_name || "Customer")}</td>
               <td>${money(order.total)}</td>
-              <td>${escapeHtml(order.payment_method || "COD")}</td>
-              <td>${escapeHtml(order.status || "Pending")}</td>
             </tr>
-          `).join("")}</tbody>
+          `).join("")}
         </table>`
       : "<p>No orders found.</p>";
-
-    renderOrders();
-    renderProducts();
   } catch (error) {
-    showMessage("globalMessage", error.message, true);
+    showMessage("message", error.message, true);
   }
 }
 
-function showSection(name) {
-  ["dashboard", "orders", "payments", "products", "settings"].forEach(section => {
-    $(section + "Section").classList.toggle("hidden", section !== name);
-  });
+async function loadOrders() {
+  const data = await api("/api/orders");
+  orders = Array.isArray(data) ? data : (data.orders || []);
 
-  $("pageTitle").textContent = name.charAt(0).toUpperCase() + name.slice(1);
-
-  document.querySelectorAll("[data-section]").forEach(button => {
-    button.classList.toggle("active", button.dataset.section === name);
-  });
-
-  if (name === "orders" || name === "payments") renderOrders();
-  if (name === "products") renderProducts();
-  if (name === "settings") loadSettings();
-}
-
-function renderOrders() {
-  const search = ($("orderSearch").value || "").toLowerCase();
-  const filter = ($("orderFilter").value || "").toLowerCase();
-
-  const filtered = orders.filter(order => {
-    const status = String(order.status || "Pending").toLowerCase();
-    const text = [order.id, order.customer_name, order.phone]
-      .join(" ").toLowerCase();
-
-    return (!search || text.includes(search)) && (!filter || status === filter);
-  });
-
-  const html = filtered.length
+  $("ordersTable").innerHTML = orders.length
     ? `<table>
-        <thead><tr><th>ID</th><th>Customer</th><th>Amount</th><th>Payment</th><th>Status</th><th>Update</th></tr></thead>
-        <tbody>${filtered.map(order => `
+        <tr><th>ID</th><th>Customer</th><th>Phone</th><th>Total</th><th>Status</th></tr>
+        ${orders.map(order => `
           <tr>
-            <td>${escapeHtml(order.id)}</td>
-            <td>${escapeHtml(order.customer_name || "Customer")}<br>${escapeHtml(order.phone || "")}</td>
+            <td>${safe(order.id)}</td>
+            <td>${safe(order.customer_name)}</td>
+            <td>${safe(order.phone)}</td>
             <td>${money(order.total)}</td>
-            <td>${escapeHtml(order.payment_method || "COD")}</td>
-            <td>${escapeHtml(order.status || "Pending")}</td>
-            <td>
-              <select id="status-${escapeHtml(order.id)}">
-                ${["Pending","Confirmed","Processing","Shipped","Delivered","Cancelled"].map(status => `
-                  <option value="${status}" ${String(order.status || "Pending").toLowerCase() === status.toLowerCase() ? "selected" : ""}>${status}</option>
-                `).join("")}
-              </select>
-              <button type="button" onclick="updateOrderStatus('${escapeHtml(order.id)}')">Save Status</button>
-            </td>
+            <td>${safe(order.status || order.payment_status || "Pending")}</td>
           </tr>
-        `).join("")}</tbody>
+        `).join("")}
       </table>`
-    : "<p>No matching orders found.</p>";
+    : "<p>No orders found.</p>";
 
-  $("ordersTable").innerHTML = html;
-  $("paymentsTable").innerHTML = html;
+  return orders;
 }
 
-async function updateOrderStatus(id) {
-  const select = $("status-" + id);
-  if (!select) return;
-
+$("refreshOrders").addEventListener("click", async () => {
   try {
-    await request(`/api/orders/${encodeURIComponent(id)}`, {
-      method: "PATCH",
-      body: JSON.stringify({ status: select.value })
-    });
-
-    showMessage("globalMessage", "Order status updated.");
-    await loadDashboard();
+    await loadOrders();
+    showMessage("message", "Orders refreshed.");
   } catch (error) {
-    showMessage("globalMessage", error.message, true);
+    showMessage("message", error.message, true);
   }
-}
+});
 
-function renderProducts() {
+async function loadProducts() {
+  const data = await api("/api/products");
+  products = Array.isArray(data) ? data : (data.products || []);
+
   $("productsTable").innerHTML = products.length
     ? `<table>
-        <thead><tr><th>Image</th><th>Name</th><th>Price</th><th>Actions</th></tr></thead>
-        <tbody>${products.map(product => `
+        <tr><th>Name</th><th>Price</th><th>Actions</th></tr>
+        ${products.map(product => `
           <tr>
-            <td>${product.image ? `<img src="${escapeHtml(product.image)}" alt="" width="60">` : "No image"}</td>
-            <td>${escapeHtml(product.name)}</td>
+            <td>${safe(product.name)}</td>
             <td>${money(product.price)}</td>
             <td>
-              <button type="button" onclick="editProduct('${escapeHtml(product.id)}')">Edit</button>
-              <button type="button" onclick="deleteProduct('${escapeHtml(product.id)}')">Delete</button>
+              <button type="button"
+                onclick="editProduct('${safe(product.id)}')">Edit</button>
+              <button type="button"
+                onclick="deleteProduct('${safe(product.id)}')">Delete</button>
             </td>
           </tr>
-        `).join("")}</tbody>
+        `).join("")}
       </table>`
     : "<p>No products found.</p>";
+
+  $("totalProducts").textContent = products.length;
+  return products;
 }
 
 function editProduct(id) {
-  const product = products.find(item => String(item.id) === String(id));
+  const product = products.find(p => String(p.id) === String(id));
   if (!product) return;
 
   $("productId").value = product.id;
   $("productName").value = product.name || "";
-  $("productPrice").value = product.price ?? "";
-  $("productImageUrl").value = product.image || "";
-
-  if (product.image) {
-    $("productPreviewImage").src = product.image;
-    $("productPreview").classList.remove("hidden");
-  } else {
-    $("productPreview").classList.add("hidden");
-  }
-
-  $("productImageFile").value = "";
-  showSection("products");
+  $("productPrice").value = product.price || "";
+  $("productImage").value = product.image || "";
+  showPage("products");
 }
 
-function resetProductForm() {
+$("clearProduct").addEventListener("click", () => {
   $("productForm").reset();
   $("productId").value = "";
-  $("productPreview").classList.add("hidden");
-  $("productUploadMessage").textContent = "";
   showMessage("productMessage", "");
-}
-
-async function uploadImage(file, folder) {
-  if (!file) return "";
-
-  if (!file.type.startsWith("image/")) {
-    throw new Error("Please choose an image file.");
-  }
-
-  const maxSize = 10 * 1024 * 1024;
-  if (file.size > maxSize) {
-    throw new Error("Image must be 10 MB or smaller.");
-  }
-
-  const formData = new FormData();
-  formData.append("image", file);
-  formData.append("folder", folder);
-
-  const response = await fetch("/api/upload-image", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token()}` },
-    body: formData
-  });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.message || "Image upload failed.");
-  }
-
-  if (!data.url) {
-    throw new Error("Upload response did not include an image URL.");
-  }
-
-  return data.url;
-}
-
-$("productImageFile").addEventListener("change", () => {
-  const file = $("productImageFile").files[0];
-  if (!file) return;
-
-  $("productPreviewImage").src = URL.createObjectURL(file);
-  $("productPreview").classList.remove("hidden");
-  showMessage("productUploadMessage", "Preview ready. Save Product to upload.");
 });
-
-async function saveProduct(event) {
+                            $("productForm").addEventListener("submit", async event => {
   event.preventDefault();
 
   const id = $("productId").value;
-  const name = $("productName").value.trim();
-  const price = Number($("productPrice").value);
-  let image = $("productImageUrl").value.trim();
+  const product = {
+    name: $("productName").value.trim(),
+    price: Number($("productPrice").value),
+    image: $("productImage").value.trim()
+  };
 
-  if (!name || !Number.isFinite(price) || price < 0) {
-    showMessage("productMessage", "Enter a valid product name and price.", true);
+  if (!product.name || !Number.isFinite(product.price) || product.price < 0) {
+    showMessage("productMessage", "Valid name aur price enter karein.", true);
     return;
   }
 
-  const button = $("saveProductButton");
-  button.disabled = true;
-
   try {
-    const file = $("productImageFile").files[0];
+    await api(
+      id ? "/api/products/" + encodeURIComponent(id) : "/api/products",
+      {
+        method: id ? "PUT" : "POST",
+        body: JSON.stringify(product)
+      }
+    );
 
-    if (file) {
-      showMessage("productUploadMessage", "Uploading image to Cloudinary...");
-      image = await uploadImage(file, "vishal-jewellers/products");
-      $("productImageUrl").value = image;
-    }
-
-    await request(id
-      ? `/api/products/${encodeURIComponent(id)}`
-      : "/api/products", {
-      method: id ? "PUT" : "POST",
-      body: JSON.stringify({ name, price, image })
-    });
-
+    $("productForm").reset();
+    $("productId").value = "";
     showMessage("productMessage", "Product saved successfully.");
-    await loadDashboard();
-    resetProductForm();
+    await loadProducts();
   } catch (error) {
     showMessage("productMessage", error.message, true);
-  } finally {
-    button.disabled = false;
   }
-}
+});
 
 async function deleteProduct(id) {
-  if (!confirm("Delete this product?")) return;
+  if (!confirm("Kya aap is product ko delete karna chahte hain?")) return;
 
   try {
-    await request(`/api/products/${encodeURIComponent(id)}`, { method: "DELETE" });
-    showMessage("productMessage", "Product deleted.");
-    await loadDashboard();
+    await api("/api/products/" + encodeURIComponent(id), {
+      method: "DELETE"
+    });
+
+    showMessage("message", "Product deleted.");
+    await loadProducts();
   } catch (error) {
-    showMessage("productMessage", error.message, true);
-  }
-}
-
-/* Store settings and QR/logo upload continue in Part 3. */
-</script>
-<!-- PART 3 CODE WILL CONTINUE HERE -->
-</body>
-  </html>
-  /* ===== PART 3/3: SETTINGS, UPI QR, LOGO & EVENTS ===== */
-
-function setField(id, value) {
-  const element = $(id);
-  if (element) element.value = value || "";
-}
-
-function setPreview(previewId, imageId, url) {
-  const preview = $(previewId);
-  const image = $(imageId);
-
-  if (!preview || !image) return;
-
-  if (url) {
-    image.src = url;
-    preview.style.display = "block";
-  } else {
-    image.removeAttribute("src");
-    preview.style.display = "none";
+    showMessage("message", error.message, true);
   }
 }
 
 async function loadSettings() {
   try {
-    const response = await request("/api/settings");
-    settings = response.settings || {};
+    const data = await api("/api/settings");
+    settings = data.settings || {};
 
-    setField("settingStoreName", settings.store_name || settings.storeName);
-    setField("settingLogoUrl", settings.logo_url || settings.logoUrl);
-    setField("settingWhatsapp", settings.whatsapp);
-    setField("settingInstagram", settings.instagram);
-    setField("settingPhone", settings.phone);
-    setField("settingEmail", settings.email);
-    setField("settingAddress", settings.address);
-    setField("settingGoogleMaps", settings.google_maps || settings.googleMaps);
-    setField("settingUpiId", settings.upi_id || settings.upiId);
-    setField("settingQrUrl", settings.qr_url || settings.qrUrl);
-
-    setPreview(
-      "settingLogoPreview",
-      "settingLogoPreviewImage",
-      settings.logo_url || settings.logoUrl
-    );
-
-    setPreview(
-      "settingQrPreview",
-      "settingQrPreviewImage",
-      settings.qr_url || settings.qrUrl
-    );
+    $("storeName").value = settings.store_name || "Vishal Jewellers";
+    $("phone").value = settings.phone || "";
+    $("whatsapp").value = settings.whatsapp || "";
+    $("email").value = settings.email || "";
+    $("address").value = settings.address || "";
+    $("upiId").value = settings.upi_id || "";
+    $("qrUrl").value = settings.qr_url || "";
   } catch (error) {
-    showMessage("settingsMessage", error.message || "Settings load nahi hui.", true);
+    showMessage("settingsMessage", error.message, true);
   }
 }
 
-/* Logo preview */
-if ($("settingLogoFile")) {
-  $("settingLogoFile").addEventListener("change", function () {
-    const file = this.files && this.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      showMessage("logoUploadMessage", "Kripya image file select karein.", true);
-      this.value = "";
-      return;
-    }
-
-    const localUrl = URL.createObjectURL(file);
-    setPreview("settingLogoPreview", "settingLogoPreviewImage", localUrl);
-    showMessage("logoUploadMessage", "Logo save karne par upload hoga.");
-  });
-}
-
-/* UPI QR preview */
-if ($("settingQrFile")) {
-  $("settingQrFile").addEventListener("change", function () {
-    const file = this.files && this.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      showMessage("qrUploadMessage", "Kripya QR ki image select karein.", true);
-      this.value = "";
-      return;
-    }
-
-    const localUrl = URL.createObjectURL(file);
-    setPreview("settingQrPreview", "settingQrPreviewImage", localUrl);
-    showMessage("qrUploadMessage", "QR save karne par upload hoga.");
-  });
-}
-
-/* Save store settings */
-async function saveSettings(event) {
+$("settingsForm").addEventListener("submit", async event => {
   event.preventDefault();
 
-  const button = $("saveSettingsButton");
-  if (button) {
-    button.disabled = true;
-    button.textContent = "Saving...";
-  }
+  const newSettings = {
+    store_name: $("storeName").value.trim(),
+    phone: $("phone").value.trim(),
+    whatsapp: $("whatsapp").value.trim(),
+    email: $("email").value.trim(),
+    address: $("address").value.trim(),
+    upi_id: $("upiId").value.trim(),
+    qr_url: $("qrUrl").value.trim()
+  };
 
   try {
-    let logoUrl =
-      $("settingLogoUrl").value.trim() ||
-      settings.logo_url ||
-      settings.logoUrl ||
-      "";
-
-    let qrUrl =
-      $("settingQrUrl").value.trim() ||
-      settings.qr_url ||
-      settings.qrUrl ||
-      "";
-
-    const logoFile = $("settingLogoFile").files[0];
-    const qrFile = $("settingQrFile").files[0];
-
-    if (logoFile) {
-      showMessage("logoUploadMessage", "Logo upload ho raha hai...");
-      const uploaded = await uploadImage(logoFile, "vishal-jewellers/logo");
-      logoUrl = uploaded.url;
-      $("settingLogoUrl").value = logoUrl;
-    }
-
-    if (qrFile) {
-      showMessage("qrUploadMessage", "UPI QR upload ho raha hai...");
-      const uploaded = await uploadImage(qrFile, "vishal-jewellers/payment-qr");
-      qrUrl = uploaded.url;
-      $("settingQrUrl").value = qrUrl;
-    }
-
-    const data = {
-      store_name: $("settingStoreName").value.trim(),
-      logo_url: logoUrl,
-      whatsapp: $("settingWhatsapp").value.trim(),
-      instagram: $("settingInstagram").value.trim(),
-      phone: $("settingPhone").value.trim(),
-      email: $("settingEmail").value.trim(),
-      address: $("settingAddress").value.trim(),
-      google_maps: $("settingGoogleMaps").value.trim(),
-      upi_id: $("settingUpiId").value.trim(),
-      qr_url: qrUrl
-    };
-
-    await request("/api/settings", {
+    await api("/api/settings", {
       method: "PUT",
-      body: JSON.stringify({ settings: data })
+      body: JSON.stringify({ settings: newSettings })
     });
 
-    settings = data;
-
-    showMessage("settingsMessage", "Settings successfully save ho gayi!");
-    showMessage("logoUploadMessage", "Logo settings save ho gayi.");
-    showMessage("qrUploadMessage", "UPI QR settings save ho gayi.");
-
-    $("settingLogoFile").value = "";
-    $("settingQrFile").value = "";
-
+    settings = newSettings;
+    showMessage("settingsMessage", "Settings saved successfully.");
   } catch (error) {
-    showMessage(
-      "settingsMessage",
-      error.message || "Settings save nahi hui. Dobara try karein.",
-      true
-    );
-  } finally {
-    if (button) {
-      button.disabled = false;
-      button.textContent = "Save Settings";
-    }
+    showMessage("settingsMessage", error.message, true);
   }
-}
-
-/* Login */
-if ($("loginForm")) {
-  $("loginForm").addEventListener("submit", login);
-}
-
-/* Logout */
-if ($("logoutButton")) {
-  $("logoutButton").addEventListener("click", logout);
-}
-
-/* Navigation */
-document.querySelectorAll("[data-section]").forEach(function (button) {
-  button.addEventListener("click", function () {
-    showSection(button.dataset.section);
-  });
 });
 
-/* Refresh dashboard */
-if ($("refreshButton")) {
-  $("refreshButton").addEventListener("click", loadDashboard);
+// Restore the login screen after page refresh.
+if (sessionStorage.getItem("adminToken")) {
+  $("loginScreen").classList.add("hidden");
+  $("appScreen").classList.remove("hidden");
+  loadDashboard();
 }
-
-/* Order search and filter */
-if ($("searchOrdersButton")) {
-  $("searchOrdersButton").addEventListener("click", renderOrders);
-}
-
-if ($("orderSearch")) {
-  $("orderSearch").addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      renderOrders();
-    }
-  });
-}
-
-if ($("orderFilter")) {
-  $("orderFilter").addEventListener("change", renderOrders);
-}
-
-/* Product form */
-if ($("productForm")) {
-  $("productForm").addEventListener("submit", saveProduct);
-}
-
-if ($("resetProductButton")) {
-  $("resetProductButton").addEventListener("click", resetProductForm);
-}
-
-/* Settings form */
-if ($("settingsForm")) {
-  $("settingsForm").addEventListener("submit", saveSettings);
-}
-
-/* Start admin panel */
-checkLogin();
-
 </script>
 </body>
 </html>
-          
