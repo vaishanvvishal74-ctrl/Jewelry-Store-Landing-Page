@@ -5,291 +5,285 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#a83291">
 <title>My Jewellery Store</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
 <style>
 :root {
-  --pink: #d633a6;
-  --purple: #7138b8;
-  --light: #fff4fb;
-  --text: #35233d;
-  --muted: #76677d;
-  --white: #fff;
+  --pink:#d633a6;
+  --purple:#7138b8;
+  --light:#fff4fb;
+  --text:#35233d;
+  --muted:#76677d;
 }
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
 body {
-  margin: 0;
-  font-family: Poppins, sans-serif;
-  color: var(--text);
-  background: white;
+  margin:0;
+  font-family:Poppins,sans-serif;
+  color:var(--text);
+  background:#fff;
 }
-a { color: inherit; text-decoration: none; }
-button, input, textarea, select { font: inherit; }
-button { cursor: pointer; }
-.container { width: min(1150px, 92%); margin: auto; }
-
+a { color:inherit; text-decoration:none; }
+button,input,textarea,select { font:inherit; }
+button { cursor:pointer; }
+.container { width:min(1150px,92%); margin:auto; }
 .topbar {
-  background: var(--purple);
-  color: white;
-  text-align: center;
-  padding: 9px;
-  font-size: 12px;
+  background:var(--purple);
+  color:white;
+  text-align:center;
+  padding:9px;
+  font-size:12px;
 }
 header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #fff;
-  box-shadow: 0 3px 18px #47205a12;
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#fff;
+  box-shadow:0 3px 18px #47205a12;
 }
 .navbar {
-  min-height: 76px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
+  min-height:76px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
 }
 .brand {
-  font: 700 25px "Playfair Display", serif;
-  color: var(--purple);
+  font:700 25px "Playfair Display",serif;
+  color:var(--purple);
 }
-.brand span { color: var(--pink); }
-nav { display: flex; align-items: center; gap: 22px; }
-nav a { font-size: 13px; font-weight: 600; }
-nav a:hover { color: var(--pink); }
+.brand span { color:var(--pink); }
+nav { display:flex; align-items:center; gap:22px; }
+nav a { font-size:13px; font-weight:600; }
+nav a:hover { color:var(--pink); }
 .menu {
-  display: none;
-  background: none;
-  border: 0;
-  color: var(--purple);
-  font-size: 24px;
+  display:none;
+  background:none;
+  border:0;
+  color:var(--purple);
+  font-size:24px;
 }
 .hero {
-  color: white;
-  padding: 95px 0;
-  min-height: 410px;
+  color:white;
+  padding:95px 0;
+  min-height:410px;
   background:
-    radial-gradient(circle at 80% 25%, #ffffff32, transparent 25%),
-    linear-gradient(120deg, #6327a0, #d633a6 70%, #f29bd7);
+    radial-gradient(circle at 80% 25%,#ffffff32,transparent 25%),
+    linear-gradient(120deg,#6327a0,#d633a6 70%,#f29bd7);
 }
 .hero .tag {
-  display: inline-block;
-  border: 1px solid #ffffff75;
-  border-radius: 30px;
-  padding: 8px 15px;
-  font-size: 12px;
+  display:inline-block;
+  border:1px solid #ffffff75;
+  border-radius:30px;
+  padding:8px 15px;
+  font-size:12px;
 }
 .hero h1 {
-  max-width: 720px;
-  margin: 18px 0;
-  font: 700 clamp(42px, 7vw, 76px) "Playfair Display", serif;
-  line-height: 1.12;
+  max-width:720px;
+  margin:18px 0;
+  font:700 clamp(42px,7vw,76px) "Playfair Display",serif;
+  line-height:1.12;
 }
-.hero p { max-width: 570px; line-height: 1.9; }
+.hero p { max-width:570px; line-height:1.9; }
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: linear-gradient(100deg, var(--pink), var(--purple));
-  color: white;
-  border: 0;
-  border-radius: 28px;
-  padding: 13px 22px;
-  margin-top: 12px;
-  font-weight: 600;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:linear-gradient(100deg,var(--pink),var(--purple));
+  color:white;
+  border:0;
+  border-radius:28px;
+  padding:13px 22px;
+  margin-top:12px;
+  font-weight:600;
 }
-.hero .btn {
-  background: white;
-  color: var(--purple);
-}
-.btn:hover { opacity: .88; }
-section { padding: 65px 0; }
-.heading { text-align: center; margin-bottom: 32px; }
+.hero .btn { background:white; color:var(--purple); }
+.btn:hover { opacity:.88; }
+.btn:disabled { opacity:.6; cursor:not-allowed; }
+section { padding:65px 0; }
+.heading { text-align:center; margin-bottom:32px; }
 .heading span {
-  color: var(--pink);
-  text-transform: uppercase;
-  letter-spacing: 3px;
-  font-size: 11px;
-  font-weight: 700;
+  color:var(--pink);
+  text-transform:uppercase;
+  letter-spacing:3px;
+  font-size:11px;
+  font-weight:700;
 }
 .heading h2 {
-  margin: 8px 0;
-  font: 700 clamp(28px, 4vw, 42px) "Playfair Display", serif;
+  margin:8px 0;
+  font:700 clamp(28px,4vw,42px) "Playfair Display",serif;
 }
-.heading p { color: var(--muted); font-size: 13px; }
-
+.heading p { color:var(--muted); font-size:13px; }
 .features {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
 }
 .feature {
-  padding: 28px 15px;
-  text-align: center;
-  background: var(--light);
-  border-radius: 16px;
+  padding:28px 15px;
+  text-align:center;
+  background:var(--light);
+  border-radius:16px;
 }
-.feature i { font-size: 30px; color: var(--pink); }
-.feature h3 { font: 700 20px "Playfair Display", serif; }
-.feature p { color: var(--muted); font-size: 13px; }
-
+.feature i { font-size:30px; color:var(--pink); }
+.feature h3 { font:700 20px "Playfair Display",serif; }
+.feature p { color:var(--muted); font-size:13px; }
 .products {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 20px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:20px;
 }
 .product {
-  background: white;
-  border: 1px solid #f0dcef;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 6px 20px #6c287b0b;
+  background:white;
+  border:1px solid #f0dcef;
+  border-radius:15px;
+  overflow:hidden;
+  box-shadow:0 6px 20px #6c287b0b;
 }
 .product img {
-  width: 100%;
-  height: 230px;
-  display: block;
-  object-fit: cover;
-  background: var(--light);
+  width:100%;
+  height:230px;
+  display:block;
+  object-fit:cover;
+  background:var(--light);
 }
-.product-info { padding: 15px; }
-.product h3 { font-size: 14px; min-height: 42px; }
-.price { color: var(--purple); font-weight: 700; }
-.product .btn { width: 100%; padding: 10px; font-size: 12px; }
+.product-info { padding:15px; }
+.product h3 { font-size:14px; min-height:42px; }
+.price { color:var(--purple); font-weight:700; }
+.product .btn { width:100%; padding:10px; font-size:12px; }
 .empty {
-  text-align: center;
-  color: var(--muted);
-  padding: 30px 10px;
-  grid-column: 1 / -1;
+  text-align:center;
+  color:var(--muted);
+  padding:30px 10px;
+  grid-column:1/-1;
 }
 .story {
-  background: linear-gradient(120deg, #fff4fb, #f3eaff);
-  text-align: center;
+  background:linear-gradient(120deg,#fff4fb,#f3eaff);
+  text-align:center;
 }
 .story p {
-  max-width: 750px;
-  margin: auto;
-  line-height: 1.9;
-  color: var(--muted);
+  max-width:750px;
+  margin:auto;
+  line-height:1.9;
+  color:var(--muted);
 }
 .contact-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
 }
 .contact-card {
-  border: 1px solid #f0dcef;
-  border-radius: 14px;
-  padding: 22px 12px;
-  text-align: center;
-  overflow-wrap: anywhere;
+  border:1px solid #f0dcef;
+  border-radius:14px;
+  padding:22px 12px;
+  text-align:center;
+  overflow-wrap:anywhere;
 }
-.contact-card i { color: var(--pink); font-size: 26px; }
-.contact-card h3 { font: 700 19px "Playfair Display", serif; }
+.contact-card i { color:var(--pink); font-size:26px; }
+.contact-card h3 { font:700 19px "Playfair Display",serif; }
 .feedback-box {
-  max-width: 650px;
-  margin: 35px auto 0;
-  padding: 25px;
-  border-radius: 18px;
-  background: var(--light);
+  max-width:650px;
+  margin:35px auto 0;
+  padding:25px;
+  border-radius:18px;
+  background:var(--light);
 }
-.form-grid { display: grid; gap: 13px; }
-input, textarea, select {
-  width: 100%;
-  padding: 13px;
-  border: 1px solid #e5cfe9;
-  border-radius: 9px;
-  background: white;
-  color: var(--text);
+.form-grid { display:grid; gap:13px; }
+input,textarea,select {
+  width:100%;
+  padding:13px;
+  border:1px solid #e5cfe9;
+  border-radius:9px;
+  background:white;
+  color:var(--text);
 }
-textarea { min-height: 100px; resize: vertical; }
+textarea { min-height:100px; resize:vertical; }
 footer {
-  padding: 35px 0 18px;
-  color: white;
-  background: #3c2054;
-  text-align: center;
+  padding:35px 0 18px;
+  color:white;
+  background:#3c2054;
+  text-align:center;
 }
-footer p { color: #eadcf0; font-size: 13px; }
+footer p { color:#eadcf0; font-size:13px; }
 .floating {
-  position: fixed;
-  right: 14px;
-  bottom: 18px;
-  display: grid;
-  gap: 10px;
-  z-index: 9;
+  position:fixed;
+  right:14px;
+  bottom:18px;
+  display:grid;
+  gap:10px;
+  z-index:9;
 }
 .floating a {
-  display: grid;
-  place-items: center;
-  width: 47px;
-  height: 47px;
-  border-radius: 50%;
-  color: white;
-  background: var(--purple);
-  box-shadow: 0 4px 15px #0002;
+  display:grid;
+  place-items:center;
+  width:47px;
+  height:47px;
+  border-radius:50%;
+  color:white;
+  background:var(--purple);
+  box-shadow:0 4px 15px #0002;
 }
 dialog {
-  width: min(500px, 94%);
-  max-height: 90vh;
-  overflow: auto;
-  border: 0;
-  border-radius: 18px;
-  padding: 25px;
-  color: var(--text);
-  box-shadow: 0 10px 50px #0004;
+  width:min(500px,94%);
+  max-height:90vh;
+  overflow:auto;
+  border:0;
+  border-radius:18px;
+  padding:25px;
+  color:var(--text);
+  box-shadow:0 10px 50px #0004;
 }
-dialog::backdrop { background: #28112c99; }
+dialog::backdrop { background:#28112c99; }
 .dialog-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
 }
-.dialog-head h2 { font: 700 25px "Playfair Display", serif; }
+.dialog-head h2 { font:700 25px "Playfair Display",serif; }
 .close {
-  border: 0;
-  background: #f6e7f8;
-  border-radius: 50%;
-  width: 38px;
-  height: 38px;
+  border:0;
+  background:#f6e7f8;
+  border-radius:50%;
+  width:38px;
+  height:38px;
 }
-.notice { font-size: 13px; color: var(--muted); line-height: 1.7; }
-.status { font-size: 13px; margin-top: 12px; }
+.notice { font-size:13px; color:var(--muted); line-height:1.7; }
+.status { font-size:13px; margin-top:12px; overflow-wrap:anywhere; }
 
 @media(max-width:760px) {
-  .navbar { min-height: 68px; }
-  .brand { font-size: 21px; }
-  .menu { display: block; }
+  .navbar { min-height:68px; }
+  .brand { font-size:21px; }
+  .menu { display:block; }
   nav {
-    display: none;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 100%;
-    padding: 20px 5%;
-    background: white;
-    flex-direction: column;
-    align-items: flex-start;
-    box-shadow: 0 8px 15px #0001;
+    display:none;
+    position:absolute;
+    left:0;
+    right:0;
+    top:100%;
+    padding:20px 5%;
+    background:white;
+    flex-direction:column;
+    align-items:flex-start;
+    box-shadow:0 8px 15px #0001;
   }
-  nav.open { display: flex; }
-  .hero { min-height: 350px; padding: 65px 0; }
-  .features { grid-template-columns: 1fr; }
-  .products { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .product img { height: 165px; }
-  .product-info { padding: 11px; }
-  .product h3 { font-size: 12px; }
-  .contact-grid { grid-template-columns: 1fr; }
-  section { padding: 45px 0; }
-  .feedback-box { padding: 17px; }
+  nav.open { display:flex; }
+  .hero { min-height:350px; padding:65px 0; }
+  .features { grid-template-columns:1fr; }
+  .products { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  .product img { height:165px; }
+  .product-info { padding:11px; }
+  .product h3 { font-size:12px; }
+  .contact-grid { grid-template-columns:1fr; }
+  section { padding:45px 0; }
+  .feedback-box { padding:17px; }
 }
 </style>
 </head>
 <body>
+
 <div class="topbar">✨ खूबसूरती और भरोसा — Jewellery for Every Occasion ✨</div>
 
 <header>
@@ -306,8 +300,8 @@ dialog::backdrop { background: #28112c99; }
       <a href="/admin.html">Admin</a>
     </nav>
   </div>
-  </header>
-        
+</header>
+
 <main>
 <section class="hero">
   <div class="container">
@@ -440,7 +434,7 @@ dialog::backdrop { background: #28112c99; }
 
   <form id="orderForm" class="form-grid">
     <input id="orderName" type="text" placeholder="Full name" maxlength="100" required>
-    <input id="orderEmail" type="email" placeholder="Email address" maxlength="150" required>
+    <input id="orderEmail" type="email" placeholder="Email address (optional)" maxlength="150">
     <input id="orderPhone" type="tel" placeholder="Mobile number" maxlength="40" required>
     <textarea id="orderAddress" placeholder="Full delivery address" maxlength="2000" required></textarea>
 
@@ -457,163 +451,239 @@ dialog::backdrop { background: #28112c99; }
     <p id="orderStatus" class="status" role="status"></p>
     <p class="notice">Order submit hone ke baad store admin se confirmation ka wait karein. This form does not process an online payment.</p>
   </form>
-      </dialog>
-  
+</dialog>
+
+<!-- PART 2 yahan se continue hoga -->
+</body>
+  </html>
+                                   
 <script>
+"use strict";
+
 const $ = (id) => document.getElementById(id);
 
 let products = [];
 let selectedProduct = null;
-
-$("year").textContent = new Date().getFullYear();
-
-function showStatus(id, message, isError = false) {
-  const el = $(id);
-  if (!el) return;
-  el.textContent = message;
-  el.style.color = isError ? "#b42318" : "#267344";
-}
+let storeSettings = {};
 
 function safeText(value, fallback = "") {
-  return typeof value === "string" && value.trim()
-    ? value.trim()
-    : fallback;
+  if (typeof value !== "string" && typeof value !== "number") {
+    return fallback;
+  }
+  const text = String(value).trim();
+  return text || fallback;
 }
 
-function normalizePhone(value) {
-  return String(value || "").replace(/[^\d+]/g, "");
+function showStatus(id, message, isError = false) {
+  const element = $(id);
+  if (!element) return;
+  element.textContent = message || "";
+  element.style.color = isError ? "#b42318" : "#237547";
 }
 
-function makeWhatsAppLink(phone) {
-  const number = String(phone || "").replace(/\D/g, "");
-  return number ? "https://wa.me/" + number : "#contact";
+function formatPrice(value) {
+  const price = Number(value);
+  if (!Number.isFinite(price) || price < 0) {
+    return "Price on request";
+  }
+  return "₹" + price.toLocaleString("en-IN");
 }
 
-// Mobile navigation
-$("menuButton").addEventListener("click", () => {
-  $("mainNav").classList.toggle("open");
-});
+function getImageUrl(value) {
+  const image = safeText(value);
+  if (!image) return "";
 
-$("mainNav").querySelectorAll("a").forEach((link) => {
-  link.addEventListener("click", () => {
-    $("mainNav").classList.remove("open");
-  });
-});
-
-// Load store settings
-async function loadSettings() {
   try {
-    const response = await fetch("/api/settings");
-    if (!response.ok) throw new Error("Settings could not load");
-
-    const result = await response.json();
-    const settings = result.settings || result || {};
-
-    const storeName = safeText(settings.storeName, "MY JEWELLERY STORE");
-    document.querySelector(".brand").textContent = storeName;
-    $("footerStoreName").textContent = storeName;
-
-    $("footerText").textContent = safeText(
-      settings.footerText,
-      "Thank you for visiting our store."
-    );
-
-    const phone = normalizePhone(settings.phone);
-    const email = safeText(settings.email);
-    const whatsapp = normalizePhone(settings.whatsapp);
-
-    if (phone) {
-      $("contactPhone").textContent = settings.phone;
-      $("contactPhone").href = "tel:" + phone;
-      $("floatingPhone").href = "tel:" + phone;
+    const url = new URL(image, window.location.origin);
+    if (url.protocol === "https:" || url.origin === window.location.origin) {
+      return url.href;
     }
+  } catch (_) {}
 
-    if (email) {
-      $("contactEmail").textContent = email;
-      $("contactEmail").href = "mailto:" + email;
-    }
+  return "";
+}
 
-    if (whatsapp) {
-      const whatsappLink = makeWhatsAppLink(whatsapp);
-      $("contactWhatsApp").textContent = "Chat on WhatsApp";
-      $("contactWhatsApp").href = whatsappLink;
-      $("contactWhatsApp").target = "_blank";
-      $("contactWhatsApp").rel = "noopener noreferrer";
-      $("floatingWhatsApp").href = whatsappLink;
-      $("floatingWhatsApp").target = "_blank";
-      $("floatingWhatsApp").rel = "noopener noreferrer";
-    }
+function setContactLink(id, value, type) {
+  const element = $(id);
+  if (!element) return;
 
-    if (settings.primaryColor) {
-      document.documentElement.style.setProperty(
-        "--purple",
-        settings.primaryColor
-      );
+  const text = safeText(value);
+  if (!text) {
+    element.textContent = "Add contact in settings";
+    element.href = "#contact";
+    return;
+  }
+
+  if (type === "email") {
+    element.textContent = text;
+    element.href = "mailto:" + text;
+  } else if (type === "phone") {
+    element.textContent = text;
+    element.href = "tel:" + text.replace(/[^\d+]/g, "");
+  } else if (type === "whatsapp") {
+    const digits = text.replace(/\D/g, "");
+    element.textContent = "Chat on WhatsApp";
+    element.href = digits
+      ? "https://wa.me/" + digits
+      : "#contact";
+    if (digits) {
+      element.target = "_blank";
+      element.rel = "noopener noreferrer";
     }
-  } catch (error) {
-    console.error("Settings error:", error);
   }
 }
 
-// Load products from server
-async function loadProducts() {
+async function loadSettings() {
+  try {
+    const response = await fetch("/api/settings", {
+      headers: { Accept: "application/json" }
+    });
+
+    if (!response.ok) {
+      throw new Error("Store settings could not be loaded.");
+    }
+
+    const data = await response.json();
+    storeSettings = data && typeof data === "object" ? data : {};
+
+    // Support common settings response shapes.
+    const settings = storeSettings.settings &&
+      typeof storeSettings.settings === "object"
+      ? storeSettings.settings
+      : storeSettings;
+
+    const storeName = safeText(
+      settings.store_name || settings.storeName,
+      "MY JEWELLERY STORE"
+    );
+
+    $("footerStoreName").textContent = storeName;
+    document.title = storeName;
+    $("footerText").textContent = safeText(
+      settings.footer_text || settings.footerText,
+      "Thank you for visiting our store."
+    );
+
+    setContactLink(
+      "contactPhone",
+      settings.phone || settings.contact_phone,
+      "phone"
+    );
+
+    setContactLink(
+      "contactWhatsApp",
+      settings.whatsapp || settings.whatsapp_number,
+      "whatsapp"
+    );
+
+    setContactLink(
+      "contactEmail",
+      settings.email || settings.contact_email,
+      "email"
+    );
+
+    const phone = safeText(
+      settings.phone || settings.contact_phone
+    );
+    const whatsapp = safeText(
+      settings.whatsapp || settings.whatsapp_number
+    );
+
+    $("floatingPhone").href = phone
+      ? "tel:" + phone.replace(/[^\d+]/g, "")
+      : "#contact";
+
+    const digits = whatsapp.replace(/\D/g, "");
+    $("floatingWhatsApp").href = digits
+      ? "https://wa.me/" + digits
+      : "#contact";
+
+  } catch (error) {
+    console.error("Settings error:", error);
+    // The shop can still display products if settings are unavailable.
+  }
+}
+
+function renderProducts() {
   const grid = $("productGrid");
   grid.replaceChildren();
 
+  if (!products.length) {
+    grid.innerHTML =
+      '<div class="empty">Abhi products available nahi hain.</div>';
+    return;
+  }
+
+  products.forEach((product, index) => {
+    const card = document.createElement("article");
+    card.className = "product";
+
+    const image = document.createElement("img");
+    image.loading = "lazy";
+    image.alt = safeText(product.name, "Jewellery product");
+    image.src = getImageUrl(
+      product.image_url || product.image || product.imageUrl
+    );
+
+    image.addEventListener("error", () => {
+      image.removeAttribute("src");
+      image.alt = "Product image unavailable";
+      image.style.display = "none";
+    }, { once: true });
+
+    const info = document.createElement("div");
+    info.className = "product-info";
+
+    const name = document.createElement("h3");
+    name.textContent = safeText(product.name, "Jewellery");
+
+    const description = document.createElement("p");
+    description.className = "notice";
+    description.textContent = safeText(
+      product.description,
+      "Beautiful jewellery for your collection."
+    );
+
+    const price = document.createElement("p");
+    price.className = "price";
+    price.textContent = formatPrice(product.price);
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn";
+    button.innerHTML =
+      'Order Now <i class="fa-solid fa-bag-shopping"></i>';
+    button.addEventListener("click", () => openOrder(index));
+
+    info.append(name, description, price, button);
+    card.append(image, info);
+    grid.append(card);
+  });
+}
+
+async function loadProducts() {
+  const grid = $("productGrid");
+  grid.innerHTML = '<div class="empty">Loading products...</div>';
+
   try {
-    const response = await fetch("/api/products");
-    if (!response.ok) throw new Error("Products could not load");
+    const response = await fetch("/api/products", {
+      headers: { Accept: "application/json" }
+    });
 
-    const result = await response.json();
-    products = Array.isArray(result)
-      ? result
-      : Array.isArray(result.products)
-        ? result.products
-        : [];
-
-    if (!products.length) {
-      grid.innerHTML = '<div class="empty">No products available yet.</div>';
-      return;
+    if (!response.ok) {
+      throw new Error("Products API returned " + response.status);
     }
 
-    products.forEach((product, index) => {
-      const card = document.createElement("article");
-      card.className = "product";
+    const data = await response.json();
 
-      const image = document.createElement("img");
-      image.src = product.imageUrl || product.image_url || "";
-      image.alt = safeText(product.name, "Jewellery");
-      image.loading = "lazy";
-      image.onerror = () => {
-        image.style.display = "none";
-      };
+    // Support either an array or { products: [...] } response.
+    products = Array.isArray(data)
+      ? data
+      : Array.isArray(data.products)
+        ? data.products
+        : [];
 
-      const info = document.createElement("div");
-      info.className = "product-info";
-
-      const name = document.createElement("h3");
-      name.textContent = safeText(product.name, "Jewellery Product");
-
-      const description = document.createElement("p");
-      description.textContent = safeText(product.description, "");
-
-      const price = document.createElement("p");
-      price.className = "price";
-      const amount = Number(product.price);
-      price.textContent = Number.isFinite(amount)
-        ? "₹" + amount.toLocaleString("en-IN")
-        : "Price on request";
-
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "btn";
-      button.innerHTML = 'Order Now <i class="fa-solid fa-bag-shopping"></i>';
-      button.addEventListener("click", () => openOrder(index));
-
-      info.append(name, description, price, button);
-      card.append(image, info);
-      grid.append(card);
-    });
+    renderProducts();
   } catch (error) {
     console.error("Products error:", error);
     grid.innerHTML =
@@ -621,7 +691,6 @@ async function loadProducts() {
   }
 }
 
-// Open order dialog
 function openOrder(index) {
   selectedProduct = products[index];
   if (!selectedProduct) return;
@@ -629,15 +698,31 @@ function openOrder(index) {
   const amount = Number(selectedProduct.price);
   $("selectedProduct").textContent =
     safeText(selectedProduct.name, "Jewellery") +
-    " — " +
-    (Number.isFinite(amount)
-      ? "₹" + amount.toLocaleString("en-IN")
-      : "Price on request");
+    " — " + formatPrice(amount);
 
   $("orderQuantity").value = "1";
   showStatus("orderStatus", "");
-  $("orderDialog").showModal();
+
+  if (!$("orderDialog").open) {
+    $("orderDialog").showModal();
+  }
 }
+
+$("menuButton").addEventListener("click", () => {
+  const nav = $("mainNav");
+  nav.classList.toggle("open");
+  $("menuButton").setAttribute(
+    "aria-expanded",
+    nav.classList.contains("open") ? "true" : "false"
+  );
+});
+
+$("mainNav").querySelectorAll("a").forEach((link) => {
+  link.addEventListener("click", () => {
+    $("mainNav").classList.remove("open");
+    $("menuButton").setAttribute("aria-expanded", "false");
+  });
+});
 
 $("closeOrder").addEventListener("click", () => {
   $("orderDialog").close();
@@ -650,7 +735,11 @@ $("orderQuantity").addEventListener("change", () => {
   }
 });
 
-// Submit order to server
+$("year").textContent = String(new Date().getFullYear());
+
+// PART 3 continues with the order submit handler and feedback form.
+</script>
+/* Submit order: matches server.js POST /api/orders */
 $("orderForm").addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -659,69 +748,103 @@ $("orderForm").addEventListener("submit", async (event) => {
     return;
   }
 
+  const customerName = $("orderName").value.trim();
+  const phone = $("orderPhone").value.trim();
+  const address = $("orderAddress").value.trim();
   const quantity = Number($("orderQuantity").value);
-  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
-    showStatus("orderStatus", "Enter a valid quantity.", true);
+  const price = Number(selectedProduct.price);
+
+  if (!customerName || !phone || !address) {
+    showStatus(
+      "orderStatus",
+      "Name, mobile number aur address bharna zaroori hai.",
+      true
+    );
     return;
   }
 
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+    showStatus("orderStatus", "Quantity 1 se 100 ke beech honi chahiye.", true);
+    return;
+  }
+
+  if (!Number.isFinite(price) || price < 0) {
+    showStatus(
+      "orderStatus",
+      "Is product ki valid price available nahi hai. Store se contact karein.",
+      true
+    );
+    return;
+  }
+
+  const total = price * quantity;
   const submitButton = $("orderForm").querySelector(
     'button[type="submit"]'
   );
-  submitButton.disabled = true;
-  showStatus("orderStatus", "Submitting order...");
 
+  submitButton.disabled = true;
+  showStatus("orderStatus", "Submitting your order...");
+
+  // These field names match server.js exactly.
   const order = {
-    customerName: $("orderName").value.trim(),
-    customerEmail: $("orderEmail").value.trim(),
-    phone: $("orderPhone").value.trim(),
-    address: $("orderAddress").value.trim(),
+    customer_name: customerName,
+    phone: phone,
+    address: address,
     items: [{
       productId: selectedProduct.id,
       name: safeText(selectedProduct.name, "Jewellery"),
-      price: Number(selectedProduct.price) || 0,
-      quantity
+      price: price,
+      quantity: quantity
     }],
-    total: (Number(selectedProduct.price) || 0) * quantity,
-    paymentMethod: $("paymentMethod").value,
-    paymentStatus: "pending"
+    total: total
   };
 
   try {
     const response = await fetch("/api/orders", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
       body: JSON.stringify(order)
     });
 
     const result = await response.json().catch(() => ({}));
 
-    if (!response.ok) {
+    if (!response.ok || result.success !== true) {
       throw new Error(
-        result.error || "Order submit nahi hua. Server API check karein."
+        result.message ||
+        "Order submit nahi hua. Please try again."
       );
     }
 
     showStatus(
       "orderStatus",
-      result.message || "Order submitted successfully!"
+      "Order successfully submit ho gaya! Order ID: " +
+      (result.order && result.order.id != null
+        ? result.order.id
+        : "Confirmed")
     );
 
     $("orderForm").reset();
+    selectedProduct = null;
 
-    setTimeout(() => {
-      $("orderDialog").close();
+    window.setTimeout(() => {
+      if ($("orderDialog").open) {
+        $("orderDialog").close();
+      }
       showStatus("orderStatus", "");
-    }, 1800);
+    }, 2500);
+
   } catch (error) {
-    console.error("Order error:", error);
+    console.error("Order submit error:", error);
     showStatus("orderStatus", error.message, true);
   } finally {
     submitButton.disabled = false;
   }
 });
 
-// Feedback form: opens email app; it does not save feedback in the database.
+/* Feedback: opens the user's email app; it does not save to the database. */
 $("feedbackForm").addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -731,7 +854,22 @@ $("feedbackForm").addEventListener("submit", (event) => {
   const message = $("feedbackMessage").value.trim();
 
   if (!name || !rating || !message) {
-    showStatus("feedbackStatus", "Please fill in all required fields.", true);
+    showStatus(
+      "feedbackStatus",
+      "Please fill in all required fields.",
+      true
+    );
+    return;
+  }
+
+  const contactLink = $("contactEmail").getAttribute("href");
+
+  if (!contactLink || !contactLink.startsWith("mailto:")) {
+    showStatus(
+      "feedbackStatus",
+      "Store email settings mein add karein.",
+      true
+    );
     return;
   }
 
@@ -743,18 +881,8 @@ $("feedbackForm").addEventListener("submit", (event) => {
     "\nFeedback: " + message
   );
 
-  const storeEmail = $("contactEmail").getAttribute("href");
-  if (!storeEmail || !storeEmail.startsWith("mailto:")) {
-    showStatus(
-      "feedbackStatus",
-      "Store email settings mein add karein.",
-      true
-    );
-    return;
-  }
-
   window.location.href =
-    storeEmail + "?subject=" + subject + "&body=" + body;
+    contactLink + "?subject=" + subject + "&body=" + body;
 
   showStatus(
     "feedbackStatus",
@@ -762,8 +890,9 @@ $("feedbackForm").addEventListener("submit", (event) => {
   );
 });
 
+/* Start page */
 loadSettings();
 loadProducts();
-</script>
+    </script>
 </body>
-</html>
+  </html>
