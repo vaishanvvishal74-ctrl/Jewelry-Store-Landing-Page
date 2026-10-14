@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -31,6 +30,7 @@ a { color: inherit; text-decoration: none; }
 button, input, textarea, select { font: inherit; }
 button { cursor: pointer; }
 .container { width: min(1150px, 92%); margin: auto; }
+
 .topbar {
   background: var(--purple);
   color: white;
@@ -121,6 +121,7 @@ section { padding: 65px 0; }
   font: 700 clamp(28px, 4vw, 42px) "Playfair Display", serif;
 }
 .heading p { color: var(--muted); font-size: 13px; }
+
 .features {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -135,6 +136,7 @@ section { padding: 65px 0; }
 .feature i { font-size: 30px; color: var(--pink); }
 .feature h3 { font: 700 20px "Playfair Display", serif; }
 .feature p { color: var(--muted); font-size: 13px; }
+
 .products {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -257,6 +259,7 @@ dialog::backdrop { background: #28112c99; }
 }
 .notice { font-size: 13px; color: var(--muted); line-height: 1.7; }
 .status { font-size: 13px; margin-top: 12px; }
+
 @media(max-width:760px) {
   .navbar { min-height: 68px; }
   .brand { font-size: 21px; }
@@ -286,7 +289,6 @@ dialog::backdrop { background: #28112c99; }
 }
 </style>
 </head>
-
 <body>
 <div class="topbar">✨ खूबसूरती और भरोसा — Jewellery for Every Occasion ✨</div>
 
@@ -304,8 +306,8 @@ dialog::backdrop { background: #28112c99; }
       <a href="/admin.html">Admin</a>
     </nav>
   </div>
-</header>
-
+  </header>
+        
 <main>
 <section class="hero">
   <div class="container">
@@ -367,6 +369,7 @@ dialog::backdrop { background: #28112c99; }
       <h2>Contact Our Store</h2>
       <p>Contact details can be configured from your Store Settings.</p>
     </div>
+
     <div class="contact-grid">
       <div class="contact-card">
         <i class="fa-solid fa-phone"></i>
@@ -420,8 +423,12 @@ dialog::backdrop { background: #28112c99; }
 </footer>
 
 <div class="floating">
-  <a id="floatingWhatsApp" href="#contact" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-  <a id="floatingPhone" href="#contact" aria-label="Call"><i class="fa-solid fa-phone"></i></a>
+  <a id="floatingWhatsApp" href="#contact" aria-label="WhatsApp">
+    <i class="fa-brands fa-whatsapp"></i>
+  </a>
+  <a id="floatingPhone" href="#contact" aria-label="Call">
+    <i class="fa-solid fa-phone"></i>
+  </a>
 </div>
 
 <dialog id="orderDialog">
@@ -430,249 +437,329 @@ dialog::backdrop { background: #28112c99; }
     <button type="button" class="close" id="closeOrder" aria-label="Close">✕</button>
   </div>
   <p id="selectedProduct" class="notice"></p>
+
   <form id="orderForm" class="form-grid">
     <input id="orderName" type="text" placeholder="Full name" maxlength="100" required>
     <input id="orderEmail" type="email" placeholder="Email address" maxlength="150" required>
     <input id="orderPhone" type="tel" placeholder="Mobile number" maxlength="40" required>
     <textarea id="orderAddress" placeholder="Full delivery address" maxlength="2000" required></textarea>
+
     <label for="orderQuantity">Quantity</label>
     <input id="orderQuantity" type="number" min="1" max="100" value="1" required>
+
     <label for="paymentMethod">Payment method</label>
     <select id="paymentMethod">
       <option value="cod">Cash on Delivery</option>
       <option value="upi">UPI (payment must be verified separately)</option>
     </select>
+
     <button class="btn" type="submit">Submit Order</button>
     <p id="orderStatus" class="status" role="status"></p>
     <p class="notice">Order submit hone ke baad store admin se confirmation ka wait karein. This form does not process an online payment.</p>
   </form>
-</dialog>
-
+      </dialog>
+  
 <script>
-const $ = id => document.getElementById(id);
+const $ = (id) => document.getElementById(id);
+
 let products = [];
 let selectedProduct = null;
-let storeEmail = "";
-let storePhone = "";
-let storeWhatsApp = "";
 
 $("year").textContent = new Date().getFullYear();
 
+function showStatus(id, message, isError = false) {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = message;
+  el.style.color = isError ? "#b42318" : "#267344";
+}
+
+function safeText(value, fallback = "") {
+  return typeof value === "string" && value.trim()
+    ? value.trim()
+    : fallback;
+}
+
+function normalizePhone(value) {
+  return String(value || "").replace(/[^\d+]/g, "");
+}
+
+function makeWhatsAppLink(phone) {
+  const number = String(phone || "").replace(/\D/g, "");
+  return number ? "https://wa.me/" + number : "#contact";
+}
+
+// Mobile navigation
 $("menuButton").addEventListener("click", () => {
   $("mainNav").classList.toggle("open");
 });
 
-document.querySelectorAll("#mainNav a").forEach(link => {
-  link.addEventListener("click", () => $("mainNav").classList.remove("open"));
+$("mainNav").querySelectorAll("a").forEach((link) => {
+  link.addEventListener("click", () => {
+    $("mainNav").classList.remove("open");
+  });
 });
 
-function validHttps(value) {
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" ? url.href : "";
-  } catch {
-    return "";
-  }
-}
-
+// Load store settings
 async function loadSettings() {
   try {
-    const response = await fetch("/api/settings", { cache: "no-store" });
-    if (!response.ok) throw new Error("Settings unavailable");
-    const settings = await response.json();
+    const response = await fetch("/api/settings");
+    if (!response.ok) throw new Error("Settings could not load");
 
-    if (settings.storeName) {
-      document.title = settings.storeName;
-      $("footerStoreName").textContent = settings.storeName;
-    }
-    if (settings.footerText) $("footerText").textContent = settings.footerText;
+    const result = await response.json();
+    const settings = result.settings || result || {};
 
-    storeEmail = settings.email || "";
-    storePhone = settings.phone || "";
-    storeWhatsApp = settings.whatsapp || "";
+    const storeName = safeText(settings.storeName, "MY JEWELLERY STORE");
+    document.querySelector(".brand").textContent = storeName;
+    $("footerStoreName").textContent = storeName;
 
-    if (storePhone) {
-      const phone = storePhone.replace(/[^\d+]/g, "");
-      $("contactPhone").textContent = storePhone;
+    $("footerText").textContent = safeText(
+      settings.footerText,
+      "Thank you for visiting our store."
+    );
+
+    const phone = normalizePhone(settings.phone);
+    const email = safeText(settings.email);
+    const whatsapp = normalizePhone(settings.whatsapp);
+
+    if (phone) {
+      $("contactPhone").textContent = settings.phone;
       $("contactPhone").href = "tel:" + phone;
       $("floatingPhone").href = "tel:" + phone;
     }
 
-    if (storeEmail) {
-      $("contactEmail").textContent = storeEmail;
-      $("contactEmail").href = "mailto:" + storeEmail;
+    if (email) {
+      $("contactEmail").textContent = email;
+      $("contactEmail").href = "mailto:" + email;
     }
 
-    if (storeWhatsApp) {
-      let url = validHttps(storeWhatsApp);
-      if (!url) {
-        const digits = storeWhatsApp.replace(/\D/g, "");
-        if (digits) url = "https://wa.me/" + digits;
-      }
-      if (url) {
-        $("contactWhatsApp").href = url;
-        $("contactWhatsApp").target = "_blank";
-        $("contactWhatsApp").rel = "noopener noreferrer";
-        $("floatingWhatsApp").href = url;
-        $("floatingWhatsApp").target = "_blank";
-        $("floatingWhatsApp").rel = "noopener noreferrer";
-      }
+    if (whatsapp) {
+      const whatsappLink = makeWhatsAppLink(whatsapp);
+      $("contactWhatsApp").textContent = "Chat on WhatsApp";
+      $("contactWhatsApp").href = whatsappLink;
+      $("contactWhatsApp").target = "_blank";
+      $("contactWhatsApp").rel = "noopener noreferrer";
+      $("floatingWhatsApp").href = whatsappLink;
+      $("floatingWhatsApp").target = "_blank";
+      $("floatingWhatsApp").rel = "noopener noreferrer";
     }
 
-    if (settings.primaryColor && /^#[0-9a-f]{6}$/i.test(settings.primaryColor)) {
-      document.documentElement.style.setProperty("--purple", settings.primaryColor);
+    if (settings.primaryColor) {
+      document.documentElement.style.setProperty(
+        "--purple",
+        settings.primaryColor
+      );
     }
   } catch (error) {
-    console.error("Settings could not load", error);
+    console.error("Settings error:", error);
   }
 }
 
-function renderProducts(list) {
+// Load products from server
+async function loadProducts() {
   const grid = $("productGrid");
   grid.replaceChildren();
 
-  if (!Array.isArray(list) || list.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "empty";
-    empty.textContent = "No products yet. Please add products in Admin Panel.";
-    grid.appendChild(empty);
-    $("productStatus").textContent = "";
-    return;
-  }
-
-  list.forEach(product => {
-    const card = document.createElement("article");
-    card.className = "product";
-
-    const img = document.createElement("img");
-    img.loading = "lazy";
-    img.alt = product.name || "Jewellery";
-    img.src = validHttps(product.image) || "";
-    img.onerror = () => { img.style.display = "none"; };
-
-    const info = document.createElement("div");
-    info.className = "product-info";
-
-    const name = document.createElement("h3");
-    name.textContent = product.name || "Jewellery";
-
-    const price = document.createElement("div");
-    price.className = "price";
-    const amount = Number(product.price);
-    price.textContent = Number.isFinite(amount)
-      ? "₹" + amount.toLocaleString("en-IN")
-      : "Contact for price";
-
-    const buy = document.createElement("button");
-    buy.className = "btn";
-    buy.type = "button";
-    buy.innerHTML = '<i class="fa-solid fa-bag-shopping"></i> Buy Now';
-    buy.addEventListener("click", () => openOrder(product));
-
-    info.append(name, price, buy);
-    card.append(img, info);
-    grid.appendChild(card);
-  });
-
-  $("productStatus").textContent = list.length + " product(s)";
-}
-
-async function loadProducts() {
   try {
-    const response = await fetch("/api/products", { cache: "no-store" });
-    if (!response.ok) throw new Error("Products request failed");
-    products = await response.json();
-    renderProducts(products);
+    const response = await fetch("/api/products");
+    if (!response.ok) throw new Error("Products could not load");
+
+    const result = await response.json();
+    products = Array.isArray(result)
+      ? result
+      : Array.isArray(result.products)
+        ? result.products
+        : [];
+
+    if (!products.length) {
+      grid.innerHTML = '<div class="empty">No products available yet.</div>';
+      return;
+    }
+
+    products.forEach((product, index) => {
+      const card = document.createElement("article");
+      card.className = "product";
+
+      const image = document.createElement("img");
+      image.src = product.imageUrl || product.image_url || "";
+      image.alt = safeText(product.name, "Jewellery");
+      image.loading = "lazy";
+      image.onerror = () => {
+        image.style.display = "none";
+      };
+
+      const info = document.createElement("div");
+      info.className = "product-info";
+
+      const name = document.createElement("h3");
+      name.textContent = safeText(product.name, "Jewellery Product");
+
+      const description = document.createElement("p");
+      description.textContent = safeText(product.description, "");
+
+      const price = document.createElement("p");
+      price.className = "price";
+      const amount = Number(product.price);
+      price.textContent = Number.isFinite(amount)
+        ? "₹" + amount.toLocaleString("en-IN")
+        : "Price on request";
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "btn";
+      button.innerHTML = 'Order Now <i class="fa-solid fa-bag-shopping"></i>';
+      button.addEventListener("click", () => openOrder(index));
+
+      info.append(name, description, price, button);
+      card.append(image, info);
+      grid.append(card);
+    });
   } catch (error) {
-    console.error(error);
-    $("productGrid").innerHTML =
-      '<div class="empty">Products could not load. Please check the server.</div>';
+    console.error("Products error:", error);
+    grid.innerHTML =
+      '<div class="empty">Products load nahi hue. Server/API check karein.</div>';
   }
 }
 
-function openOrder(product) {
-  selectedProduct = product;
+// Open order dialog
+function openOrder(index) {
+  selectedProduct = products[index];
+  if (!selectedProduct) return;
+
+  const amount = Number(selectedProduct.price);
   $("selectedProduct").textContent =
-    product.name + " — ₹" + Number(product.price).toLocaleString("en-IN");
+    safeText(selectedProduct.name, "Jewellery") +
+    " — " +
+    (Number.isFinite(amount)
+      ? "₹" + amount.toLocaleString("en-IN")
+      : "Price on request");
+
   $("orderQuantity").value = "1";
-  $("orderStatus").textContent = "";
+  showStatus("orderStatus", "");
   $("orderDialog").showModal();
 }
 
-$("closeOrder").addEventListener("click", () => $("orderDialog").close());
+$("closeOrder").addEventListener("click", () => {
+  $("orderDialog").close();
+});
 
-$("orderForm").addEventListener("submit", async event => {
+$("orderQuantity").addEventListener("change", () => {
+  const quantity = Number($("orderQuantity").value);
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+    $("orderQuantity").value = "1";
+  }
+});
+
+// Submit order to server
+$("orderForm").addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!selectedProduct) return;
 
-  const button = $("orderForm").querySelector('button[type="submit"]');
-  button.disabled = true;
-  $("orderStatus").textContent = "Submitting order...";
+  if (!selectedProduct) {
+    showStatus("orderStatus", "Please select a product first.", true);
+    return;
+  }
 
-  const payload = {
-    customer_name: $("orderName").value.trim(),
-    customer_email: $("orderEmail").value.trim(),
+  const quantity = Number($("orderQuantity").value);
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+    showStatus("orderStatus", "Enter a valid quantity.", true);
+    return;
+  }
+
+  const submitButton = $("orderForm").querySelector(
+    'button[type="submit"]'
+  );
+  submitButton.disabled = true;
+  showStatus("orderStatus", "Submitting order...");
+
+  const order = {
+    customerName: $("orderName").value.trim(),
+    customerEmail: $("orderEmail").value.trim(),
     phone: $("orderPhone").value.trim(),
     address: $("orderAddress").value.trim(),
     items: [{
-      product_id: Number(selectedProduct.id),
-      quantity: Number($("orderQuantity").value)
+      productId: selectedProduct.id,
+      name: safeText(selectedProduct.name, "Jewellery"),
+      price: Number(selectedProduct.price) || 0,
+      quantity
     }],
-    payment_method: $("paymentMethod").value
+    total: (Number(selectedProduct.price) || 0) * quantity,
+    paymentMethod: $("paymentMethod").value,
+    paymentStatus: "pending"
   };
 
   try {
     const response = await fetch("/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(order)
     });
-    const data = await response.json();
+
+    const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(data.error || "Could not submit order");
+      throw new Error(
+        result.error || "Order submit nahi hua. Server API check karein."
+      );
     }
 
-    $("orderStatus").textContent =
-      "Order submitted successfully! Order ID: " + data.order.id;
-    $("orderStatus").style.color = "green";
+    showStatus(
+      "orderStatus",
+      result.message || "Order submitted successfully!"
+    );
+
     $("orderForm").reset();
+
+    setTimeout(() => {
+      $("orderDialog").close();
+      showStatus("orderStatus", "");
+    }, 1800);
   } catch (error) {
-    $("orderStatus").textContent = error.message +
-      ". Please try again or contact the store.";
-    $("orderStatus").style.color = "#b42318";
+    console.error("Order error:", error);
+    showStatus("orderStatus", error.message, true);
   } finally {
-    button.disabled = false;
+    submitButton.disabled = false;
   }
 });
 
-$("feedbackForm").addEventListener("submit", event => {
+// Feedback form: opens email app; it does not save feedback in the database.
+$("feedbackForm").addEventListener("submit", (event) => {
   event.preventDefault();
-
-  if (!storeEmail) {
-    $("feedbackStatus").textContent =
-      "Feedback email is not configured. Please contact the store.";
-    return;
-  }
 
   const name = $("feedbackName").value.trim();
   const email = $("feedbackEmail").value.trim();
   const rating = $("feedbackRating").value;
   const message = $("feedbackMessage").value.trim();
 
+  if (!name || !rating || !message) {
+    showStatus("feedbackStatus", "Please fill in all required fields.", true);
+    return;
+  }
+
   const subject = encodeURIComponent("Jewellery Store Feedback");
   const body = encodeURIComponent(
-    "Name: " + name + "\n" +
-    "Email: " + (email || "Not provided") + "\n" +
-    "Rating: " + rating + "/5\n\n" +
-    "Feedback:\n" + message
+    "Name: " + name +
+    "\nEmail: " + (email || "Not provided") +
+    "\nRating: " + rating + "/5" +
+    "\nFeedback: " + message
   );
 
-  $("feedbackStatus").textContent =
-    "Your email app will open. Send the prepared email to submit your feedback.";
+  const storeEmail = $("contactEmail").getAttribute("href");
+  if (!storeEmail || !storeEmail.startsWith("mailto:")) {
+    showStatus(
+      "feedbackStatus",
+      "Store email settings mein add karein.",
+      true
+    );
+    return;
+  }
 
   window.location.href =
-    "mailto:" + storeEmail + "?subject=" + subject + "&body=" + body;
+    storeEmail + "?subject=" + subject + "&body=" + body;
+
+  showStatus(
+    "feedbackStatus",
+    "Email app open ho sakti hai. Feedback bhejne ke liye email send karein."
+  );
 });
 
 loadSettings();
