@@ -1,921 +1,1036 @@
-Writing
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#7138b8">
-<title>Vishal Jewellers</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#641747">
+  <title>Vishal Jewellers | Jewellery Store</title>
 
-<style>
-:root {
-  --pink:#d633a6;
-  --purple:#7138b8;
-  --light:#fff4fb;
-  --text:#35233d;
-  --muted:#76677d;
-}
-* { box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body {
-  margin:0;
-  font-family:Poppins,sans-serif;
-  color:var(--text);
-  background:#fff;
-}
-a { color:inherit;text-decoration:none; }
-button,input,textarea,select { font:inherit; }
-button { cursor:pointer; }
-.container { width:min(1150px,92%);margin:auto; }
-
-.topbar {
-  background:var(--purple);
-  color:white;
-  text-align:center;
-  padding:9px;
-  font-size:12px;
-}
-header {
-  position:sticky;
-  top:0;
-  z-index:10;
-  background:white;
-  box-shadow:0 3px 18px #47205a12;
-}
-.navbar {
-  min-height:72px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-}
-.brand {
-  font:700 25px "Playfair Display",serif;
-  color:var(--purple);
-}
-.brand span { color:var(--pink); }
-nav { display:flex;align-items:center;gap:22px; }
-nav a { font-size:13px;font-weight:600; }
-nav a:hover { color:var(--pink); }
-.menu {
-  display:none;
-  border:0;
-  background:none;
-  color:var(--purple);
-  font-size:24px;
-}
-.hero {
-  color:white;
-  padding:85px 0;
-  min-height:390px;
-  background:
-    radial-gradient(circle at 80% 25%,#ffffff32,transparent 25%),
-    linear-gradient(120deg,#6327a0,#d633a6 70%,#f29bd7);
-}
-.hero .tag {
-  display:inline-block;
-  border:1px solid #ffffff75;
-  border-radius:30px;
-  padding:8px 15px;
-  font-size:12px;
-}
-.hero h1 {
-  max-width:720px;
-  margin:18px 0;
-  font:700 clamp(40px,7vw,72px) "Playfair Display",serif;
-  line-height:1.12;
-}
-.hero p { max-width:570px;line-height:1.9; }
-.btn {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  background:linear-gradient(100deg,var(--pink),var(--purple));
-  color:white;
-  border:0;
-  border-radius:28px;
-  padding:13px 22px;
-  margin-top:12px;
-  font-weight:600;
-}
-.hero .btn { background:white;color:var(--purple); }
-.btn:disabled { opacity:.6;cursor:not-allowed; }
-section { padding:60px 0; }
-.heading { text-align:center;margin-bottom:30px; }
-.heading span {
-  color:var(--pink);
-  text-transform:uppercase;
-  letter-spacing:3px;
-  font-size:11px;
-  font-weight:700;
-}
-.heading h2 {
-  margin:8px 0;
-  font:700 clamp(28px,4vw,42px) "Playfair Display",serif;
-}
-.heading p { color:var(--muted);font-size:13px; }
-.features {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-}
-.feature {
-  padding:26px 15px;
-  text-align:center;
-  background:var(--light);
-  border-radius:16px;
-}
-.feature i { font-size:30px;color:var(--pink); }
-.feature h3 { font:700 20px "Playfair Display",serif; }
-.feature p { color:var(--muted);font-size:13px; }
-
-.products {
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:18px;
-}
-.product {
-  background:white;
-  border:1px solid #f0dcef;
-  border-radius:15px;
-  overflow:hidden;
-  box-shadow:0 6px 20px #6c287b0b;
-}
-.product img {
-  width:100%;
-  height:220px;
-  display:block;
-  object-fit:cover;
-  background:var(--light);
-}
-.product-info { padding:14px; }
-.product h3 { font-size:14px;min-height:38px; }
-.price { color:var(--purple);font-weight:700; }
-.product .btn { width:100%;padding:10px;font-size:12px; }
-.empty {
-  text-align:center;
-  color:var(--muted);
-  padding:30px 10px;
-  grid-column:1/-1;
-}
-.story {
-  background:linear-gradient(120deg,#fff4fb,#f3eaff);
-  text-align:center;
-}
-.story p {
-  max-width:750px;
-  margin:auto;
-  line-height:1.9;
-  color:var(--muted);
-}
-.contact-grid {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-}
-.contact-card {
-  border:1px solid #f0dcef;
-  border-radius:14px;
-  padding:22px 12px;
-  text-align:center;
-  overflow-wrap:anywhere;
-}
-.contact-card i { color:var(--pink);font-size:26px; }
-.contact-card h3 { font:700 19px "Playfair Display",serif; }
-.feedback-box {
-  max-width:650px;
-  margin:35px auto 0;
-  padding:25px;
-  border-radius:18px;
-  background:var(--light);
-}
-.form-grid { display:grid;gap:13px; }
-input,textarea,select {
-  width:100%;
-  padding:13px;
-  border:1px solid #e5cfe9;
-  border-radius:9px;
-  background:white;
-  color:var(--text);
-}
-textarea { min-height:90px;resize:vertical; }
-footer {
-  padding:35px 0 18px;
-  color:white;
-  background:#3c2054;
-  text-align:center;
-}
-footer p { color:#eadcf0;font-size:13px; }
-.floating {
-  position:fixed;
-  right:14px;
-  bottom:18px;
-  display:grid;
-  gap:10px;
-  z-index:9;
-}
-.floating a {
-  display:grid;
-  place-items:center;
-  width:47px;
-  height:47px;
-  border-radius:50%;
-  color:white;
-  background:var(--purple);
-  box-shadow:0 4px 15px #0002;
-}
-dialog {
-  width:min(500px,94%);
-  max-height:90vh;
-  overflow:auto;
-  border:0;
-  border-radius:18px;
-  padding:24px;
-  color:var(--text);
-  box-shadow:0 10px 50px #0004;
-}
-dialog::backdrop { background:#28112c99; }
-.dialog-head {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
-.dialog-head h2 { font:700 24px "Playfair Display",serif; }
-.close {
-  border:0;
-  background:#f6e7f8;
-  border-radius:50%;
-  width:38px;
-  height:38px;
-}
-.notice { font-size:13px;color:var(--muted);line-height:1.7; }
-.status { font-size:13px;margin-top:12px;overflow-wrap:anywhere; }
-.qr-box {
-  display:none;
-  text-align:center;
-  padding:18px;
-  margin:8px 0;
-  border:1px solid #ead5ef;
-  border-radius:14px;
-  background:#fff8fe;
-}
-.qr-box img {
-  display:block;
-  width:min(240px,100%);
-  max-height:280px;
-  object-fit:contain;
-  margin:12px auto;
-  background:white;
-}
-.upi-id {
-  font-weight:700;
-  overflow-wrap:anywhere;
-  color:var(--purple);
-}
-@media(max-width:760px) {
-  .navbar { min-height:66px; }
-  .brand { font-size:21px; }
-  .menu { display:block; }
-  nav {
-    display:none;
-    position:absolute;
-    left:0;right:0;top:100%;
-    padding:20px 5%;
-    background:white;
-    flex-direction:column;
-    align-items:flex-start;
-    box-shadow:0 8px 15px #0001;
-  }
-  nav.open { display:flex; }
-  .hero { min-height:330px;padding:60px 0; }
-  .features { grid-template-columns:1fr; }
-  .products { grid-template-columns:repeat(2,minmax(0,1fr));gap:12px; }
-  .product img { height:160px; }
-  .product-info { padding:10px; }
-  .product h3 { font-size:12px; }
-  .contact-grid { grid-template-columns:1fr; }
-  section { padding:42px 0; }
-  .feedback-box { padding:16px; }
-}
-</style>
-</head>
-
-<body>
-<div class="topbar">✨ Vishal Jewellers — खूबसूरती और भरोसा ✨</div>
-
-<header>
-  <div class="container navbar">
-    <a href="#" class="brand">VISHAL <span>JEWELLERS</span></a>
-    <button class="menu" id="menuButton" aria-label="Open menu">
-      <i class="fa-solid fa-bars"></i>
-    </button>
-    <nav id="mainNav">
-      <a href="#">Home</a>
-      <a href="#products">Collections</a>
-      <a href="#about">About Us</a>
-      <a href="#contact">Contact</a>
-      <a href="/admin.html">Admin</a>
-    </nav>
-  </div>
-</header>
-
-<main>
-<section class="hero">
-  <div class="container">
-    <span class="tag">NEW COLLECTION ✨</span>
-    <h1>Jewellery That Makes You Shine</h1>
-    <p>अपने खास पलों के लिए खूबसूरत jewellery designs देखें और सीधे हमारे स्टोर पर ऑर्डर करें।</p>
-    <a class="btn" href="#products">Shop Now <i class="fa-solid fa-arrow-right"></i></a>
-  </div>
-</section>
-
-<section>
-  <div class="container features">
-    <div class="feature">
-      <i class="fa-solid fa-gem"></i>
-      <h3>Beautiful Designs</h3>
-      <p>हर अवसर के लिए खूबसूरत designs।</p>
-    </div>
-    <div class="feature">
-      <i class="fa-solid fa-heart"></i>
-      <h3>Made With Care</h3>
-      <p>अपने लिए कुछ खास चुनें।</p>
-    </div>
-    <div class="feature">
-      <i class="fa-solid fa-truck-fast"></i>
-      <h3>Easy Ordering</h3>
-      <p>आसानी से अपना ऑर्डर भेजें।</p>
-    </div>
-  </div>
-</section>
-
-<section id="products" style="background:#fff4fb">
-  <div class="container">
-    <div class="heading">
-      <span>Our Collection</span>
-      <h2>Vishal Jewellers Collection</h2>
-      <p>हमारे latest jewellery designs देखें।</p>
-    </div>
-    <div class="products" id="productGrid">
-      <div class="empty">Products load हो रहे हैं...</div>
-    </div>
-    <p class="status" id="productStatus" role="status"></p>
-  </div>
-</section>
-
-<section class="story" id="about">
-  <div class="container">
-    <div class="heading">
-      <span>Our Story</span>
-      <h2>Every Piece Tells A Story</h2>
-    </div>
-    <p>Vishal Jewellers में अपने पसंदीदा designs चुनें। ऑर्डर से जुड़ी सहायता के लिए हमसे संपर्क करें।</p>
-  </div>
-</section>
-
-<section id="contact">
-  <div class="container">
-    <div class="heading">
-      <span>Get In Touch</span>
-      <h2>Contact Vishal Jewellers</h2>
-      <p>Store contact details Settings से अपडेट किए जा सकते हैं।</p>
-    </div>
-    <div class="contact-grid">
-      <div class="contact-card">
-        <i class="fa-solid fa-phone"></i>
-        <h3>Phone</h3>
-        <a id="contactPhone" href="#contact">Settings में phone जोड़ें</a>
-      </div>
-      <div class="contact-card">
-        <i class="fa-brands fa-whatsapp"></i>
-        <h3>WhatsApp</h3>
-        <a id="contactWhatsApp" href="#contact">Contact our store</a>
-      </div>
-      <div class="contact-card">
-        <i class="fa-solid fa-envelope"></i>
-        <h3>Email</h3>
-        <a id="contactEmail" href="#contact">Settings में email जोड़ें</a>
-      </div>
-    </div>
-  </div>
-</section>
-</main>
-
-<footer>
-  <div class="container">
-    <h2 id="footerStoreName">VISHAL JEWELLERS</h2>
-    <p id="footerText">Thank you for visiting our store.</p>
-    <p>© <span id="year"></span> Vishal Jewellers</p>
-  </div>
-</footer>
-
-<div class="floating">
-  <a id="floatingWhatsApp" href="#contact" aria-label="WhatsApp">
-    <i class="fa-brands fa-whatsapp"></i>
-  </a>
-  <a id="floatingPhone" href="#contact" aria-label="Call">
-    <i class="fa-solid fa-phone"></i>
-  </a>
-</div>
-
-<dialog id="orderDialog">
-  <div class="dialog-head">
-    <h2>Place Your Order</h2>
-    <button type="button" class="close" id="closeOrder" aria-label="Close">✕</button>
-  </div>
-  <p id="selectedProduct" class="notice"></p>
-
-  <form id="orderForm" class="form-grid">
-    <input id="orderName" type="text" placeholder="Full name" maxlength="100" required>
-    <input id="orderEmail" type="email" placeholder="Email (optional)" maxlength="150">
-    <input id="orderPhone" type="tel" placeholder="Mobile number" maxlength="40" required>
-    <textarea id="orderAddress" placeholder="Full delivery address" maxlength="2000" required></textarea>
-
-    <label for="orderQuantity">Quantity</label>
-    <input id="orderQuantity" type="number" min="1" max="100" value="1" required>
-
-    <label for="paymentMethod">Payment method</label>
-    <select id="paymentMethod">
-      <option value="cod">Cash on Delivery</option>
-      <option value="upi">UPI / QR Payment</option>
-    </select>
-
-    <div id="upiQrBox" class="qr-box">
-      <h3>Pay with UPI</h3>
-      <p class="notice">नीचे दिए गए QR को अपने UPI app से scan करें।</p>
-      <img id="upiQrImage" alt="Store UPI QR code">
-      <p>UPI ID: <span id="upiIdText" class="upi-id"></span></p>
-      <p>Order amount: <strong id="upiAmount">₹0</strong></p>
-      <p class="notice">Payment करने के बाद भी ऑर्डर की पुष्टि स्टोर द्वारा की जाएगी।</p>
-    </div>
-
-    <button class="btn" type="submit">Submit Order</button>
-    <p id="orderStatus" class="status" role="status"></p>
-    <p class="notice">QR दिखना payment confirmation नहीं है। भुगतान की पुष्टि अलग से करें।</p>
-  </form>
-</dialog>
-
-<script>
-"use strict";
-
-const $ = (id) => document.getElementById(id);
-
-let products = [];
-let selectedProduct = null;
-let storeSettings = {};
-
-function safeText(value, fallback = "") {
-  if (value === null || value === undefined) return fallback;
-  const text = String(value).trim();
-  return text || fallback;
-}
-
-function showStatus(id, message, isError = false) {
-  const element = $(id);
-  if (!element) return;
-  element.textContent = message || "";
-  element.style.color = isError ? "#b42318" : "#237547";
-}
-
-function formatPrice(value) {
-  const price = Number(value);
-  if (!Number.isFinite(price) || price < 0) {
-    return "Price on request";
-  }
-  return "₹" + price.toLocaleString("en-IN");
-}
-
-function safeImageUrl(value) {
-  const image = safeText(value);
-  if (!image) return "";
-
-  try {
-    const url = new URL(image, window.location.origin);
-    if (
-      url.protocol === "https:" ||
-      url.origin === window.location.origin
-    ) {
-      return url.href;
-    }
-  } catch (error) {
-    console.warn("Invalid image URL");
-  }
-  return "";
-}
-
-function getSettingsObject(response) {
-  if (
-    response &&
-    response.settings &&
-    typeof response.settings === "object"
-  ) {
-    return response.settings;
-  }
-  return response && typeof response === "object" ? response : {};
-}
-
-/* Load store settings, contact details, UPI ID and QR URL */
-async function loadSettings() {
-  try {
-    const response = await fetch("/api/settings", {
-      headers: { Accept: "application/json" }
-    });
-
-    if (!response.ok) {
-      throw new Error("Store settings load nahi hui.");
+  <style>
+    :root {
+      --wine: #641747;
+      --pink: #f9e8f0;
+      --gold: #c49a45;
+      --ink: #29202a;
+      --muted: #766b75;
+      --white: #fff;
     }
 
-    storeSettings = getSettingsObject(await response.json());
-
-    const name = safeText(
-      storeSettings.store_name || storeSettings.storeName,
-      "Vishal Jewellers"
-    );
-
-    $("footerStoreName").textContent = name;
-    document.title = name;
-
-    $("footerText").textContent = safeText(
-      storeSettings.footer_text || storeSettings.footerText,
-      "Thank you for visiting our store."
-    );
-
-    const phone = safeText(
-      storeSettings.phone || storeSettings.contact_phone
-    );
-
-    const whatsapp = safeText(
-      storeSettings.whatsapp || storeSettings.whatsapp_number
-    );
-
-    const email = safeText(
-      storeSettings.email || storeSettings.contact_email
-    );
-
-    const phoneLink = $("contactPhone");
-    phoneLink.textContent = phone || "Phone details not available";
-    phoneLink.href = phone
-      ? "tel:" + phone.replace(/[^\d+]/g, "")
-      : "#contact";
-
-    const emailLink = $("contactEmail");
-    emailLink.textContent = email || "Email details not available";
-    emailLink.href = email ? "mailto:" + email : "#contact";
-
-    const whatsappDigits = whatsapp.replace(/\D/g, "");
-    const whatsappLink = $("contactWhatsApp");
-    whatsappLink.textContent = whatsappDigits
-      ? "Chat on WhatsApp"
-      : "WhatsApp details not available";
-    whatsappLink.href = whatsappDigits
-      ? "https://wa.me/" + whatsappDigits
-      : "#contact";
-
-    if (whatsappDigits) {
-      whatsappLink.target = "_blank";
-      whatsappLink.rel = "noopener noreferrer";
+    * {
+      box-sizing: border-box;
     }
 
-    $("floatingPhone").href = phone
-      ? "tel:" + phone.replace(/[^\d+]/g, "")
-      : "#contact";
-
-    $("floatingWhatsApp").href = whatsappDigits
-      ? "https://wa.me/" + whatsappDigits
-      : "#contact";
-
-  } catch (error) {
-    console.error("Settings error:", error);
-  }
-}
-
-/* Load and display products */
-async function loadProducts() {
-  const grid = $("productGrid");
-  grid.textContent = "Products load ho rahe hain...";
-
-  try {
-    const response = await fetch("/api/products", {
-      headers: { Accept: "application/json" }
-    });
-
-    if (!response.ok) {
-      throw new Error("Products API error: " + response.status);
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fffafc;
+      color: var(--ink);
     }
 
-    const data = await response.json();
-
-    products = Array.isArray(data)
-      ? data
-      : Array.isArray(data.products)
-        ? data.products
-        : [];
-
-    renderProducts();
-
-  } catch (error) {
-    console.error("Products error:", error);
-    grid.textContent =
-      "Products load nahi hue. Server/API check karein.";
-  }
-}
-
-function renderProducts() {
-  const grid = $("productGrid");
-  grid.replaceChildren();
-
-  if (!products.length) {
-    const empty = document.createElement("div");
-    empty.className = "empty";
-    empty.textContent = "Abhi products available nahi hain.";
-    grid.appendChild(empty);
-    return;
-  }
-
-  products.forEach((product, index) => {
-    const card = document.createElement("article");
-    card.className = "product";
-
-    const image = document.createElement("img");
-    image.loading = "lazy";
-    image.alt = safeText(product.name, "Jewellery product");
-
-    const imageUrl = safeImageUrl(
-      product.image_url || product.image || product.imageUrl
-    );
-
-    if (imageUrl) {
-      image.src = imageUrl;
-      image.addEventListener("error", () => {
-        image.style.display = "none";
-      }, { once: true });
-    } else {
-      image.style.display = "none";
+    button, input, textarea, select {
+      font: inherit;
     }
 
-    const info = document.createElement("div");
-    info.className = "product-info";
+    button {
+      cursor: pointer;
+    }
 
-    const name = document.createElement("h3");
-    name.textContent = safeText(product.name, "Jewellery");
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-    const price = document.createElement("p");
-    price.className = "price";
-    price.textContent = formatPrice(product.price);
+    .topbar {
+      background: var(--wine);
+      color: white;
+      text-align: center;
+      padding: 9px;
+      font-size: 13px;
+    }
 
-    const description = document.createElement("p");
-    description.className = "notice";
-    description.textContent = safeText(
-      product.description,
-      "Beautiful jewellery for your collection."
-    );
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 5%;
+      background: white;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
 
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "btn";
-    button.textContent = "Order Now";
-    button.addEventListener("click", () => openOrder(index));
+    .brand {
+      font-family: Georgia, serif;
+      font-size: 23px;
+      font-weight: bold;
+      color: var(--wine);
+    }
 
-    info.append(name, description, price, button);
-    card.append(image, info);
-    grid.appendChild(card);
-  });
-}
+    .brand small {
+      display: block;
+      font: 10px Arial, sans-serif;
+      letter-spacing: 3px;
+      margin-top: 4px;
+    }
 
-/* Read the current UPI details */
-function getUpiId() {
-  return safeText(
-    storeSettings.upi_id ||
-    storeSettings.upiId ||
-    storeSettings.admin_upi_id
-  );
-}
+    .nav {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
 
-function getUpiQrUrl() {
-  return safeImageUrl(
-    storeSettings.qr_url ||
-    storeSettings.qrUrl ||
-    storeSettings.upi_qr_url ||
-    storeSettings.upiQrUrl
-  );
-}
+    .btn {
+      border: 0;
+      border-radius: 7px;
+      padding: 12px 16px;
+      background: var(--wine);
+      color: white;
+      font-weight: bold;
+    }
 
-function updatePaymentDisplay() {
-  const method = $("paymentMethod").value;
-  const qrBox = $("upiQrBox");
-  const qrImage = $("upiQrImage");
-  const upiId = getUpiId();
-  const qrUrl = getUpiQrUrl();
+    .btn.gold {
+      background: var(--gold);
+      color: #21150b;
+    }
 
-  const quantity = Number($("orderQuantity").value) || 1;
-  const price = selectedProduct
-    ? Number(selectedProduct.price)
-    : 0;
+    .btn.light {
+      background: var(--pink);
+      color: var(--wine);
+    }
 
-  $("upiAmount").textContent = formatPrice(price * quantity);
-  $("upiIdText").textContent = upiId || "Store UPI ID not configured";
+    .hero {
+      padding: 70px 7%;
+      min-height: 360px;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(110deg, #f8e8ef, #fff8ed);
+    }
 
-  if (method !== "upi") {
-    qrBox.style.display = "none";
-    return;
-  }
+    .hero-content {
+      max-width: 600px;
+    }
 
-  qrBox.style.display = "block";
+    .eyebrow {
+      color: var(--gold);
+      font-weight: bold;
+      letter-spacing: 3px;
+      font-size: 12px;
+    }
 
-  if (qrUrl) {
-    qrImage.src = qrUrl;
-    qrImage.style.display = "block";
-    qrImage.onerror = () => {
-      qrImage.style.display = "none";
-      showStatus(
-        "orderStatus",
-        "QR image load nahi hui. Store se contact karein.",
-        true
-      );
-    };
-  } else {
-    qrImage.removeAttribute("src");
-    qrImage.style.display = "none";
-  }
+    h1 {
+      font: bold clamp(34px, 6vw, 58px) Georgia, serif;
+      color: var(--wine);
+      margin: 15px 0;
+    }
 
-  if (!upiId && !qrUrl) {
-    showStatus(
-      "orderStatus",
-      "Store ne abhi UPI ID ya QR configure nahi kiya hai.",
-      true
-    );
-  } else {
-    showStatus("orderStatus", "");
-  }
-}
+    .hero p {
+      line-height: 1.8;
+      color: var(--muted);
+    }
 
-function openOrder(index) {
-  selectedProduct = products[index];
-  if (!selectedProduct) return;
+    .section {
+      padding: 42px 5%;
+    }
 
-  $("selectedProduct").textContent =
-    safeText(selectedProduct.name, "Jewellery") +
-    " — " + formatPrice(selectedProduct.price);
+    .section-title {
+      text-align: center;
+      margin-bottom: 26px;
+    }
 
-  $("orderQuantity").value = "1";
-  $("paymentMethod").value = "cod";
-  showStatus("orderStatus", "");
-  updatePaymentDisplay();
+    .section-title h2 {
+      color: var(--wine);
+      font: bold 30px Georgia, serif;
+    }
 
-  if (!$("orderDialog").open) {
-    $("orderDialog").showModal();
-  }
-}
+    .section-title p {
+      color: var(--muted);
+    }
 
-/* Mobile navigation */
-$("menuButton").addEventListener("click", () => {
-  const nav = $("mainNav");
-  nav.classList.toggle("open");
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
 
-  $("menuButton").setAttribute(
-    "aria-expanded",
-    nav.classList.contains("open") ? "true" : "false"
-  );
-});
+    .toolbar input,
+    .toolbar select {
+      padding: 12px;
+      border: 1px solid #e4d8df;
+      border-radius: 7px;
+      background: white;
+    }
 
-$("mainNav").querySelectorAll("a").forEach((link) => {
-  link.addEventListener("click", () => {
-    $("mainNav").classList.remove("open");
-    $("menuButton").setAttribute("aria-expanded", "false");
-  });
-});
+    .toolbar input {
+      flex: 1;
+      min-width: 160px;
+    }
 
-/* Close order dialog */
-$("closeOrder").addEventListener("click", () => {
-  $("orderDialog").close();
-});
+    .products {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+    
+    .product {
+      background: white;
+      border: 1px solid #f0e5eb;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px #6417470b;
+      display: flex;
+      flex-direction: column;
+    }
 
-/* Update QR amount when payment method or quantity changes */
-$("paymentMethod").addEventListener("change", updatePaymentDisplay);
-$("orderQuantity").addEventListener("input", updatePaymentDisplay);
+    .product img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      background: var(--pink);
+    }
 
-$("year").textContent = String(new Date().getFullYear());
+    .product-info {
+      padding: 14px;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+    }
 
-  async function submitOrder(event) {
-  event.preventDefault();
+    .product-info h3 {
+      margin: 4px 0 8px;
+    }
 
-  if (!selectedProduct) {
-    showStatus("कृपया पहले कोई प्रोडक्ट चुनें।", true);
-    return;
-  }
+    .description {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
 
-  const customerName = $("orderName").value.trim();
-  const email = $("orderEmail").value.trim();
-  const phone = $("orderPhone").value.trim();
-  const address = $("orderAddress").value.trim();
-  const quantity = Number($("orderQuantity").value);
-  const method = $("paymentMethod").value;
+    .price {
+      color: var(--wine);
+      font-size: 20px;
+      font-weight: bold;
+      margin: 8px 0;
+    }
 
-  if (!customerName || !phone || !address) {
-    $("orderStatus").textContent =
-      "नाम, मोबाइल नंबर और पता भरना ज़रूरी है।";
-    return;
-  }
+    .stock {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
 
-  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
-    $("orderStatus").textContent = "कृपया सही मात्रा चुनें।";
-    return;
-  }
+    .product .btn {
+      margin-top: auto;
+    }
 
-  if (method === "upi" && !getUpiId() && !getUpiQrUrl()) {
-    $("orderStatus").textContent =
-      "UPI की जानकारी अभी उपलब्ध नहीं है। कृपया स्टोर से संपर्क करें।";
-    return;
-  }
+    .benefits {
+      background: var(--pink);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      padding: 28px 5%;
+      text-align: center;
+    }
 
-  const price = Number(
-    selectedProduct.price ?? selectedProduct.selling_price ?? 0
-  );
+    .benefits h3 {
+      color: var(--wine);
+    }
 
-  if (!Number.isFinite(price) || price < 0) {
-    $("orderStatus").textContent = "इस प्रोडक्ट की कीमत सही नहीं है।";
-    return;
-  }
+    .benefits p {
+      color: var(--muted);
+      font-size: 14px;
+    }
 
-  const total = price * quantity;
-  const submitButton = $("orderForm").querySelector(
-    'button[type="submit"]'
-  );
+    footer {
+      background: #2d1528;
+      color: white;
+      padding: 32px 5%;
+    }
 
-  submitButton.disabled = true;
-  submitButton.textContent = "ऑर्डर भेजा जा रहा है...";
-  $("orderStatus").textContent = "";
+    footer p {
+      color: #e7d6e0;
+      line-height: 1.7;
+    }
 
-  const orderPayload = {
-    customer_name: customerName,
-    email: email,
-    phone: phone,
-    address: address,
-    items: [
-      {
-        productId: selectedProduct.id,
-        name: selectedProduct.name || selectedProduct.title || "Jewellery",
-        price: price,
-        quantity: quantity
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #160b15b8;
+      z-index: 20;
+      padding: 16px;
+      overflow: auto;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 14px;
+      padding: 22px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 94vh;
+      overflow: auto;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close {
+      border: 0;
+      background: #f4e8ef;
+      border-radius: 50%;
+      padding: 8px 12px;
+    }
+
+    .field {
+      margin: 13px 0;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      border: 1px solid #ddd;
+      padding: 12px;
+      border-radius: 7px;
+      background: white;
+    }
+
+    .field textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .cart-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #eee;
+      padding: 12px 0;
+    }
+
+    .cart-line button {
+      border: 0;
+      padding: 5px 9px;
+      border-radius: 5px;
+    }
+
+    .notice {
+      padding: 12px;
+      background: var(--pink);
+      border-radius: 7px;
+      margin: 10px 0;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 30px 10px;
+      color: var(--muted);
+    }
+
+    #message {
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 850px) {
+      .products {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
-    ],
-    total: total,
-    payment_method: method === "upi" ? "UPI" : "COD"
-  };
 
-  try {
-    const response = await fetch("/api/orders", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(orderPayload)
-    });
+      .nav {
+        gap: 8px;
+      }
 
-    const result = await response.json().catch(() => ({}));
+      .nav a {
+        display: none;
+      }
 
-    if (!response.ok || result.success === false) {
-      throw new Error(
-        result.message || result.error || "ऑर्डर जमा नहीं हो पाया।"
+      .hero {
+        padding: 48px 6%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 12px 4%;
+      }
+
+      .brand {
+        font-size: 19px;
+      }
+
+      .products {
+        gap: 10px;
+      }
+
+      .product-info {
+        padding: 10px;
+      }
+
+      .product-info h3 {
+        font-size: 15px;
+      }
+
+      .product .btn {
+        padding: 10px 7px;
+        font-size: 12px;
+      }
+
+      .benefits,
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .benefits {
+        gap: 4px;
+      }
+
+      .section {
+        padding: 30px 4%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    ✨ Vishal Jewellers — आपकी पसंद, हमारी पहचान ✨
+  </div>
+
+  <header>
+    <a class="brand" href="#">
+      <span id="brandName">VISHAL JEWELLERS</span>
+      <small>BEAUTY • TRUST • TRADITION</small>
+    </a>
+
+    <nav class="nav">
+      <a href="#home">Home</a>
+      <a href="#products">Products</a>
+      <a href="#contact">Contact</a>
+      <button class="btn" onclick="openCart()">
+        🛒 Cart (<span id="cartCount">0</span>)
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <div class="eyebrow">TIMELESS ELEGANCE</div>
+        <h1>हर पल को बनाइए खास</h1>
+        <p>
+          खूबसूरत ज्वेलरी का शानदार कलेक्शन।
+          अपनी पसंद का डिज़ाइन चुनें और आसानी से ऑर्डर करें।
+        </p>
+        <a class="btn gold" href="#products">कलेक्शन देखें</a>
+      </div>
+    </section>
+
+    <section class="section" id="products">
+      <div class="section-title">
+        <div class="eyebrow">OUR COLLECTION</div>
+        <h2>हमारे प्रोडक्ट्स</h2>
+        <p>अपनी पसंद की ज्वेलरी चुनें</p>
+      </div>
+
+      <div class="toolbar">
+        <input
+          id="search"
+          type="search"
+          placeholder="प्रोडक्ट खोजें..."
+          oninput="renderProducts()"
+        >
+
+        <select id="category" onchange="renderProducts()">
+          <option value="">सभी कैटेगरी</option>
+        </select>
+
+        <button class="btn light" onclick="loadProducts()">
+          Refresh
+        </button>
+      </div>
+
+      <div id="productGrid" class="products">
+        <div class="empty">प्रोडक्ट लोड हो रहे हैं...</div>
+      </div>
+    </section>
+
+    <section class="benefits">
+      <div>
+        <h3>💎 सुंदर डिज़ाइन</h3>
+        <p>अपनी पसंद के अनुसार कलेक्शन देखें।</p>
+      </div>
+
+      <div>
+        <h3>🔒 आसान ऑर्डर</h3>
+        <p>अपनी जानकारी भरकर ऑर्डर भेजें।</p>
+      </div>
+
+      <div>
+        <h3>🤝 भरोसेमंद सेवा</h3>
+        <p>सहायता के लिए हमारी टीम से संपर्क करें।</p>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact">
+    <div class="footer-grid">
+      <div>
+        <h2 id="footerName">Vishal Jewellers</h2>
+        <p>आपकी पसंद और भरोसा हमारे लिए सबसे खास है।</p>
+      </div>
+
+      <div>
+        <h3>Contact Us</h3>
+        <p id="contactInfo">संपर्क विवरण लोड हो रहे हैं...</p>
+      </div>
+
+      <div>
+        <h3>Store Address</h3>
+        <p id="storeAddress">पता लोड हो रहा है...</p>
+        <a href="/admin.html">Admin Login</a>
+      </div>
+    </div>
+
+    <p>© <span id="year"></span> Vishal Jewellers. All rights reserved.</p>
+  </footer>
+
+  <!-- Cart -->
+  <div id="cartModal" class="modal" onclick="backdropClose(event,'cartModal')">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>आपकी कार्ट</h2>
+        <button class="close" onclick="closeModal('cartModal')">✕</button>
+      </div>
+
+      <div id="cartItems"></div>
+
+      <h3>कुल: ₹<span id="cartTotal">0.00</span></h3>
+
+      <button class="btn" style="width:100%" onclick="openCheckout()">
+        ऑर्डर आगे बढ़ाएँ
+      </button>
+    </div>
+  </div>
+
+  <!-- Checkout -->
+  <div id="checkoutModal" class="modal" onclick="backdropClose(event,'checkoutModal')">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>ऑर्डर विवरण</h2>
+        <button class="close" onclick="closeModal('checkoutModal')">✕</button>
+      </div>
+
+      <div class="notice">
+        अपना सही मोबाइल नंबर और पता भरें।
+      </div>
+
+      <form id="checkoutForm">
+        <div class="field">
+          <label for="customerName">पूरा नाम *</label>
+          <input id="customerName" name="customer_name" required maxlength="150">
+        </div>
+
+        <div class="field">
+          <label for="email">ईमेल (वैकल्पिक)</label>
+          <input id="email" name="email" type="email" maxlength="200">
+        </div>
+
+        <div class="field">
+          <label for="phone">मोबाइल नंबर *</label>
+          <input id="phone" name="phone" required type="tel" maxlength="30">
+        </div>
+
+        <div class="field">
+          <label for="address">पूरा पता *</label>
+          <textarea id="address" name="address" required maxlength="1000"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="payment">पेमेंट का तरीका</label>
+          <select id="payment" name="payment_method">
+            <option value="cod">Cash on Delivery (COD)</option>
+            <option value="upi">UPI</option>
+          </select>
+        </div>
+
+        <div id="upiInfo" class="notice hidden"></div>
+
+        <div id="qrWrap" class="notice hidden">
+          <img id="qrImage" alt="UPI QR Code"
+               style="width:160px;max-width:100%;display:block;margin:auto">
+          <p>UPI भुगतान की पुष्टि दुकान से करें।</p>
+        </div>
+
+        <h3>कुल: ₹<span id="checkoutTotal">0.00</span></h3>
+
+        <button id="submitOrder" class="btn" type="submit" style="width:100%">
+          ऑर्डर भेजें
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Order result -->
+  <div id="resultModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>ऑर्डर की जानकारी</h2>
+        <button class="close" onclick="closeModal('resultModal')">✕</button>
+      </div>
+
+      <div id="message"></div>
+
+      <button class="btn" onclick="closeModal('resultModal')" style="width:100%">
+        ठीक है
+      </button>
+    </div>
+  </div>
+
+  <script>
+    
+    "use strict";
+
+    let products = [];
+    let cart = [];
+    let settings = {};
+
+    const $ = id => document.getElementById(id);
+
+    const money = value =>
+      Number(value || 0).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+    async function api(url, options = {}) {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          ...(options.body
+            ? { "Content-Type": "application/json" }
+            : {}),
+          ...(options.headers || {})
+        }
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || "रिक्वेस्ट पूरी नहीं हो सकी।");
+      }
+
+      return data;
+    }
+
+    function openModal(id) {
+      $(id).classList.add("open");
+    }
+
+    function closeModal(id) {
+      $(id).classList.remove("open");
+    }
+
+    function backdropClose(event, id) {
+      if (event.target.id === id) closeModal(id);
+    }
+
+    function safeImage(url) {
+      if (!url) return "";
+
+      try {
+        const parsed = new URL(url, location.origin);
+
+        if (
+          parsed.protocol === "https:" ||
+          parsed.origin === location.origin
+        ) {
+          return parsed.href;
+        }
+      } catch {}
+
+      return "";
+    }
+
+    async function loadSettings() {
+      try {
+        settings = await api("/api/settings");
+
+        const name = settings.store_name || "Vishal Jewellers";
+
+        $("brandName").textContent = name.toUpperCase();
+        $("footerName").textContent = name;
+
+        $("contactInfo").textContent =
+          [settings.phone, settings.email].filter(Boolean).join(" • ") ||
+          "संपर्क विवरण जल्द उपलब्ध होंगे।";
+
+        $("storeAddress").textContent =
+          settings.address || "पता जल्द उपलब्ध होगा।";
+
+        $("upiInfo").textContent = settings.upi_id
+          ? "UPI ID: " + settings.upi_id +
+            " — भुगतान करने से पहले दुकान से पुष्टि करें।"
+          : "UPI विवरण उपलब्ध नहीं हैं। दुकान से संपर्क करें।";
+
+        if (settings.qr_image && safeImage(settings.qr_image)) {
+          $("qrImage").src = safeImage(settings.qr_image);
+        } else {
+          $("qrImage").removeAttribute("src");
+        }
+      } catch {
+        $("contactInfo").textContent =
+          "संपर्क विवरण अभी उपलब्ध नहीं हैं।";
+        $("storeAddress").textContent = "पता अभी उपलब्ध नहीं है।";
+      }
+    }
+
+    async function loadProducts() {
+      $("productGrid").innerHTML =
+        '<div class="empty">प्रोडक्ट लोड हो रहे हैं...</div>';
+
+      try {
+        const data = await api("/api/products");
+
+        products = Array.isArray(data) ? data : [];
+
+        updateCategories();
+        renderProducts();
+      } catch {
+        $("productGrid").innerHTML =
+          '<div class="empty">प्रोडक्ट लोड नहीं हुए। कुछ देर बाद Refresh करें।</div>';
+      }
+    }
+
+    function updateCategories() {
+      const select = $("category");
+      const previous = select.value;
+
+      const categories = [
+        ...new Set(products.map(p => p.category).filter(Boolean))
+      ];
+
+      select.innerHTML = '<option value="">सभी कैटेगरी</option>';
+
+      categories.forEach(category => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        select.appendChild(option);
+      });
+
+      select.value = categories.includes(previous) ? previous : "";
+    }
+
+    function renderProducts() {
+      const query = $("search").value.trim().toLowerCase();
+      const category = $("category").value;
+
+      const filtered = products.filter(p =>
+        (
+          String(p.name || "").toLowerCase().includes(query) ||
+          String(p.description || "").toLowerCase().includes(query)
+        ) &&
+        (!category || p.category === category)
+      );
+
+      const grid = $("productGrid");
+      grid.innerHTML = "";
+
+      if (!filtered.length) {
+        grid.innerHTML =
+          '<div class="empty">अभी कोई प्रोडक्ट नहीं मिला।</div>';
+        return;
+      }
+
+      filtered.forEach(product => {
+        const card = document.createElement("article");
+        card.className = "product";
+
+        const img = document.createElement("img");
+        img.alt = product.name || "Jewellery";
+        img.loading = "lazy";
+        img.src = safeImage(product.image) ||
+          "https://placehold.co/600x600/f9e8f0/641747?text=Jewellery";
+
+        const info = document.createElement("div");
+        info.className = "product-info";
+
+        const title = document.createElement("h3");
+        title.textContent = product.name;
+
+        const description = document.createElement("div");
+        description.className = "description";
+        description.textContent =
+          product.description || product.category || "";
+
+        const price = document.createElement("div");
+        price.className = "price";
+        price.textContent = "₹" + money(product.price);
+
+        const stock = document.createElement("div");
+        stock.className = "stock";
+        stock.textContent = Number(product.stock) > 0
+          ? "उपलब्ध: " + product.stock
+          : "स्टॉक उपलब्ध नहीं";
+
+        const button = document.createElement("button");
+        button.className = "btn";
+        button.textContent = Number(product.stock) > 0
+          ? "कार्ट में जोड़ें"
+          : "Out of Stock";
+
+        button.disabled = Number(product.stock) <= 0;
+        button.onclick = () => addToCart(product.id);
+
+        info.append(title, description, price, stock, button);
+        card.append(img, info);
+        grid.appendChild(card);
+      });
+    }
+
+    function addToCart(id) {
+      const product = products.find(p => Number(p.id) === Number(id));
+
+      if (!product || Number(product.stock) < 1) {
+        alert("यह प्रोडक्ट उपलब्ध नहीं है।");
+        return;
+      }
+
+      const existing = cart.find(item => Number(item.id) === Number(id));
+
+      if (existing) {
+        if (existing.quantity >= Number(product.stock)) {
+          alert("इससे ज्यादा स्टॉक उपलब्ध नहीं है।");
+          return;
+        }
+
+        existing.quantity++;
+      } else {
+        cart.push({
+          id: Number(id),
+          quantity: 1
+        });
+      }
+
+      updateCartCount();
+      alert("प्रोडक्ट कार्ट में जोड़ दिया गया।");
+    }
+
+    function updateCartCount() {
+      $("cartCount").textContent =
+        cart.reduce((sum, item) => sum + item.quantity, 0);
+    }
+
+    function cartTotal() {
+      return cart.reduce((sum, item) => {
+        const p = products.find(x => Number(x.id) === item.id);
+
+        return sum + (p ? Number(p.price) * item.quantity : 0);
+      }, 0);
+    }
+
+    function openCart() {
+      renderCart();
+      openModal("cartModal");
+    }
+
+    function renderCart() {
+      const container = $("cartItems");
+      container.innerHTML = "";
+
+      cart = cart.filter(item =>
+        products.some(p => Number(p.id) === item.id)
+      );
+
+      if (!cart.length) {
+        container.innerHTML =
+          '<div class="empty">आपकी कार्ट खाली है।</div>';
+      }
+
+      cart.forEach(item => {
+        const p = products.find(x => Number(x.id) === item.id);
+
+        const line = document.createElement("div");
+        line.className = "cart-line";
+
+        const details = document.createElement("div");
+
+        const title = document.createElement("strong");
+        title.textContent = p.name;
+
+        const amount = document.createElement("div");
+        amount.textContent =
+          "₹" + money(Number(p.price) * item.quantity);
+
+        details.append(title, amount);
+
+        const controls = document.createElement("div");
+
+        const minus = document.createElement("button");
+        minus.textContent = "−";
+        minus.onclick = () => changeQuantity(item.id, -1);
+
+        const quantity = document.createElement("span");
+        quantity.style.margin = "0 8px";
+        quantity.textContent = item.quantity;
+
+        const plus = document.createElement("button");
+        plus.textContent = "+";
+        plus.onclick = () => changeQuantity(item.id, 1);
+
+        const remove = document.createElement("button");
+        remove.textContent = "🗑";
+        remove.onclick = () => {
+          cart = cart.filter(x => x.id !== item.id);
+          updateCartCount();
+          renderCart();
+        };
+
+        controls.append(minus, quantity, plus, remove);
+        line.append(details, controls);
+        container.appendChild(line);
+      });
+
+      $("cartTotal").textContent = money(cartTotal());
+      updateCartCount();
+    }
+
+    function changeQuantity(id, amount) {
+      const item = cart.find(x => x.id === id);
+      const product = products.find(x => Number(x.id) === id);
+
+      if (!item || !product) return;
+
+      const next = item.quantity + amount;
+
+      if (next <= 0) {
+        cart = cart.filter(x => x.id !== id);
+      } else if (next <= Number(product.stock)) {
+        item.quantity = next;
+      } else {
+        alert("इतना स्टॉक उपलब्ध नहीं है।");
+      }
+
+      renderCart();
+    }
+
+    function openCheckout() {
+      if (!cart.length) {
+        alert("पहले कार्ट में प्रोडक्ट जोड़ें।");
+        return;
+      }
+
+      closeModal("cartModal");
+
+      $("checkoutTotal").textContent = money(cartTotal());
+
+      updatePaymentInfo();
+      openModal("checkoutModal");
+    }
+
+    function updatePaymentInfo() {
+      const isUpi = $("payment").value === "upi";
+
+      $("upiInfo").classList.toggle("hidden", !isUpi);
+
+      $("qrWrap").classList.toggle(
+        "hidden",
+        !isUpi ||
+        !settings.qr_image ||
+        !safeImage(settings.qr_image)
       );
     }
 
-    $("orderStatus").textContent =
-      method === "upi"
-        ? "ऑर्डर भेज दिया गया है। UPI भुगतान की पुष्टि स्टोर द्वारा की जाएगी।"
-        : "ऑर्डर भेज दिया गया है। स्टोर आपसे संपर्क करेगा।";
+    $("payment").addEventListener("change", updatePaymentInfo);
 
-    $("orderStatus").style.color = "#15803d";
+    $("checkoutForm").addEventListener("submit", async event => {
+      event.preventDefault();
 
-    $("orderForm").reset();
-    updatePaymentDisplay();
+      if (!cart.length) {
+        alert("कार्ट खाली है।");
+        return;
+      }
 
-    setTimeout(() => {
-      $("orderDialog").classList.add("hidden");
-      $("orderDialog").setAttribute("aria-hidden", "true");
-      selectedProduct = null;
-    }, 2500);
+      const button = $("submitOrder");
+      button.disabled = true;
+      button.textContent = "ऑर्डर भेजा जा रहा है...";
 
-  } catch (error) {
-    $("orderStatus").textContent =
-      error.message || "समस्या हुई। कृपया दोबारा कोशिश करें।";
-    $("orderStatus").style.color = "#b91c1c";
+      try {
+        const body = {
+          customer_name: $("customerName").value.trim(),
+          email: $("email").value.trim(),
+          phone: $("phone").value.trim(),
+          address: $("address").value.trim(),
+          payment_method: $("payment").value,
+          items: cart.map(item => ({
+            id: item.id,
+            quantity: item.quantity
+          }))
+        };
 
-  } finally {
-    submitButton.disabled = false;
-    submitButton.textContent = "Place Order";
-  }
-}
+        const result = await api("/api/orders", {
+          method: "POST",
+          body: JSON.stringify(body)
+        });
 
-$("orderForm").addEventListener("submit", submitOrder);
+        cart = [];
+        updateCartCount();
 
-// Initial page loading
-loadSettings();
-loadProducts();
-</script>
+        closeModal("checkoutModal");
+
+        $("message").textContent =
+          "आपका ऑर्डर सफलतापूर्वक भेज दिया गया!\n" +
+          "Order ID: " + result.order.id + "\n" +
+          "कुल राशि: ₹" + money(result.order.total) + "\n" +
+          "ऑर्डर की स्थिति: " + result.order.status;
+
+        $("checkoutForm").reset();
+
+        await loadProducts();
+        openModal("resultModal");
+      } catch (error) {
+        alert("ऑर्डर नहीं हो सका: " + error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = "ऑर्डर भेजें";
+      }
+    });
+
+    $("year").textContent = new Date().getFullYear();
+
+    loadSettings();
+    loadProducts();
+  </script>
 </body>
 </html>
